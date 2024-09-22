@@ -11,12 +11,14 @@ import CalendarComponent from '@/components/calendar-component';
 import VoiceMemo from '@/components/voice-memo';
 import Settings from '@/components/settings';
 import Profile from '@/components/profile';
+import { useAuth } from '@/hooks/useAuth';
 
 import { User, Goal, Challenge, Task } from '@/types';
 
 const GoalTrackerApp: React.FC = () => {
   // User data
   const [user, setUser] = useState<User | null>(null);
+  const { handleSignOut } = useAuth();
   
   // Application data
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -172,7 +174,7 @@ const GoalTrackerApp: React.FC = () => {
       {user ? (
         <div className="w-full max-w-4xl">
           {/* Header with Tabs and Logout */}
-          <Header activeTab={activeTab} setActiveTab={setActiveTab} logout={logout} />
+          <Header activeTab={activeTab} setActiveTab={setActiveTab} logout={handleSignOut} />
 
           {/* Animated Content */}
           <AnimatePresence mode="wait">
