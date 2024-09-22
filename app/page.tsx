@@ -163,18 +163,13 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  // Logout Function (Implement according to your auth logic)
-  const logout = () => {
-    // Implement logout logic here (e.g., clear auth tokens, redirect to login)
-    console.log("User logged out");
-  }
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-gray-100'} flex flex-col items-center justify-start p-4`}>
       {user ? (
         <div className="w-full max-w-4xl">
-          {/* Header with Tabs and Logout */}
-          <Header activeTab={activeTab} setActiveTab={setActiveTab} logout={handleSignOut} />
+          {/* Header with Tabs and Sign Out */}
+          <Header activeTab={activeTab} setActiveTab={setActiveTab} SignOut={handleSignOut} />
 
           {/* Animated Content */}
           <AnimatePresence mode="wait">
