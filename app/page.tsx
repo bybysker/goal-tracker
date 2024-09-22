@@ -1,101 +1,259 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import React, { useState, useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from "framer-motion";
+
+import Header from '@/components/header';
+import Dashboard from '@/components/dashboard';
+import GoalsAndChallenges from '@/components/goals-and-challenges';
+import Tasks from '@/components/tasks';
+import CalendarComponent from '@/components/calendar-component';
+import VoiceMemo from '@/components/voice-memo';
+import Settings from '@/components/settings';
+import Profile from '@/components/profile';
+
+import { User, Goal, Challenge, Task } from '@/types';
+
+const GoalTrackerApp: React.FC = () => {
+  // User data
+  const [user, setUser] = useState<User | null>(null);
+  
+  // Application data
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [streak, setStreak] = useState<number>(0);
+  const [aiInsights, setAiInsights] = useState<string[]>([]);
+  const [darkMode, setDarkMode] = useState<boolean>(true);
+  const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
+
+  // Voice Memo state
+  const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+
+  useEffect(() => {
+    // Fetch user data (replace with real data fetching logic)
+    const fetchedUser: User = {
+      id: 1,
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      avatar: '/avatar.png',
+    };
+    setUser(fetchedUser);
+
+    // Initialize application data
+    setGoals([
+      { id: 1, title: 'Learn React', deadline: '2024-12-31', category: 'professional', progress: 60 },
+      { id: 2, title: 'Exercise regularly', deadline: '2024-12-31', category: 'health', progress: 40 },
+    ]);
+    setChallenges([
+      { id: 1, title: 'Meditate for 10 minutes daily' },
+      { id: 2, title: 'Read a book every month' },
+    ]);
+    setTasks([
+      { id: 1, title: 'Complete React tutorial', completed: false, date: '2024-06-15' },
+      { id: 2, title: 'Go for a 30-minute run', completed: true, date: '2024-06-15' },
+    ]);
+    setStreak(5); // Simulating a 5-day streak
+    setAiInsights([
+      "You've been consistently working on your professional goals. Keep it up!",
+      "Consider increasing your focus on health-related tasks to maintain a good work-life balance.",
+    ]);
+  }, []);
+
+  // CRUD operations for Goals
+  const addGoal = (goal: Omit<Goal, 'id' | 'progress'>) => {
+    setGoals([...goals, { ...goal, id: Date.now(), progress: 0 }]);
+  }
+
+  const updateGoal = (id: number, updatedGoal: Partial<Goal>) => {
+    setGoals(goals.map(goal => goal.id === id ? { ...goal, ...updatedGoal } : goal));
+  }
+
+  const deleteGoal = (id: number) => {
+    setGoals(goals.filter(goal => goal.id !== id));
+  }
+
+  // CRUD operations for Challenges
+  const addChallenge = (challenge: Omit<Challenge, 'id'>) => {
+    setChallenges([...challenges, { ...challenge, id: Date.now() }]);
+  }
+
+  const updateChallenge = (id: number, updatedChallenge: Partial<Challenge>) => {
+    setChallenges(challenges.map(challenge => challenge.id === id ? { ...challenge, ...updatedChallenge } : challenge));
+  }
+
+  const deleteChallenge = (id: number) => {
+    setChallenges(challenges.filter(challenge => challenge.id !== id));
+  }
+
+  // CRUD operations for Tasks
+  const addTask = (task: Omit<Task, 'id' | 'completed'>) => {
+    setTasks([...tasks, { ...task, id: Date.now(), completed: false }]);
+  }
+
+  const updateTask = (id: number, updatedTask: Partial<Task>) => {
+    setTasks(tasks.map(task => task.id === id ? { ...task, ...updatedTask } : task));
+  }
+
+  const deleteTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  }
+
+  const toggleTaskCompletion = (id: number) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  }
+
+  // Voice Memo Functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      mediaRecorder.current.start();
+
+      const audioChunks: Blob[] = [];
+      mediaRecorder.current.addEventListener("dataavailable", (event: BlobEvent) => {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.current.addEventListener("stop", () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        setVoiceMemo(URL.createObjectURL(audioBlob));
+      });
+
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+    }
+  }
+
+  // AI Insights Simulation
+  const simulateAiInsights = () => {
+    // In a real app, this would make an API call to OpenAI
+    const newInsight = "Based on your recent activities, you might want to focus more on your health goals.";
+    setAiInsights([...aiInsights, newInsight]);
+  }
+
+  // Save Settings Function
+  const saveSettings = () => {
+    // Implement settings save logic here (e.g., update user preferences)
+    console.log("Settings saved:", { darkMode, openaiApiKey });
+  }
+
+  // Update Profile Function
+  const updateProfile = (profile: { name: string; email: string }) => {
+    if (user) {
+      setUser({ ...user, ...profile });
+      // Implement additional profile update logic here (e.g., API call)
+      console.log("Profile updated:", profile);
+    }
+  }
+
+  // Logout Function (Implement according to your auth logic)
+  const logout = () => {
+    // Implement logout logic here (e.g., clear auth tokens, redirect to login)
+    console.log("User logged out");
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-gray-100'} flex flex-col items-center justify-start p-4`}>
+      {user ? (
+        <div className="w-full max-w-4xl">
+          {/* Header with Tabs and Logout */}
+          <Header activeTab={activeTab} setActiveTab={setActiveTab} logout={logout} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Animated Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === 'dashboard' && (
+                <Dashboard
+                  user={user}
+                  goals={goals}
+                  challenges={challenges}
+                  streak={streak}
+                  tasks={tasks}
+                  aiInsights={aiInsights}
+                  simulateAiInsights={simulateAiInsights}
+                />
+              )}
+              {activeTab === 'goals' && (
+                <GoalsAndChallenges
+                  goals={goals}
+                  challenges={challenges}
+                  addGoal={addGoal}
+                  deleteGoal={deleteGoal}
+                  addChallenge={addChallenge}
+                  deleteChallenge={deleteChallenge}
+                  setIsEditing={() => { /* Implement editing logic */ }}
+                />
+              )}
+              {activeTab === 'tasks' && (
+                <Tasks
+                  tasks={tasks}
+                  addTask={addTask}
+                  deleteTask={deleteTask}
+                  toggleTaskCompletion={toggleTaskCompletion}
+                />
+              )}
+              {activeTab === 'calendar' && (
+                <CalendarComponent
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  tasks={tasks}
+                  toggleTaskCompletion={toggleTaskCompletion}
+                  deleteTask={deleteTask}
+                />
+              )}
+              {activeTab === 'voice-memo' && (
+                <VoiceMemo
+                  voiceMemo={voiceMemo}
+                  isRecording={isRecording}
+                  startRecording={startRecording}
+                  stopRecording={stopRecording}
+                />
+              )}
+              {activeTab === 'settings' && (
+                <Settings
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  openaiApiKey={openaiApiKey}
+                  setOpenaiApiKey={setOpenaiApiKey}
+                  saveSettings={saveSettings}
+                />
+              )}
+              {activeTab === 'profile' && (
+                <Profile
+                  user={user}
+                  updateProfile={updateProfile}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      ) : (
+        // User is not logged in; handle accordingly
+        <p>Loading...</p>
+      )}
     </div>
-  );
+  )
 }
+
+export default GoalTrackerApp;
