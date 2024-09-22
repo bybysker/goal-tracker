@@ -69,7 +69,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                   </DialogHeader>
                   <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault();
-                    const target = e.target as typeof e.target & {
+                    const target = e.target as HTMLFormElement & {
                       title: { value: string };
                       deadline: { value: string };
                       category: { value: string };
@@ -142,7 +142,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                   </DialogHeader>
                   <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault();
-                    const target = e.target as typeof e.target & {
+                    const target = e.target as HTMLFormElement & {
                       title: { value: string };
                     };
                     addChallenge({

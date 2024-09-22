@@ -43,9 +43,9 @@ const Auth: React.FC = () => {
       if (authMode === 'login') {
         await handleEmailPasswordSignIn(email, password);
       } else {
-        await registerUser(name, email, password);
+        await registerUser(email, password);
       }
-      router.push('/dashboard');
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
     }
@@ -62,7 +62,7 @@ const Auth: React.FC = () => {
         <CardContent>
           <Tabs
             value={authMode}
-            onValueChange={(value: 'login' | 'signup') => setAuthMode(value)}
+            onValueChange={(value: string) => setAuthMode(value as 'login' | 'signup')}
           >
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="login">Login</TabsTrigger>

@@ -52,7 +52,7 @@ const Tasks: React.FC<TasksProps> = ({
               </DialogHeader>
               <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                const target = e.target as typeof e.target & {
+                const target = e.target as HTMLFormElement & {
                   title: { value: string };
                   date: { value: string };
                 };

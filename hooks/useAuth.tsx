@@ -49,9 +49,7 @@ export const useAuth = () => {
 
     const handleEmailPasswordSignIn = async (email: string, password: string) => {
         try {
-            // Correctly call the signInWithEmailAndPassword function from firebase/auth
             const result = await signInWithEmailAndPassword(auth, email, password)
-            // The result is not void; it contains a user property
             setUser(result.user)
             router.push('/')
         } catch (error) {
