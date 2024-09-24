@@ -9,10 +9,10 @@ import { LogOut } from "lucide-react";
 interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  logout: () => void;
+  SignOut: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, logout }) => {
+const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, SignOut }) => {
   return (
     <div className="mb-4 flex justify-between items-center">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -26,8 +26,8 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, logout }) => {
           <TabsTrigger value="profile">Profile</TabsTrigger>
         </TabsList>
       </Tabs>
-      <Button variant="ghost" onClick={logout}>
-        <LogOut className="mr-2 h-4 w-4" /> Logout
+      <Button variant="ghost" onClick={SignOut}>
+        <LogOut className="mr-2 h-4 w-4" /> Sign Out
       </Button>
     </div>
   )

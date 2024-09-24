@@ -19,7 +19,6 @@ const Auth: React.FC = () => {
     handleAppleSignIn,
     handleEmailPasswordSignIn,
     registerUser,
-    handleSignOut,
     redirectIfAuthenticated
   } = useAuth();
 

@@ -14,34 +14,31 @@ interface TaskCardProps {
   task: Task;
   onToggle: () => void;
   onDelete: () => void;
+  onUpdate?: () => void; // Optional, for editing
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onToggle, onDelete }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onToggle, onDelete, onUpdate }) => {
   return (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardContent className="flex justify-between items-center p-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id={`task-${task.id}`}
-            checked={task.completed}
-            onCheckedChange={onToggle}
-          />
-          <Label
-            htmlFor={`task-${task.id}`}
-            className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}
-          >
-            {task.title}
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-400">{task.date}</span>
-          <Button variant="ghost" size="sm" onClick={onDelete}>
-            <Trash className="h-4 w-4" />
+    <div className="flex items-center justify-between p-4 bg-gray-800 rounded">
+      <div className="flex items-center">
+        <Checkbox checked={task.completed} onCheckedChange={onToggle} />
+        <span className={`ml-2 ${task.completed ? 'line-through text-gray-500' : 'text-gray-100'}`}>
+          {task.title} - {new Date(task.date).toLocaleDateString()}
+        </span>
+      </div>
+      <div className="flex items-center space-x-2">
+        {/* Add edit button if onUpdate is provided */}
+        {onUpdate && (
+          <Button variant="ghost" size="sm" onClick={onUpdate}>
+            Edit
           </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+        )}
+        <Button variant="ghost" size="sm" onClick={onDelete}>
+          <Trash className="h-4 w-4 text-red-500" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export default TaskCard;
