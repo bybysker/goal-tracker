@@ -1,28 +1,20 @@
+export interface Goal {
+  id: string;
+  title: string;
+  deadline: string;
+  category: string;
+  progress: number;
+}
 
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    avatar: string;
-  }
-  
-  export interface Goal {
-    id: number;
-    title: string;
-    deadline: string;
-    category: string;
-    progress: number;
-  }
-  
-  export interface Challenge {
-    id: number;
-    title: string;
-  }
-  
-  export interface Task {
-    id: number;
-    title: string;
-    completed: boolean;
-    date: string;
-  }
+export interface Challenge {
+  id: string;
+  title: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  date: string;
+}
   

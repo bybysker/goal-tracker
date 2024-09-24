@@ -13,14 +13,17 @@ import Settings from '@/components/settings';
 import Profile from '@/components/profile';
 import { useAuth } from '@/hooks/useAuth';
 
-import { User, Goal, Challenge, Task } from '@/types';
+import { Goal, Challenge, Task } from '@/types';
+//import { User as FirebaseUser } from 'firebase/auth';
+
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { db, storage } from '@/db/configFirebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const GoalTrackerApp: React.FC = () => {
-  // User data
-  const [user, setUser] = useState<User | null>(null);
-  const { handleSignOut } = useAuth();
-  
-  // Application data
+  const { user, handleSignOut } = useAuth();
+
+  // Application data  
   const [goals, setGoals] = useState<Goal[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -37,78 +40,162 @@ const GoalTrackerApp: React.FC = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
 
   useEffect(() => {
-    // Fetch user data (replace with real data fetching logic)
-    const fetchedUser: User = {
-      id: 1,
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      avatar: '/avatar.png',
-    };
-    setUser(fetchedUser);
+    if (!user) return;
 
-    // Initialize application data
-    setGoals([
-      { id: 1, title: 'Learn React', deadline: '2024-12-31', category: 'professional', progress: 60 },
-      { id: 2, title: 'Exercise regularly', deadline: '2024-12-31', category: 'health', progress: 40 },
-    ]);
-    setChallenges([
-      { id: 1, title: 'Meditate for 10 minutes daily' },
-      { id: 2, title: 'Read a book every month' },
-    ]);
-    setTasks([
-      { id: 1, title: 'Complete React tutorial', completed: false, date: '2024-06-15' },
-      { id: 2, title: 'Go for a 30-minute run', completed: true, date: '2024-06-15' },
-    ]);
-    setStreak(5); // Simulating a 5-day streak
-    setAiInsights([
-      "You've been consistently working on your professional goals. Keep it up!",
-      "Consider increasing your focus on health-related tasks to maintain a good work-life balance.",
-    ]);
-  }, []);
+    // Listen to Goals collection
+    const goalsRef = collection(db, 'users', user.uid, 'goals');
+    const goalsUnsub = onSnapshot(goalsRef, (snapshot) => {
+      const fetchedGoals: Goal[] = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          deadline: data.deadline,
+          category: data.category,
+          progress: data.progress,
+        } as Goal;
+      });
+      setGoals(fetchedGoals);
+    });
+
+    // Listen to Challenges collection
+    const challengesRef = collection(db, 'users', user.uid, 'challenges');
+    const challengesUnsub = onSnapshot(challengesRef, (snapshot) => {
+      const fetchedChallenges: Challenge[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        title: doc.data().title,
+      } as Challenge));
+      setChallenges(fetchedChallenges);
+    });
+
+    // Listen to Tasks collection
+    const tasksRef = collection(db, 'users', user.uid, 'tasks');
+    const tasksUnsub = onSnapshot(tasksRef, (snapshot) => {
+      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        title: doc.data().title,
+        completed: doc.data().completed,
+        date: doc.data().date,
+      } as Task));
+      setTasks(fetchedTasks);
+    });
+
+    // Listen to User document for streak and AI insights
+    const userDocRef = doc(db, 'users', user.uid);
+    const userUnsub = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        setStreak(data.streak || 0);
+        setAiInsights(data.aiInsights || []);
+      }
+    });
+
+    return () => {
+      goalsUnsub();
+      challengesUnsub();
+      tasksUnsub();
+      userUnsub();
+    };
+  }, [user]);
 
   // CRUD operations for Goals
-  const addGoal = (goal: Omit<Goal, 'id' | 'progress'>) => {
-    setGoals([...goals, { ...goal, id: Date.now(), progress: 0 }]);
+  const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 });
+    } catch (error) {
+      console.error("Error adding goal:", error);
+    }
   }
 
-  const updateGoal = (id: number, updatedGoal: Partial<Goal>) => {
-    setGoals(goals.map(goal => goal.id === id ? { ...goal, ...updatedGoal } : goal));
+  const updateGoal = async (id: string, updatedGoal: Partial<Goal>) => {
+    if (!user) return;
+    try {
+      const goalRef = doc(db, 'users', user.uid, 'goals', id);
+      await updateDoc(goalRef, updatedGoal);
+    } catch (error) {
+      console.error("Error updating goal:", error);
+    }
   }
 
-  const deleteGoal = (id: number) => {
-    setGoals(goals.filter(goal => goal.id !== id));
+  const deleteGoal = async (id: string) => {
+    if (!user) return;
+    try {
+      const goalRef = doc(db, 'users', user.uid, 'goals', id);
+      await deleteDoc(goalRef);
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+    }
   }
 
   // CRUD operations for Challenges
-  const addChallenge = (challenge: Omit<Challenge, 'id'>) => {
-    setChallenges([...challenges, { ...challenge, id: Date.now() }]);
+  const addChallenge = async (challenge: Omit<Challenge, 'id'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'challenges'), challenge);
+    } catch (error) {
+      console.error("Error adding challenge:", error);
+    }
   }
 
-  const updateChallenge = (id: number, updatedChallenge: Partial<Challenge>) => {
-    setChallenges(challenges.map(challenge => challenge.id === id ? { ...challenge, ...updatedChallenge } : challenge));
+  const updateChallenge = async (id: string, updatedChallenge: Partial<Challenge>) => {
+    if (!user) return;
+    try {
+      const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
+      await updateDoc(challengeRef, updatedChallenge);
+    } catch (error) {
+      console.error("Error updating challenge:", error);
+    }
   }
 
-  const deleteChallenge = (id: number) => {
-    setChallenges(challenges.filter(challenge => challenge.id !== id));
+  const deleteChallenge = async (id: string) => {
+    if (!user) return;
+    try {
+      const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
+      await deleteDoc(challengeRef);
+    } catch (error) {
+      console.error("Error deleting challenge:", error);
+    }
   }
 
   // CRUD operations for Tasks
-  const addTask = (task: Omit<Task, 'id' | 'completed'>) => {
-    setTasks([...tasks, { ...task, id: Date.now(), completed: false }]);
+  const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'tasks'), { ...task, completed: false });
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   }
 
-  const updateTask = (id: number, updatedTask: Partial<Task>) => {
-    setTasks(tasks.map(task => task.id === id ? { ...task, ...updatedTask } : task));
+  const updateTask = async (id: string, updatedTask: Partial<Task>) => {
+    if (!user) return;
+    try {
+      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
+      await updateDoc(taskRef, updatedTask);
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   }
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const deleteTask = async (id: string) => {
+    if (!user) return;
+    try {
+      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
+      await deleteDoc(taskRef);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   }
 
-  const toggleTaskCompletion = (id: number) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  const toggleTaskCompletion = async (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task || !user) return;
+    try {
+      await updateTask(id, { completed: !task.completed });
+    } catch (error) {
+      console.error("Error toggling task completion:", error);
+    }
   }
 
   // Voice Memo Functions
@@ -123,9 +210,20 @@ const GoalTrackerApp: React.FC = () => {
         audioChunks.push(event.data);
       });
 
-      mediaRecorder.current.addEventListener("stop", () => {
+      mediaRecorder.current.addEventListener("stop", async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        setVoiceMemo(URL.createObjectURL(audioBlob));
+        if (user) {
+          const storageRef = ref(storage, `users/${user.uid}/voice-memos/${Date.now()}.wav`);
+          try {
+            const snapshot = await uploadBytes(storageRef, audioBlob);
+            const url = await getDownloadURL(snapshot.ref);
+            setVoiceMemo(url);
+            // Optionally, save the URL to Firestore
+            // await addDoc(collection(db, 'users', user.uid, 'voiceMemos'), { url, createdAt: new Date() });
+          } catch (error) {
+            console.error("Error uploading voice memo:", error);
+          }
+        }
       });
 
       setIsRecording(true);
@@ -141,31 +239,51 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  // AI Insights Simulation
+  // AI Insights Simulation (could be enhanced with actual AI integration)
   const simulateAiInsights = () => {
-    // In a real app, this would make an API call to OpenAI
+    // In a real app, this would make an API call to OpenAI or another AI service
     const newInsight = "Based on your recent activities, you might want to focus more on your health goals.";
     setAiInsights([...aiInsights, newInsight]);
+
+    // Optionally, save AI insights to Firestore
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
+      updateDoc(userDocRef, {
+        aiInsights: [...aiInsights, newInsight]
+      }).catch(error => console.error("Error updating AI insights:", error));
+    }
   }
 
   // Save Settings Function
   const saveSettings = () => {
-    // Implement settings save logic here (e.g., update user preferences)
-    console.log("Settings saved:", { darkMode, openaiApiKey });
+    if (!user) return;
+    // Implement settings save logic here (e.g., update user preferences in Firestore)
+    const userDocRef = doc(db, 'users', user.uid);
+    updateDoc(userDocRef, { darkMode, openaiApiKey })
+      .then(() => console.log("Settings saved"))
+      .catch(error => console.error("Error saving settings:", error));
   }
 
   // Update Profile Function
   const updateProfile = (profile: { name: string; email: string }) => {
-    if (user) {
-      setUser({ ...user, ...profile });
-      // Implement additional profile update logic here (e.g., API call)
-      console.log("Profile updated:", profile);
-    }
+    if (!user) return;
+    // Update Firebase Auth profile
+    // Assuming you have additional user info stored in Firestore
+    const userDocRef = doc(db, 'users', user.uid);
+    updateDoc(userDocRef, profile)
+      .then(() => {
+        console.log("Profile updated:", profile);
+        // Optionally update Firebase Auth user profile
+        // import { updateProfile as firebaseUpdateProfile } from 'firebase/auth';
+        // firebaseUpdateProfile(user, { displayName: profile.name, email: profile.email })
+        //   .then(() => console.log("Auth profile updated"))
+        //   .catch(error => console.error("Error updating auth profile:", error));
+      })
+      .catch(error => console.error("Error updating profile:", error));
   }
 
-
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-gray-100'} flex flex-col items-center justify-start p-4`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-gray-100 text-black'} flex flex-col items-center justify-start p-4`}>
       {user ? (
         <div className="w-full max-w-4xl">
           {/* Header with Tabs and Sign Out */}
@@ -180,7 +298,7 @@ const GoalTrackerApp: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {activeTab === 'dashboard' && (
+              {activeTab === 'dashboard' && user && (
                 <Dashboard
                   user={user}
                   goals={goals}
@@ -200,6 +318,8 @@ const GoalTrackerApp: React.FC = () => {
                   addChallenge={addChallenge}
                   deleteChallenge={deleteChallenge}
                   setIsEditing={() => { /* Implement editing logic */ }}
+                  updateGoal={updateGoal} // Pass update functions if needed
+                  updateChallenge={updateChallenge}
                 />
               )}
               {activeTab === 'tasks' && (
@@ -208,13 +328,14 @@ const GoalTrackerApp: React.FC = () => {
                   addTask={addTask}
                   deleteTask={deleteTask}
                   toggleTaskCompletion={toggleTaskCompletion}
+                  updateTask={updateTask} // Pass update functions if needed
                 />
               )}
               {activeTab === 'calendar' && (
                 <CalendarComponent
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
-                  tasks={tasks}
+                  tasks={tasks.filter(task => new Date(task.date).toDateString() === selectedDate.toDateString())}
                   toggleTaskCompletion={toggleTaskCompletion}
                   deleteTask={deleteTask}
                 />

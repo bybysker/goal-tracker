@@ -15,15 +15,17 @@ import { Task } from '@/types';
 interface TasksProps {
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'completed'>) => void;
-  deleteTask: (id: number) => void;
-  toggleTaskCompletion: (id: number) => void;
+  deleteTask: (id: string) => void;
+  toggleTaskCompletion: (id: string) => void;
+  updateTask?: (id: string, updatedTask: Partial<Task>) => void; // Optional, in case needed
 }
 
 const Tasks: React.FC<TasksProps> = ({
   tasks,
   addTask,
   deleteTask,
-  toggleTaskCompletion
+  toggleTaskCompletion,
+  updateTask
 }) => {
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
@@ -38,6 +40,8 @@ const Tasks: React.FC<TasksProps> = ({
               task={task}
               onToggle={() => toggleTaskCompletion(task.id)}
               onDelete={() => deleteTask(task.id)}
+              // Pass updateTask if editing functionality is implemented
+               onUpdate={updateTask ? () => updateTask(task.id, {/* updated fields */}) : undefined}
             />
           ))}
           <Dialog>
@@ -67,13 +71,13 @@ const Tasks: React.FC<TasksProps> = ({
                     <Label htmlFor="task-title" className="text-right">
                       Title
                     </Label>
-                    <Input id="task-title" name="title" className="col-span-3 bg-gray-700 text-gray-100" />
+                    <Input id="task-title" name="title" className="col-span-3 bg-gray-700 text-gray-100" required />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="task-date" className="text-right">
                       Date
                     </Label>
-                    <Input id="task-date" name="date" type="date" className="col-span-3 bg-gray-700 text-gray-100" />
+                    <Input id="task-date" name="date" type="date" className="col-span-3 bg-gray-700 text-gray-100" required />
                   </div>
                 </div>
                 <DialogFooter>

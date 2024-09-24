@@ -16,8 +16,8 @@ interface CalendarComponentProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   tasks: Task[];
-  toggleTaskCompletion: (id: number) => void;
-  deleteTask: (id: number) => void;
+  toggleTaskCompletion: (id: string) => void;
+  deleteTask: (id: string) => void;
 }
 
 const CalendarComponent: React.FC<CalendarComponentProps> = ({

@@ -19,10 +19,12 @@ interface GoalsAndChallengesProps {
   goals: Goal[];
   challenges: Challenge[];
   addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => void;
-  deleteGoal: (id: number) => void;
+  deleteGoal: (id: string) => void;
   addChallenge: (challenge: Omit<Challenge, 'id'>) => void;
-  deleteChallenge: (id: number) => void;
+  deleteChallenge: (id: string) => void;
   setIsEditing: (item: Goal | Challenge | null) => void;
+  updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
+  updateChallenge?: (id: string, updatedChallenge: Partial<Challenge>) => void;
 }
 
 const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
@@ -32,7 +34,9 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
   deleteGoal,
   addChallenge,
   deleteChallenge,
-  setIsEditing
+  setIsEditing,
+  updateGoal,
+  updateChallenge
 }) => {
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
@@ -55,6 +59,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                   goal={goal}
                   onEdit={() => setIsEditing(goal)}
                   onDelete={() => deleteGoal(goal.id)}
+                  onUpdate={updateGoal ? () => updateGoal(goal.id, { /* updated fields */ }) : undefined}
                 />
               ))}
               <Dialog>
@@ -86,19 +91,19 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                         <Label htmlFor="title" className="text-right">
                           Title
                         </Label>
-                        <Input id="title" name="title" className="col-span-3 bg-gray-700 text-gray-100" />
+                        <Input id="title" name="title" className="col-span-3 bg-gray-700 text-gray-100" required />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="deadline" className="text-right">
                           Deadline
                         </Label>
-                        <Input id="deadline" name="deadline" type="date" className="col-span-3 bg-gray-700 text-gray-100" />
+                        <Input id="deadline" name="deadline" type="date" className="col-span-3 bg-gray-700 text-gray-100" required />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="category" className="text-right">
                           Category
                         </Label>
-                        <Select name="category">
+                        <Select name="category" required>
                           <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
@@ -106,6 +111,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                             <SelectItem value="personal">Personal</SelectItem>
                             <SelectItem value="professional">Professional</SelectItem>
                             <SelectItem value="health">Health</SelectItem>
+                            {/* Add more categories as needed */}
                           </SelectContent>
                         </Select>
                       </div>
@@ -128,6 +134,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                   challenge={challenge}
                   onEdit={() => setIsEditing(challenge)}
                   onDelete={() => deleteChallenge(challenge.id)}
+                  onUpdate={updateChallenge ? () => updateChallenge(challenge.id, { /* updated fields */ }) : undefined}
                 />
               ))}
               <Dialog>
@@ -155,7 +162,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
                         <Label htmlFor="challenge-title" className="text-right">
                           Title
                         </Label>
-                        <Input id="challenge-title" name="title" className="col-span-3 bg-gray-700 text-gray-100" />
+                        <Input id="challenge-title" name="title" className="col-span-3 bg-gray-700 text-gray-100" required />
                       </div>
                     </div>
                     <DialogFooter>
