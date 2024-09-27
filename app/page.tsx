@@ -107,7 +107,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Goals
   const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 });
     } catch (error) {
@@ -116,7 +119,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateGoal = async (id: string, updatedGoal: Partial<Goal>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const goalRef = doc(db, 'users', user.uid, 'goals', id);
       await updateDoc(goalRef, updatedGoal);
@@ -126,7 +132,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteGoal = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const goalRef = doc(db, 'users', user.uid, 'goals', id);
       await deleteDoc(goalRef);
@@ -137,7 +146,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Challenges
   const addChallenge = async (challenge: Omit<Challenge, 'id'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'challenges'), challenge);
     } catch (error) {
@@ -146,7 +158,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateChallenge = async (id: string, updatedChallenge: Partial<Challenge>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
       await updateDoc(challengeRef, updatedChallenge);
@@ -156,7 +171,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteChallenge = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
       await deleteDoc(challengeRef);
@@ -167,7 +185,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Tasks
   const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'tasks'), { ...task, completed: false });
     } catch (error) {
@@ -186,7 +207,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteTask = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       await deleteDoc(taskRef);
@@ -231,15 +255,8 @@ const GoalTrackerApp: React.FC = () => {
               }
             });
     
-            const transcription = response.data.transcription;
-            setTranscription(transcription);
-    
-            // Create a text file from the transcription
-            const transcriptionBlob = new Blob([transcription], { type: 'text/plain' });
-            const storageRef = ref(storage, `users/${user.uid}/transcriptions/${Date.now()}.txt`);
-            const snapshot = await uploadBytes(storageRef, transcriptionBlob);
-            const url = await getDownloadURL(snapshot.ref);
-            console.log("Transcription uploaded to:", url);
+            const receivedTranscription = response.data.transcription;
+            setTranscription(receivedTranscription);
     
           } catch (error) {
             console.error("Error transcribing voice memo:", error);
@@ -260,6 +277,48 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
+  // Save Reflection Handler
+  const handleSaveReflection = async () => {
+    if (!transcription) {
+      alert("No transcription available to save.");
+      return;
+    }
+
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
+
+    try {
+      // **Step 1:** Create a text Blob from the transcription
+      const transcriptionBlob = new Blob([transcription], { type: 'text/plain' });
+
+      // **Step 2:** Define the storage path
+      const storageRefPath = `users/${user.uid}/transcriptions/${Date.now()}.txt`;
+      const storageRefPathEncoded = encodeURI(storageRefPath); // Ensure the path is URL-safe
+      const storageRefInstance = ref(storage, storageRefPathEncoded);
+
+      // **Step 3:** Upload the transcription text file to Firebase Storage
+      const snapshot = await uploadBytes(storageRefInstance, transcriptionBlob);
+
+      // **Step 4:** Get the download URL of the uploaded transcription
+      const url = await getDownloadURL(snapshot.ref);
+      console.log("Transcription uploaded to:", url);
+
+      // Optionally, provide user feedback
+      alert("Reflection saved successfully!");
+
+      // Optionally, reset the transcription state
+      setTranscription('');
+      // If you want to clear the textarea after saving, you might need to adjust the `VoiceMemo` component accordingly
+
+    } catch (error) {
+      console.error("Error uploading transcription:", error);
+      alert("Failed to save reflection. Please try again.");
+    }
+  };
+
+
   // AI Insights Simulation (could be enhanced with actual AI integration)
   const simulateAiInsights = () => {
     // In a real app, this would make an API call to OpenAI or another AI service
@@ -277,7 +336,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // Save Settings Function
   const saveSettings = () => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     // Implement settings save logic here (e.g., update user preferences in Firestore)
     const userDocRef = doc(db, 'users', user.uid);
     updateDoc(userDocRef, { darkMode, openaiApiKey })
@@ -287,7 +349,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // Update Profile Function
   const updateProfile = (profile: { name: string; email: string }) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     // Update Firebase Auth profile
     // Assuming you have additional user info stored in Firestore
     const userDocRef = doc(db, 'users', user.uid);
@@ -368,7 +433,7 @@ const GoalTrackerApp: React.FC = () => {
                   startRecording={startRecording}
                   stopRecording={stopRecording}
                   transcription={transcription}
-                  setTranscription={setTranscription}
+                  onSaveReflection={handleSaveReflection}
                 />
               )}
               {activeTab === 'settings' && (
