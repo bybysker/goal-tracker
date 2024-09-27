@@ -37,6 +37,8 @@ const GoalTrackerApp: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
   const [transcription, setTranscription] = useState<string | null>(null);
+  const [reflection, setReflection] = useState<string | null>(null);
+
   // Voice Memo state
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -279,7 +281,7 @@ const GoalTrackerApp: React.FC = () => {
 
   // Save Reflection Handler
   const handleSaveReflection = async () => {
-    if (!transcription) {
+    if (!reflection) {
       alert("No reflection available to save.");
       return;
     }
@@ -290,16 +292,16 @@ const GoalTrackerApp: React.FC = () => {
     }
 
     try {
-      // **Step 1:** Create a text Blob from the transcription
-      const transcriptionBlob = new Blob([transcription], { type: 'text/plain' });
+      // **Step 1:** Create a text Blob from the reflection
+      const reflectionBlob = new Blob([reflection], { type: 'text/plain' });
 
       // **Step 2:** Define the storage path
-      const storageRefPath = `users/${user.uid}/transcriptions/${Date.now()}.txt`;
+      const storageRefPath = `users/${user.uid}/reflections/${Date.now()}.txt`;
       const storageRefPathEncoded = encodeURI(storageRefPath); // Ensure the path is URL-safe
       const storageRefInstance = ref(storage, storageRefPathEncoded);
 
-      // **Step 3:** Upload the transcription text file to Firebase Storage
-      const snapshot = await uploadBytes(storageRefInstance, transcriptionBlob);
+      // **Step 3:** Upload the reflection text file to Firebase Storage
+      const snapshot = await uploadBytes(storageRefInstance, reflectionBlob);
 
       // **Step 4:** Get the download URL of the uploaded transcription
       const url = await getDownloadURL(snapshot.ref);
@@ -432,6 +434,7 @@ const GoalTrackerApp: React.FC = () => {
                   startRecording={startRecording}
                   stopRecording={stopRecording}
                   transcription={transcription}
+                  setTranscription={setTranscription}
                   onSaveReflection={handleSaveReflection}
                 />
               )}

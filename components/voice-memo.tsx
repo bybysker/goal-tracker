@@ -13,6 +13,7 @@ interface VoiceMemoProps {
   startRecording: () => void;
   stopRecording: () => void;
   transcription: string | null;
+  setTranscription: (value: string) => void;
   onSaveReflection: () => void;
 }
 
@@ -22,6 +23,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
   startRecording,
   stopRecording,
   transcription,
+  setTranscription,
   onSaveReflection
 }) => {
 
@@ -33,13 +35,13 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
     setTimeout(() => setShowSuccessMessage(false), 1500)
   }
 
-  const [reflection, setReflection] = useState(transcription || '');
+  //const [reflection, setReflection] = useState(transcription || '');
 
-  useEffect(() => {
-    if (transcription) {
-      setReflection(transcription);
-    }
-  }, [transcription]);
+  //useEffect(() => {
+  //  if (transcription) {
+  //    setReflection(transcription);
+  //  }
+  //}, [transcription]);
 
   return (
     
@@ -64,8 +66,8 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
           <Textarea 
             placeholder="Transcribe your voice memo here or type your daily reflection" 
             className="w-full bg-gray-800 border-gray-700 text-gray-100 min-h-[100px]"
-            value={reflection}
-            onChange={(e) => setReflection(e.target.value)}
+            value={transcription || ''}
+            onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
           />
           <AnimatePresence>
             {showSuccessMessage && (
