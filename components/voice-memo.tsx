@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Mic, StopCircle } from "lucide-react";
@@ -11,13 +11,17 @@ interface VoiceMemoProps {
   isRecording: boolean;
   startRecording: () => void;
   stopRecording: () => void;
+  transcription: string | null;
+  setTranscription: (transcription: string) => void;
 }
 
 const VoiceMemo: React.FC<VoiceMemoProps> = ({
   voiceMemo,
   isRecording,
   startRecording,
-  stopRecording
+  stopRecording,
+  transcription,
+  setTranscription
 }) => {
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
@@ -40,7 +44,9 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
           )}
           <Textarea 
             placeholder="Transcribe your voice memo here or type your daily reflection" 
-            className="w-full bg-gray-800 border-gray-700 text-gray-100 min-h-[100px]" 
+            className="w-full bg-gray-800 border-gray-700 text-gray-100 min-h-[100px]"
+            value={transcription ?? ''}
+            onChange={(e) => setTranscription(e.target.value)}
           />
           <Button className="w-full bg-green-600 hover:bg-green-700">
             Save Reflection

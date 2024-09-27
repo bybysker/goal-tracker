@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
+import axios from 'axios';
+
 
 import Header from '@/components/header';
 import Dashboard from '@/components/dashboard';
@@ -12,6 +14,7 @@ import VoiceMemo from '@/components/voice-memo';
 import Settings from '@/components/settings';
 import Profile from '@/components/profile';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 import { Goal, Challenge, Task } from '@/types';
 //import { User as FirebaseUser } from 'firebase/auth';
@@ -33,14 +36,18 @@ const GoalTrackerApp: React.FC = () => {
   const [aiInsights, setAiInsights] = useState<string[]>([]);
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
-
+  const [transcription, setTranscription] = useState<string | null>(null);
   // Voice Memo state
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
 
     // Listen to Goals collection
     const goalsRef = collection(db, 'users', user.uid, 'goals');
@@ -204,33 +211,47 @@ const GoalTrackerApp: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
       mediaRecorder.current.start();
-
+  
       const audioChunks: Blob[] = [];
       mediaRecorder.current.addEventListener("dataavailable", (event: BlobEvent) => {
         audioChunks.push(event.data);
       });
-
+  
       mediaRecorder.current.addEventListener("stop", async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        console.log(audioBlob, 'audioBlob')
+        const formData = new FormData();
         if (user) {
-          const storageRef = ref(storage, `users/${user.uid}/voice-memos/${Date.now()}.wav`);
+          formData.append('voice_memo', audioBlob, "voice_memo.wav");
+          
           try {
-            const snapshot = await uploadBytes(storageRef, audioBlob);
+            const response = await axios.post('/api/transcribe_voice', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+    
+            const transcription = response.data.transcription;
+            setTranscription(transcription);
+    
+            // Create a text file from the transcription
+            const transcriptionBlob = new Blob([transcription], { type: 'text/plain' });
+            const storageRef = ref(storage, `users/${user.uid}/transcriptions/${Date.now()}.txt`);
+            const snapshot = await uploadBytes(storageRef, transcriptionBlob);
             const url = await getDownloadURL(snapshot.ref);
-            setVoiceMemo(url);
-            // Optionally, save the URL to Firestore
-            // await addDoc(collection(db, 'users', user.uid, 'voiceMemos'), { url, createdAt: new Date() });
+            console.log("Transcription uploaded to:", url);
+    
           } catch (error) {
-            console.error("Error uploading voice memo:", error);
+            console.error("Error transcribing voice memo:", error);
           }
         }
       });
 
       setIsRecording(true);
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
+    } catch (error) {
+      console.error("Error starting recording:", error);
     }
-  }
+  };
 
   const stopRecording = () => {
     if (mediaRecorder.current) {
@@ -346,6 +367,8 @@ const GoalTrackerApp: React.FC = () => {
                   isRecording={isRecording}
                   startRecording={startRecording}
                   stopRecording={stopRecording}
+                  transcription={transcription}
+                  setTranscription={setTranscription}
                 />
               )}
               {activeTab === 'settings' && (

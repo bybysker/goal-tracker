@@ -1,9 +1,11 @@
 import os
+import io
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
+
 
 #from some_vector_db_library import VectorDBClient
 embed_model = "text-embedding-ada-002"
@@ -46,26 +48,28 @@ def define_tasks(user_id: int, prompt: str):
     return {"tasks": tasks}
 
 @app.post('/transcribe_voice')
-def transcribe_voice(voice_memo_path: str,user_id: int = 0):
+def transcribe_voice(voice_memo: UploadFile = File(...)):
     """
     Endpoint to transcribe a voice memo for a given user.
 
     Args:
-    - user_id (int): The ID of the user.
-    - voice_memo_path (str): The file path to the voice memo.
+    - voice_memo (UploadFile): The uploaded voice memo file.
 
     Returns:
     - dict: A dictionary containing the transcription text.
     """
     try:
         # Open the audio file
-        with open(voice_memo_path, "rb") as audio_file:
-            # Transcribe the audio file using OpenAI's Whisper model
-            transcription = client.audio.transcriptions.create(
-                model="whisper-1", 
-                file=audio_file,
-                response_format="text"
-            )
+        audio_file = voice_memo.file.read()
+        buffer = io.BytesIO(audio_file)
+
+        buffer.name = voice_memo.filename
+        # Transcribe the audio file using OpenAI's Whisper model
+        transcription = client.audio.transcriptions.create(
+            model="whisper-1", 
+            file=buffer,
+            response_format="text"
+        )
         
         # Return the transcription text
         return {"transcription": transcription}
@@ -73,3 +77,4 @@ def transcribe_voice(voice_memo_path: str,user_id: int = 0):
     except Exception as e:
         # Handle exceptions and return an error message
         return {"error": str(e)}
+    
