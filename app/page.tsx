@@ -280,7 +280,7 @@ const GoalTrackerApp: React.FC = () => {
   // Save Reflection Handler
   const handleSaveReflection = async () => {
     if (!transcription) {
-      alert("No transcription available to save.");
+      alert("No reflection available to save.");
       return;
     }
 
@@ -305,8 +305,6 @@ const GoalTrackerApp: React.FC = () => {
       const url = await getDownloadURL(snapshot.ref);
       console.log("Transcription uploaded to:", url);
 
-      // Optionally, provide user feedback
-      alert("Reflection saved successfully!");
 
       // Optionally, reset the transcription state
       setTranscription('');
@@ -375,6 +373,7 @@ const GoalTrackerApp: React.FC = () => {
           {/* Header with Tabs and Sign Out */}
           <Header activeTab={activeTab} setActiveTab={setActiveTab} SignOut={handleSignOut} />
 
+         
           {/* Animated Content */}
           <AnimatePresence mode="wait">
             <motion.div
