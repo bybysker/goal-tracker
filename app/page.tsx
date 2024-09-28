@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
+import axios from 'axios';
+
 
 import Header from '@/components/header';
 import Dashboard from '@/components/dashboard';
@@ -12,6 +14,7 @@ import VoiceMemo from '@/components/voice-memo';
 import Settings from '@/components/settings';
 import Profile from '@/components/profile';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 import { Goal, Challenge, Task } from '@/types';
 //import { User as FirebaseUser } from 'firebase/auth';
@@ -33,14 +36,19 @@ const GoalTrackerApp: React.FC = () => {
   const [aiInsights, setAiInsights] = useState<string[]>([]);
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
+  const [transcription, setTranscription] = useState<string | null>(null);
+  const [reflection, setReflection] = useState<string | null>(null);
 
   // Voice Memo state
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
 
     // Listen to Goals collection
     const goalsRef = collection(db, 'users', user.uid, 'goals');
@@ -100,7 +108,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Goals
   const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 });
     } catch (error) {
@@ -109,7 +120,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateGoal = async (id: string, updatedGoal: Partial<Goal>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const goalRef = doc(db, 'users', user.uid, 'goals', id);
       await updateDoc(goalRef, updatedGoal);
@@ -119,7 +133,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteGoal = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const goalRef = doc(db, 'users', user.uid, 'goals', id);
       await deleteDoc(goalRef);
@@ -130,7 +147,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Challenges
   const addChallenge = async (challenge: Omit<Challenge, 'id'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'challenges'), challenge);
     } catch (error) {
@@ -139,7 +159,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateChallenge = async (id: string, updatedChallenge: Partial<Challenge>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
       await updateDoc(challengeRef, updatedChallenge);
@@ -149,7 +172,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteChallenge = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
       await deleteDoc(challengeRef);
@@ -160,7 +186,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // CRUD operations for Tasks
   const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       await addDoc(collection(db, 'users', user.uid, 'tasks'), { ...task, completed: false });
     } catch (error) {
@@ -179,7 +208,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const deleteTask = async (id: string) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     try {
       const taskRef = doc(db, 'users', user.uid, 'tasks', id);
       await deleteDoc(taskRef);
@@ -195,47 +227,6 @@ const GoalTrackerApp: React.FC = () => {
       await updateTask(id, { completed: !task.completed });
     } catch (error) {
       console.error("Error toggling task completion:", error);
-    }
-  }
-
-  // Voice Memo Functions
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      mediaRecorder.current.start();
-
-      const audioChunks: Blob[] = [];
-      mediaRecorder.current.addEventListener("dataavailable", (event: BlobEvent) => {
-        audioChunks.push(event.data);
-      });
-
-      mediaRecorder.current.addEventListener("stop", async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        if (user) {
-          const storageRef = ref(storage, `users/${user.uid}/voice-memos/${Date.now()}.wav`);
-          try {
-            const snapshot = await uploadBytes(storageRef, audioBlob);
-            const url = await getDownloadURL(snapshot.ref);
-            setVoiceMemo(url);
-            // Optionally, save the URL to Firestore
-            // await addDoc(collection(db, 'users', user.uid, 'voiceMemos'), { url, createdAt: new Date() });
-          } catch (error) {
-            console.error("Error uploading voice memo:", error);
-          }
-        }
-      });
-
-      setIsRecording(true);
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
-    }
-  }
-
-  const stopRecording = () => {
-    if (mediaRecorder.current) {
-      mediaRecorder.current.stop();
-      setIsRecording(false);
     }
   }
 
@@ -256,7 +247,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // Save Settings Function
   const saveSettings = () => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     // Implement settings save logic here (e.g., update user preferences in Firestore)
     const userDocRef = doc(db, 'users', user.uid);
     updateDoc(userDocRef, { darkMode, openaiApiKey })
@@ -266,7 +260,10 @@ const GoalTrackerApp: React.FC = () => {
 
   // Update Profile Function
   const updateProfile = (profile: { name: string; email: string }) => {
-    if (!user) return;
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
     // Update Firebase Auth profile
     // Assuming you have additional user info stored in Firestore
     const userDocRef = doc(db, 'users', user.uid);
@@ -289,6 +286,7 @@ const GoalTrackerApp: React.FC = () => {
           {/* Header with Tabs and Sign Out */}
           <Header activeTab={activeTab} setActiveTab={setActiveTab} SignOut={handleSignOut} />
 
+         
           {/* Animated Content */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -343,9 +341,7 @@ const GoalTrackerApp: React.FC = () => {
               {activeTab === 'voice-memo' && (
                 <VoiceMemo
                   voiceMemo={voiceMemo}
-                  isRecording={isRecording}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
+                  user={user}
                 />
               )}
               {activeTab === 'settings' && (
