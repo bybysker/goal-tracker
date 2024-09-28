@@ -41,7 +41,6 @@ const GoalTrackerApp: React.FC = () => {
 
   // Voice Memo state
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const router = useRouter();
 
@@ -231,94 +230,6 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  // Voice Memo Functions
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      mediaRecorder.current.start();
-  
-      const audioChunks: Blob[] = [];
-      mediaRecorder.current.addEventListener("dataavailable", (event: BlobEvent) => {
-        audioChunks.push(event.data);
-      });
-  
-      mediaRecorder.current.addEventListener("stop", async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        console.log(audioBlob, 'audioBlob')
-        const formData = new FormData();
-        if (user) {
-          formData.append('voice_memo', audioBlob, "voice_memo.wav");
-          
-          try {
-            const response = await axios.post('/api/transcribe_voice', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            });
-    
-            const receivedTranscription = response.data.transcription;
-            setTranscription(receivedTranscription);
-    
-          } catch (error) {
-            console.error("Error transcribing voice memo:", error);
-          }
-        }
-      });
-
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Error starting recording:", error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder.current) {
-      mediaRecorder.current.stop();
-      setIsRecording(false);
-    }
-  }
-
-  // Save Reflection Handler
-  const handleSaveReflection = async () => {
-    if (!reflection) {
-      alert("No reflection available to save.");
-      return;
-    }
-
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-
-    try {
-      // **Step 1:** Create a text Blob from the reflection
-      const reflectionBlob = new Blob([reflection], { type: 'text/plain' });
-
-      // **Step 2:** Define the storage path
-      const storageRefPath = `users/${user.uid}/reflections/${Date.now()}.txt`;
-      const storageRefPathEncoded = encodeURI(storageRefPath); // Ensure the path is URL-safe
-      const storageRefInstance = ref(storage, storageRefPathEncoded);
-
-      // **Step 3:** Upload the reflection text file to Firebase Storage
-      const snapshot = await uploadBytes(storageRefInstance, reflectionBlob);
-
-      // **Step 4:** Get the download URL of the uploaded transcription
-      const url = await getDownloadURL(snapshot.ref);
-      console.log("Transcription uploaded to:", url);
-
-
-      // Optionally, reset the transcription state
-      setTranscription('');
-      // If you want to clear the textarea after saving, you might need to adjust the `VoiceMemo` component accordingly
-
-    } catch (error) {
-      console.error("Error uploading transcription:", error);
-      alert("Failed to save reflection. Please try again.");
-    }
-  };
-
-
   // AI Insights Simulation (could be enhanced with actual AI integration)
   const simulateAiInsights = () => {
     // In a real app, this would make an API call to OpenAI or another AI service
@@ -430,12 +341,7 @@ const GoalTrackerApp: React.FC = () => {
               {activeTab === 'voice-memo' && (
                 <VoiceMemo
                   voiceMemo={voiceMemo}
-                  isRecording={isRecording}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  transcription={transcription}
-                  setTranscription={setTranscription}
-                  onSaveReflection={handleSaveReflection}
+                  user={user}
                 />
               )}
               {activeTab === 'settings' && (
