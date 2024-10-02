@@ -58,6 +58,8 @@ def transcribe_voice(voice_memo: UploadFile = File(...)):
     Returns:
     - dict: A dictionary containing the transcription text.
     """
+
+    prompt = ""
     try:
         # Open the audio file
         audio_file = voice_memo.file.read()

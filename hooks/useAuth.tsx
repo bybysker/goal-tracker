@@ -1,9 +1,8 @@
-// hooks/useAuth.tsx
 "use client"
 
 import React, { useState, useEffect, createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/db/configFirebase";
+import { auth, db } from "@/db/configFirebase";
 import {
   onAuthStateChanged,
   User as FirebaseUser,
@@ -15,6 +14,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // Initialize Providers
 const googleProvider = new GoogleAuthProvider();
@@ -43,12 +43,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
+  const checkFirstLogin = async (user: FirebaseUser) => {
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      // First login
+      await setDoc(userDocRef, {
+        email: user.email,
+        firstLogin: true,
+        // Add any other initial user data you want to store
+      });
+      router.push('/onboarding');
+    } else {
+      const userData = userDoc.data();
+      if (userData.firstLogin) {
+        // User hasn't completed onboarding
+        router.push('/onboarding');
+      } else {
+        // Regular login
+        router.push('/');
+      }
+    }
+  };
+
   // Authentication Functions
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
-      router.push('/');
+      await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Google Sign-In Error:", error);
     }
@@ -58,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await signInWithPopup(auth, githubProvider);
       setUser(result.user);
-      router.push('/');
+      await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Github Sign-In Error:", error);
     }
@@ -68,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await signInWithPopup(auth, appleProvider);
       setUser(result.user);
-      router.push('/');
+      await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Apple Sign-In Error:", error);
     }
@@ -78,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setUser(result.user);
-      router.push('/');
+      await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Email/Password Sign-In Error:", error);
     }
@@ -98,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       setUser(result.user);
-      router.push('/');
+      await checkFirstLogin(result.user);
     } catch (error) {
       console.error("User Registration Error:", error);
     }
@@ -106,15 +130,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const redirectIfAuthenticated = () => {
     if (user) {
-      router.push('/');
+      checkFirstLogin(user);
     }
   };
 
   // Listen for Authentication State Changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       setIsLoading(false);
+      if (firebaseUser) {
+        await checkFirstLogin(firebaseUser);
+      }
     });
     return () => unsubscribe();
   }, []);
