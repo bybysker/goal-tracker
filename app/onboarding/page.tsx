@@ -80,7 +80,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
         await addDoc(collection(db, 'users', user.uid, "formResponses"), formData);
         showMessage();
         setTimeout(() => {
-          router.push('/main'); // Redirect to the main page after the animation
+          router.push('/'); // Redirect to the main page after the animation
         }, 1500);
       } catch (error) {
         console.error("Error adding document: ", error);
@@ -102,7 +102,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
           <Input
             id={currentQuestion.id}
             name={currentQuestion.id}
-            value={value}
+            value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
             className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
@@ -114,7 +114,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
           <Textarea
             id={currentQuestion.id}
             name={currentQuestion.id}
-            value={value}
+            value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
             className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
@@ -141,7 +141,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
         )
       case 'radio':
         return (
-          <RadioGroup onValueChange={handleRadioChange} value={value} className="space-y-2">
+          <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || []} className="space-y-2">
             {currentQuestion.options?.map((option) => (
               <div key={String(option)} className="flex items-center space-x-2">
                 <RadioGroupItem value={option} id={option} className="border-white/20 text-white" />
@@ -283,7 +283,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-              <h2 className="text-xl font-bold text-gray-800">Reflection saved successfully!</h2>
+              <h2 className="text-xl font-bold text-gray-800">Submission successful</h2>
             </motion.div>
           </motion.div>
         )}
