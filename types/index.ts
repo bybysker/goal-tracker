@@ -6,15 +6,14 @@ export interface Goal {
   progress: number;
 }
 
-export interface Challenge {
-  id: string;
-  title: string;
-}
-
 export interface Task {
   id: string;
   title: string;
   completed: boolean;
   date: string;
 }
-  
+export interface Memo {
+  id: string;
+  text: string;
+  createdAt: Date;
+}

@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronsRight, ChevronLeft, CheckCircle } from 'lucide-react'
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc} from 'firebase/firestore';
 import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -78,6 +78,10 @@ const FuturisticFirstLoginForm: React.FC = () => {
       try {
         console.log('Submitting formData:', formData);
         await addDoc(collection(db, 'users', user.uid, "formResponses"), formData);
+
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, { firstLogin: false });
+
         showMessage();
         setTimeout(() => {
           router.push('/'); // Redirect to the main page after the animation

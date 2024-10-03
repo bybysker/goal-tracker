@@ -1,48 +1,34 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
-import axios from 'axios';
-
-
-import Header from '@/components/header';
-import Dashboard from '@/components/dashboard';
-import GoalsAndChallenges from '@/components/goals-and-challenges';
-import Tasks from '@/components/tasks';
-import CalendarComponent from '@/components/calendar-component';
-import VoiceMemo from '@/components/voice-memo';
-import Settings from '@/components/settings';
-import Profile from '@/components/profile';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
-import { Goal, Challenge, Task } from '@/types';
-//import { User as FirebaseUser } from 'firebase/auth';
+// Import components
+import Sidebar from '@/components/sidebar';
+import Dashboard from '@/components/dashboard';
+import Goals from '@/components/goals';
+import CalendarComponent from '@/components/calendar-component';
+import Settings from '@/components/settings';
+import Profile from '@/components/profile';
 
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
-import { db, storage } from '@/db/configFirebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+// Import types
+import { Goal, Task, Memo } from '@/types';
 
 const GoalTrackerApp: React.FC = () => {
   const { user, handleSignOut } = useAuth();
+  const router = useRouter();
 
-  // Application data  
+  // Application data
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [memos, setMemos] = useState<Memo[]>([]);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [streak, setStreak] = useState<number>(0);
-  const [aiInsights, setAiInsights] = useState<string[]>([]);
   const [darkMode, setDarkMode] = useState<boolean>(true);
-  const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
-  const [transcription, setTranscription] = useState<string | null>(null);
-  const [reflection, setReflection] = useState<string | null>(null);
-
-  // Voice Memo state
-  const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     if (!user) {
@@ -50,61 +36,28 @@ const GoalTrackerApp: React.FC = () => {
       return;
     }
 
-    // Listen to Goals collection
-    const goalsRef = collection(db, 'users', user.uid, 'goals');
-    const goalsUnsub = onSnapshot(goalsRef, (snapshot) => {
-      const fetchedGoals: Goal[] = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          title: data.title,
-          deadline: data.deadline,
-          category: data.category,
-          progress: data.progress,
-        } as Goal;
-      });
+    // Firestore listeners (goals, tasks, memos)
+    const goalsUnsub = onSnapshot(collection(db, 'users', user.uid, 'goals'), (snapshot) => {
+      const fetchedGoals: Goal[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Goal));
       setGoals(fetchedGoals);
     });
 
-    // Listen to Challenges collection
-    const challengesRef = collection(db, 'users', user.uid, 'challenges');
-    const challengesUnsub = onSnapshot(challengesRef, (snapshot) => {
-      const fetchedChallenges: Challenge[] = snapshot.docs.map(doc => ({
-        id: doc.id,
-        title: doc.data().title,
-      } as Challenge));
-      setChallenges(fetchedChallenges);
-    });
-
-    // Listen to Tasks collection
-    const tasksRef = collection(db, 'users', user.uid, 'tasks');
-    const tasksUnsub = onSnapshot(tasksRef, (snapshot) => {
-      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({
-        id: doc.id,
-        title: doc.data().title,
-        completed: doc.data().completed,
-        date: doc.data().date,
-      } as Task));
+    const tasksUnsub = onSnapshot(collection(db, 'users', user.uid, 'tasks'), (snapshot) => {
+      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
       setTasks(fetchedTasks);
     });
 
-    // Listen to User document for streak and AI insights
-    const userDocRef = doc(db, 'users', user.uid);
-    const userUnsub = onSnapshot(userDocRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        const data = docSnapshot.data();
-        setStreak(data.streak || 0);
-        setAiInsights(data.aiInsights || []);
-      }
+    const memosUnsub = onSnapshot(collection(db, 'users', user.uid, 'memos'), (snapshot) => {
+      const fetchedMemos: Memo[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Memo));
+      setMemos(fetchedMemos);
     });
 
     return () => {
       goalsUnsub();
-      challengesUnsub();
       tasksUnsub();
-      userUnsub();
+      memosUnsub();
     };
-  }, [user]);
+  }, [user, router]);
 
   // CRUD operations for Goals
   const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>) => {
@@ -120,78 +73,36 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateGoal = async (id: string, updatedGoal: Partial<Goal>) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
+    if (!user) return;
     try {
-      const goalRef = doc(db, 'users', user.uid, 'goals', id);
-      await updateDoc(goalRef, updatedGoal);
+      await updateDoc(doc(db, 'users', user.uid, 'goals', id), updatedGoal);
     } catch (error) {
       console.error("Error updating goal:", error);
     }
   }
 
   const deleteGoal = async (id: string) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
+    if (!user) return;
     try {
-      const goalRef = doc(db, 'users', user.uid, 'goals', id);
-      await deleteDoc(goalRef);
+      await deleteDoc(doc(db, 'users', user.uid, 'goals', id));
     } catch (error) {
       console.error("Error deleting goal:", error);
     }
   }
 
-  // CRUD operations for Challenges
-  const addChallenge = async (challenge: Omit<Challenge, 'id'>) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
+  const addMemo = async (memo: Omit<Memo, 'id'>) => {
+    if (!user) return;
     try {
-      await addDoc(collection(db, 'users', user.uid, 'challenges'), challenge);
+      await addDoc(collection(db, 'users', user.uid, 'memos'), memo);
     } catch (error) {
-      console.error("Error adding challenge:", error);
+      console.error("Error adding memo:", error);
     }
   }
 
-  const updateChallenge = async (id: string, updatedChallenge: Partial<Challenge>) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
+  const addTask = async (task: Omit<Task, 'id'>) => {
+    if (!user) return;
     try {
-      const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
-      await updateDoc(challengeRef, updatedChallenge);
-    } catch (error) {
-      console.error("Error updating challenge:", error);
-    }
-  }
-
-  const deleteChallenge = async (id: string) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-    try {
-      const challengeRef = doc(db, 'users', user.uid, 'challenges', id);
-      await deleteDoc(challengeRef);
-    } catch (error) {
-      console.error("Error deleting challenge:", error);
-    }
-  }
-
-  // CRUD operations for Tasks
-  const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'tasks'), { ...task, completed: false });
+      await addDoc(collection(db, 'users', user.uid, 'tasks'), task);
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -200,26 +111,11 @@ const GoalTrackerApp: React.FC = () => {
   const updateTask = async (id: string, updatedTask: Partial<Task>) => {
     if (!user) return;
     try {
-      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
-      await updateDoc(taskRef, updatedTask);
+      await updateDoc(doc(db, 'users', user.uid, 'tasks', id), updatedTask);
     } catch (error) {
       console.error("Error updating task:", error);
     }
   }
-
-  const deleteTask = async (id: string) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-    try {
-      const taskRef = doc(db, 'users', user.uid, 'tasks', id);
-      await deleteDoc(taskRef);
-    } catch (error) {
-      console.error("Error deleting task:", error);
-    }
-  }
-
   const toggleTaskCompletion = async (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task || !user) return;
@@ -230,144 +126,101 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  // AI Insights Simulation (could be enhanced with actual AI integration)
-  const simulateAiInsights = () => {
-    // In a real app, this would make an API call to OpenAI or another AI service
-    const newInsight = "Based on your recent activities, you might want to focus more on your health goals.";
-    setAiInsights([...aiInsights, newInsight]);
 
-    // Optionally, save AI insights to Firestore
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      updateDoc(userDocRef, {
-        aiInsights: [...aiInsights, newInsight]
-      }).catch(error => console.error("Error updating AI insights:", error));
+  const deleteTask = async (id: string) => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'tasks', id));
+    } catch (error) {
+      console.error("Error deleting task:", error);
     }
   }
 
-  // Save Settings Function
-  const saveSettings = () => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-    // Implement settings save logic here (e.g., update user preferences in Firestore)
-    const userDocRef = doc(db, 'users', user.uid);
-    updateDoc(userDocRef, { darkMode, openaiApiKey })
-      .then(() => console.log("Settings saved"))
-      .catch(error => console.error("Error saving settings:", error));
+  // Generate/Update today's tasks
+  const generateTodaysTasks = () => {
+    // Implement logic to generate or update tasks for today
+    console.log("Generating today's tasks");
   }
 
   // Update Profile Function
   const updateProfile = (profile: { name: string; email: string }) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
-    // Update Firebase Auth profile
-    // Assuming you have additional user info stored in Firestore
+    if (!user) return;
     const userDocRef = doc(db, 'users', user.uid);
     updateDoc(userDocRef, profile)
-      .then(() => {
-        console.log("Profile updated:", profile);
-        // Optionally update Firebase Auth user profile
-        // import { updateProfile as firebaseUpdateProfile } from 'firebase/auth';
-        // firebaseUpdateProfile(user, { displayName: profile.name, email: profile.email })
-        //   .then(() => console.log("Auth profile updated"))
-        //   .catch(error => console.error("Error updating auth profile:", error));
-      })
+      .then(() => console.log("Profile updated:", profile))
       .catch(error => console.error("Error updating profile:", error));
   }
 
-  return (
-    <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-gray-100 text-black'} flex flex-col items-center justify-start p-4`}>
-      {user ? (
-        <div className="w-full max-w-4xl">
-          {/* Header with Tabs and Sign Out */}
-          <Header activeTab={activeTab} setActiveTab={setActiveTab} SignOut={handleSignOut} />
+  // Save Settings Function
+  const saveSettings = () => {
+    if (!user) return;
+    const userDocRef = doc(db, 'users', user.uid);
+    updateDoc(userDocRef, { darkMode })
+      .then(() => console.log("Settings saved"))
+      .catch(error => console.error("Error saving settings:", error));
+  }
 
-         
-          {/* Animated Content */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {activeTab === 'dashboard' && user && (
-                <Dashboard
-                  user={user}
-                  goals={goals}
-                  challenges={challenges}
-                  streak={streak}
-                  tasks={tasks}
-                  aiInsights={aiInsights}
-                  simulateAiInsights={simulateAiInsights}
-                />
-              )}
-              {activeTab === 'goals' && (
-                <GoalsAndChallenges
-                  goals={goals}
-                  challenges={challenges}
-                  addGoal={addGoal}
-                  deleteGoal={deleteGoal}
-                  addChallenge={addChallenge}
-                  deleteChallenge={deleteChallenge}
-                  setIsEditing={() => { /* Implement editing logic */ }}
-                  updateGoal={updateGoal} // Pass update functions if needed
-                  updateChallenge={updateChallenge}
-                />
-              )}
-              {activeTab === 'tasks' && (
-                <Tasks
-                  tasks={tasks}
-                  addTask={addTask}
-                  deleteTask={deleteTask}
-                  toggleTaskCompletion={toggleTaskCompletion}
-                  updateTask={updateTask} // Pass update functions if needed
-                />
-              )}
-              {activeTab === 'calendar' && (
-                <CalendarComponent
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  tasks={tasks.filter(task => new Date(task.date).toDateString() === selectedDate.toDateString())}
-                  toggleTaskCompletion={toggleTaskCompletion}
-                  deleteTask={deleteTask}
-                />
-              )}
-              {activeTab === 'voice-memo' && (
-                <VoiceMemo
-                  voiceMemo={voiceMemo}
-                  user={user}
-                />
-              )}
-              {activeTab === 'settings' && (
-                <Settings
-                  darkMode={darkMode}
-                  setDarkMode={setDarkMode}
-                  openaiApiKey={openaiApiKey}
-                  setOpenaiApiKey={setOpenaiApiKey}
-                  saveSettings={saveSettings}
-                />
-              )}
-              {activeTab === 'profile' && (
-                <Profile
-                  user={user}
-                  updateProfile={updateProfile}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      ) : (
-        // User is not logged in; handle accordingly
-        <p>Loading...</p>
-      )}
+  return (
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex`}>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
+      
+      <main className="flex-1 p-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'dashboard' && (
+              <Dashboard
+                user={user}
+                goals={goals}
+                addMemo={addMemo}
+                memos={memos}
+                generateTodaysTasks={generateTodaysTasks}
+                tasks={tasks}
+                updateTask={updateTask}
+                deleteTask={deleteTask}
+              />
+            )}
+            {activeTab === 'goals' && (
+              <Goals
+                goals={goals}
+                addGoal={addGoal}
+                updateGoal={updateGoal}
+                deleteGoal={deleteGoal}
+                setIsEditing={() => {/* function logic here */}}
+              />
+            )}
+            {activeTab === 'calendar' && (
+              <CalendarComponent
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                tasks={tasks.filter(task => new Date(task.date).toDateString() === selectedDate.toDateString())}
+                toggleTaskCompletion={toggleTaskCompletion}
+                deleteTask={deleteTask}
+              />
+            )}
+            {activeTab === 'profile' && (
+              <Profile
+                user={user}
+                updateProfile={updateProfile}
+              />
+            )}
+            {activeTab === 'settings' && (
+              <Settings
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                saveSettings={saveSettings}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </main>
     </div>
-  )
+  );
 }
 
 export default GoalTrackerApp;

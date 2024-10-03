@@ -1,4 +1,4 @@
-// app/components/GoalsAndChallenges/GoalsAndChallenges.tsx
+// app/components/Goals/Goals.tsx
 "use client"
 
 import React from 'react';
@@ -11,43 +11,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import GoalCard from './common/goal-card';
-import ChallengeCard from './common/challenge-card';
 
-import { Goal, Challenge } from '@/types';
+import { Goal } from '@/types';
 
-interface GoalsAndChallengesProps {
+interface GoalsProps {
   goals: Goal[];
-  challenges: Challenge[];
   addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => void;
   deleteGoal: (id: string) => void;
-  addChallenge: (challenge: Omit<Challenge, 'id'>) => void;
-  deleteChallenge: (id: string) => void;
-  setIsEditing: (item: Goal | Challenge | null) => void;
+  setIsEditing: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
-  updateChallenge?: (id: string, updatedChallenge: Partial<Challenge>) => void;
 }
 
-const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
+const Goals: React.FC<GoalsProps> = ({
   goals,
-  challenges,
   addGoal,
   deleteGoal,
-  addChallenge,
-  deleteChallenge,
   setIsEditing,
   updateGoal,
-  updateChallenge
 }) => {
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Goals and Challenges</CardTitle>
+        <CardTitle className="text-2xl font-bold">Goals</CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="goals" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="goals">Goals</TabsTrigger>
-            <TabsTrigger value="challenges">Challenges</TabsTrigger>
           </TabsList>
           
           {/* Goals Tab */}
@@ -125,58 +115,10 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({
             </div>
           </TabsContent>
           
-          {/* Challenges Tab */}
-          <TabsContent value="challenges">
-            <div className="space-y-4">
-              {challenges.map(challenge => (
-                <ChallengeCard
-                  key={challenge.id}
-                  challenge={challenge}
-                  onEdit={() => setIsEditing(challenge)}
-                  onDelete={() => deleteChallenge(challenge.id)}
-                  onUpdate={updateChallenge ? () => updateChallenge(challenge.id, { /* updated fields */ }) : undefined}
-                />
-              ))}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                    <Plus className="mr-2 h-4 w-4" /> Add Challenge
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-gray-800 text-gray-100">
-                  <DialogHeader>
-                    <DialogTitle>Add New Challenge</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                    e.preventDefault();
-                    const target = e.target as HTMLFormElement & {
-                      title: { value: string };
-                    };
-                    addChallenge({
-                      title: target.title.value,
-                    });
-                    target.reset();
-                  }}>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="challenge-title" className="text-right">
-                          Title
-                        </Label>
-                        <Input id="challenge-title" name="title" className="col-span-3 bg-gray-700 text-gray-100" required />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit" className="bg-purple-600 hover:bg-purple-700">Add Challenge</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
   )
 }
 
-export default GoalsAndChallenges;
+export default Goals;
