@@ -4,7 +4,7 @@ import { Target, List, Calendar, Star, Gauge, AlertTriangle, Clock, Heart, Slide
 
 export const questionsGoal = [
   {
-    id: 'goal',
+    id: 'title',
     question: 'What is the goal that you want to achieve?',
     type: 'textarea',
     icon: Target,
@@ -82,20 +82,6 @@ export const questionsGoal = [
       'More than 5 hours',
     ],
     icon: Clock,
-  },
-  {
-    id: 'motivation',
-    question: 'What motivates you to achieve this goal?',
-    type: 'radio',
-    options: [
-      'Personal growth',
-      'Career advancement',
-      'Financial gain',
-      'Health improvement',
-      'Family & friends',
-      'Other',
-    ],
-    icon: Heart,
   },
   {
     id: 'approach',

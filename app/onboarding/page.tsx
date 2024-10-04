@@ -297,3 +297,4 @@ const FuturisticFirstLoginForm: React.FC = () => {
 }
 
 export default FuturisticFirstLoginForm;
+
