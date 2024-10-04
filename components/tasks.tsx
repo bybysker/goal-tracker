@@ -63,6 +63,7 @@ const Tasks: React.FC<TasksProps> = ({
                 addTask({
                   title: target.title.value,
                   date: target.date.value,
+                  goalId: target.goalId.value,
                 });
                 target.reset();
               }}>

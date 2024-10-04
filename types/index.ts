@@ -1,11 +1,14 @@
 export interface Goal {
   id: string;
   title: string;
-  deadline: string;
   category: string;
-  progress: number;
+  timeframe: string;
+  importance: number;
+  progress: string;
+  obstacles: string[];
+  timeCommitment: string;
+  approach: string;
 }
-
 export interface Task {
   id: string;
   title: string;

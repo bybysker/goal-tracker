@@ -1,18 +1,21 @@
-// app/components/Goals/Goals.tsx
 "use client"
 
 import React from 'react';
+import { useForm } from 'react-hook-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Textarea } from '@/components/ui/textarea'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Slider } from '@/components/ui/slider'
 import { Plus } from "lucide-react";
 import GoalCard from './common/goal-card';
 
 import { Goal, Task } from '@/types';
+import { questionsGoal } from '@/config/questionsGoalConfig'
 
 interface GoalsProps {
   goals: Goal[];
@@ -35,6 +38,21 @@ const Goals: React.FC<GoalsProps> = ({
   toggleTaskCompletion,
   deleteTask
 }) => {
+  const { register, handleSubmit, setValue, reset } = useForm()
+
+  const onSubmit = (data: any) => {
+    const formattedData: Omit<Goal, 'id' | 'progress'> = {
+      title: data.goal,
+      category: data.category,
+      timeframe: data.timeframe,
+      importance: data.importance,
+      obstacles: data.obstacles,
+      timeCommitment: data.time_commitment,
+      approach: data.approach
+    };
+    addGoal(formattedData);
+    reset();
+  }
 
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
@@ -47,7 +65,6 @@ const Goals: React.FC<GoalsProps> = ({
             <TabsTrigger value="goals">Goals</TabsTrigger>
           </TabsList>
           
-          {/* Goals Tab */}
           <TabsContent value="goals">
             <div className="space-y-4">
               {goals.map(goal => (
@@ -55,9 +72,7 @@ const Goals: React.FC<GoalsProps> = ({
                   key={goal.id}
                   goal={goal}
                   tasks={tasks.filter(task => task.goalId === goal.id)}
-                  //onEdit={() => setIsEditing(goal)}
                   onDelete={deleteGoal ? () => deleteGoal(goal.id) : undefined}
-                  //onUpdate={updateGoal ? () => updateGoal(goal.id, { /* updated fields */ }) : undefined}
                   toggleTaskCompletion={toggleTaskCompletion}
                   deleteTask={deleteTask}
                 />
@@ -72,59 +87,62 @@ const Goals: React.FC<GoalsProps> = ({
                   <DialogHeader>
                     <DialogTitle>Add New Goal</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                    e.preventDefault();
-                    const target = e.target as HTMLFormElement & {
-                      title: { value: string };
-                      deadline: { value: string };
-                      category: { value: string };
-                    };
-                    addGoal({
-                      title: target.title.value,
-                      deadline: target.deadline.value,
-                      category: target.category.value
-                    });
-                    target.reset();
-                  }}>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="title" className="text-right">
-                          Title
-                        </Label>
-                        <Input id="title" name="title" className="col-span-3 bg-gray-700 text-gray-100" required />
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    {questionsGoal.map((q) => (
+                      <div key={q.id} className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          {React.createElement(q.icon, { className: "w-5 h-5 text-primary" })}
+                          <Label htmlFor={q.id} className="text-lg font-medium text-foreground">
+                            {q.question}
+                          </Label>
+                        </div>
+                        {q.type === 'textarea' && (
+                          <Textarea 
+                            id={q.id} 
+                            {...register(q.id)} 
+                            className="w-full bg-gray-700 text-gray-100 border-gray-600"
+                          />
+                        )}
+                        {q.type === 'radio' && (
+                          <RadioGroup onValueChange={(value) => setValue(q.id, value)} className="space-y-2">
+                            {q.options?.map((option) => (
+                              <div key={option} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option} id={`${q.id}-${option}`} />
+                                <Label htmlFor={`${q.id}-${option}`} className="text-gray-100">{option}</Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        )}
+                        {q.type === 'slider' && (
+                          <Slider
+                            id={q.id}
+                            min={q.min}
+                            max={q.max}
+                            step={1}
+                            onValueChange={(value) => setValue(q.id, value[0])}
+                            className="w-full"
+                          />
+                        )}
+                        {q.type === 'checkbox' && (
+                          <div className="space-y-2">
+                            {q.options?.map((option) => (
+                              <div key={option} className="flex items-center space-x-2">
+                                <Checkbox id={`${q.id}-${option}`} {...register(q.id)} value={option} />
+                                <Label htmlFor={`${q.id}-${option}`} className="text-gray-100">{option}</Label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="deadline" className="text-right">
-                          Deadline
-                        </Label>
-                        <Input id="deadline" name="deadline" type="date" className="col-span-3 bg-gray-700 text-gray-100" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category" className="text-right">
-                          Category
-                        </Label>
-                        <Select name="category" required>
-                          <SelectTrigger className="col-span-3 bg-gray-700 text-gray-100">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="personal">Personal</SelectItem>
-                            <SelectItem value="professional">Professional</SelectItem>
-                            <SelectItem value="health">Health</SelectItem>
-                            {/* Add more categories as needed */}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Add Goal</Button>
-                    </DialogFooter>
+                    ))}
+                    <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                      Submit Goal
+                    </Button>
                   </form>
                 </DialogContent>
               </Dialog>
             </div>
           </TabsContent>
-          
         </Tabs>
       </CardContent>
     </Card>

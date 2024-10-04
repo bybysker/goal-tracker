@@ -28,7 +28,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">{goal.title}</h3>
-          <p className="text-sm text-gray-400">Deadline: {new Date(goal.deadline).toLocaleDateString()}</p>
+          <p className="text-sm text-gray-400">Deadline: {new Date(goal.timeframe).toLocaleDateString()}</p>
           <p className="text-sm text-gray-400">Category: {goal.category}</p>
           <p className="text-sm text-gray-400">Progress: {goal.progress}%</p>
         </div>

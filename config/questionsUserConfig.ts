@@ -6,7 +6,7 @@ import {
   Flower, Compass, Accessibility, User
  } from 'lucide-react'
 
- export const questions = [
+ export const questionsUser = [
   { id: 'name',
     question: "What's your name?",
     type: 'input',

@@ -16,7 +16,7 @@ import { collection, addDoc, doc, updateDoc} from 'firebase/firestore';
 import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 
-import { questions } from '@/config/questionsConfig'
+import { questionsUser } from '@/config/questionsUserConfig'
 
 
 
@@ -29,10 +29,10 @@ const FuturisticFirstLoginForm: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    setProgress(((currentQuestionIndex + 1) / questions.length) * 100)
+    setProgress(((currentQuestionIndex + 1) / questionsUser.length) * 100)
   }, [currentQuestionIndex])
 
-  const currentQuestion = questions[currentQuestionIndex]
+  const currentQuestion = questionsUser[currentQuestionIndex]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -68,7 +68,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questionsUser.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1)
     } else {
       if (!user) {
@@ -255,7 +255,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
                 Back
               </Button>
               <Button type="submit" className="flex-1 text-lg font-semibold group bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">
-                <span className="mr-2">{currentQuestionIndex < questions.length - 1 ? 'Next' : 'Submit'}</span>
+                <span className="mr-2">{currentQuestionIndex < questionsUser.length - 1 ? 'Next' : 'Submit'}</span>
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
                   transition={{ repeat: Infinity, duration: 1 }}
@@ -266,7 +266,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
               </Button>
             </div>
             <div className="text-sm text-white/60 flex justify-between w-full">
-              <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
+              <span>Question {currentQuestionIndex + 1} of {questionsUser.length}</span>
               <span>{Math.round(progress)}% completed</span>
             </div>
           </CardFooter>
