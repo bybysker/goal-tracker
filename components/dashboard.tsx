@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { User as FirebaseUser } from 'firebase/auth';
 import { Goal, Task, Memo } from '@/types';
 import VoiceMemo from '@/components/voice-memo';
+import GoalCard  from '@/components/common/goal-card'
+import TaskCard  from '@/components/common/task-card';
 
 interface DashboardProps {
   user: FirebaseUser | null;
@@ -20,6 +22,7 @@ interface DashboardProps {
   generateTodaysTasks: () => void;
   updateTask: (id: string, updatedTask: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
+  toggleTaskCompletion: (id: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -30,7 +33,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   addMemo,
   generateTodaysTasks,
   updateTask,
-  deleteTask
+  deleteTask,
+  toggleTaskCompletion
+
 }) => {
   const [memoText, setMemoText] = useState('');
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
@@ -71,56 +76,28 @@ const Dashboard: React.FC<DashboardProps> = ({
         </Avatar>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Goal Overview */}
-          <Card className="bg-card text-card-foreground border-border">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">Goal Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {goals.length > 0 ? (
-                goals.map(goal => (
-                  <div key={goal.id} className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span>{goal.title}</span>
-                      <span>{goal.progress}%</span>
-                    </div>
-                    <Progress value={goal.progress} className="h-2" />
-                  </div>
-                ))
-              ) : (
-                <p>No goals available.</p>
-              )}
-            </CardContent>
-          </Card>
-          
-          {/* Add a Memo */}
-          <Card className="bg-card text-card-foreground border-border">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">Add a Memo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-2 mb-4">
-                <Input
-                  type="text"
-                  value={memoText}
-                  onChange={(e) => setMemoText(e.target.value)}
-                  placeholder="Enter your memo..."
-                  className="flex-grow"
+        {/* Goal Overview */}
+        <Card className="bg-card text-card-foreground border-border">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">Goals Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {goals.length > 0 ? (
+              goals.map(goal => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  tasks={tasks.filter(task => task.goalId === goal.id)}
+                  deleteTask={deleteTask}
+                  toggleTaskCompletion={toggleTaskCompletion}
                 />
-                <Button onClick={handleAddMemo}>
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Add
-                </Button>
-              </div>
-              {memos.slice(0, 5).map((memo) => (
-                <div key={memo.id} className="bg-muted p-2 rounded mb-2">
-                  {memo.text}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+        ))
+      ) : (
+        <p>No goals available.</p>
+      )}
+    </CardContent>
+        </Card>
+
         
         {/* Generate/Update Today's Tasks */}
         <Card className="mt-4 bg-card text-card-foreground border-border">
@@ -159,7 +136,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Voice Memo */}
         <Card className="mt-4 bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Voice Memo</CardTitle>
+            <CardTitle className="text-xl font-bold">Express your thoughts</CardTitle>
           </CardHeader>
           <CardContent>
             <VoiceMemo voiceMemo={voiceMemo} user={user} />

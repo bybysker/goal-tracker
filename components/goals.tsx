@@ -12,23 +12,30 @@ import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import GoalCard from './common/goal-card';
 
-import { Goal } from '@/types';
+import { Goal, Task } from '@/types';
 
 interface GoalsProps {
   goals: Goal[];
+  tasks: Task[];
   addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => void;
-  deleteGoal: (id: string) => void;
-  setIsEditing: (item: Goal | null) => void;
+  deleteGoal?: (id: string) => void;
+  setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
+  toggleTaskCompletion: (id: string) => void;
+  deleteTask: (id: string) => void;
 }
 
 const Goals: React.FC<GoalsProps> = ({
   goals,
+  tasks,
   addGoal,
   deleteGoal,
   setIsEditing,
   updateGoal,
+  toggleTaskCompletion,
+  deleteTask
 }) => {
+
   return (
     <Card className="bg-gray-900 text-gray-100 border-gray-700">
       <CardHeader>
@@ -47,9 +54,12 @@ const Goals: React.FC<GoalsProps> = ({
                 <GoalCard
                   key={goal.id}
                   goal={goal}
-                  onEdit={() => setIsEditing(goal)}
-                  onDelete={() => deleteGoal(goal.id)}
-                  onUpdate={updateGoal ? () => updateGoal(goal.id, { /* updated fields */ }) : undefined}
+                  tasks={tasks.filter(task => task.goalId === goal.id)}
+                  //onEdit={() => setIsEditing(goal)}
+                  onDelete={deleteGoal ? () => deleteGoal(goal.id) : undefined}
+                  //onUpdate={updateGoal ? () => updateGoal(goal.id, { /* updated fields */ }) : undefined}
+                  toggleTaskCompletion={toggleTaskCompletion}
+                  deleteTask={deleteTask}
                 />
               ))}
               <Dialog>

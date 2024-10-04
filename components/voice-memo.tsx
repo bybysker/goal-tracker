@@ -144,7 +144,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
     <div >
       <Card className="bg-gray-900 text-gray-100 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Voice Memo</CardTitle>
+          <CardTitle className="text-2xl font-bold">Reflexion box</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

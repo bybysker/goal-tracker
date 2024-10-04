@@ -183,15 +183,19 @@ const GoalTrackerApp: React.FC = () => {
                 tasks={tasks}
                 updateTask={updateTask}
                 deleteTask={deleteTask}
+                toggleTaskCompletion={toggleTaskCompletion}
               />
             )}
             {activeTab === 'goals' && (
               <Goals
                 goals={goals}
+                tasks={tasks}
                 addGoal={addGoal}
                 updateGoal={updateGoal}
                 deleteGoal={deleteGoal}
                 setIsEditing={() => {/* function logic here */}}
+                toggleTaskCompletion={toggleTaskCompletion}
+                deleteTask={deleteTask}
               />
             )}
             {activeTab === 'calendar' && (

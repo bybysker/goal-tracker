@@ -11,6 +11,7 @@ export interface Task {
   title: string;
   completed: boolean;
   date: string;
+  goalId: string;
 }
 export interface Memo {
   id: string;
