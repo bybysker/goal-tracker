@@ -10,16 +10,12 @@ import { Switch } from "@/components/ui/switch";
 interface SettingsProps {
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
-  openaiApiKey: string;
-  setOpenaiApiKey: (key: string) => void;
   saveSettings: () => void;
 }
 
 const Settings: React.FC<SettingsProps> = ({
   darkMode,
   setDarkMode,
-  openaiApiKey,
-  setOpenaiApiKey,
   saveSettings
 }) => {
   return (
@@ -36,18 +32,6 @@ const Settings: React.FC<SettingsProps> = ({
               id="dark-mode"
               checked={darkMode}
               onCheckedChange={setDarkMode}
-            />
-          </div>
-          
-          {/* OpenAI API Key */}
-          <div className="space-y-2">
-            <Label htmlFor="openai-api-key">OpenAI API Key</Label>
-            <Input
-              id="openai-api-key"
-              type="password"
-              value={openaiApiKey}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpenaiApiKey(e.target.value)}
-              className="bg-gray-800 border-gray-700 text-gray-100"
             />
           </div>
           

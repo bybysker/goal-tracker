@@ -1,20 +1,23 @@
 export interface Goal {
   id: string;
   title: string;
-  deadline: string;
   category: string;
-  progress: number;
+  timeframe: string;
+  importance: number;
+  progress: string;
+  obstacles: string[];
+  timeCommitment: string;
+  approach: string;
 }
-
-export interface Challenge {
-  id: string;
-  title: string;
-}
-
 export interface Task {
   id: string;
   title: string;
   completed: boolean;
   date: string;
+  goalId: string;
 }
-  
+export interface Memo {
+  id: string;
+  text: string;
+  createdAt: Date;
+}

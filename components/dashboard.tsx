@@ -1,37 +1,48 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { User as FirebaseUser } from 'firebase/auth';
-import { Goal, Challenge, Task } from '@/types';
+import { Goal, Task, Memo } from '@/types';
+import VoiceMemo from '@/components/voice-memo';
+import GoalCard  from '@/components/common/goal-card'
+import TaskCard  from '@/components/common/task-card';
 
 interface DashboardProps {
-  user: FirebaseUser | null; // Updated to allow null
+  user: FirebaseUser | null;
   goals: Goal[];
-  challenges: Challenge[];
-  streak: number;
   tasks: Task[];
-  aiInsights: string[];
-  simulateAiInsights: () => void;
+  memos: Memo[];
+  addMemo: (memo: Omit<Memo, 'id'>) => Promise<void>;
+  generateTodaysTasks: () => void;
+  updateTask: (id: string, updatedTask: Partial<Task>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  toggleTaskCompletion: (id: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   user,
   goals,
-  challenges,
-  streak,
   tasks,
-  aiInsights,
-  simulateAiInsights
+  memos,
+  addMemo,
+  generateTodaysTasks,
+  updateTask,
+  deleteTask,
+  toggleTaskCompletion
+
 }) => {
-  // If user is null, display a fallback UI
+  const [memoText, setMemoText] = useState('');
+  const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
+
   if (!user) {
     return (
-      <Card className="bg-gray-900 text-gray-100 border-gray-700">
+      <Card className="bg-background text-foreground border-border">
         <CardContent>
           <p className="text-center">User data is not available.</p>
         </CardContent>
@@ -39,8 +50,19 @@ const Dashboard: React.FC<DashboardProps> = ({
     );
   }
 
+  const handleAddMemo = () => {
+    if (memoText.trim()) {
+      addMemo({ text: memoText, createdAt: new Date() });
+      setMemoText('');
+    }
+  };
+
+  const todaysTasks = tasks.filter(task => 
+    new Date(task.date).toDateString() === new Date().toDateString()
+  );
+
   return (
-    <Card className="bg-gray-900 text-gray-100 border-gray-700">
+    <Card className="bg-background text-foreground border-border">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl font-bold">Dashboard</CardTitle>
         <Avatar>
@@ -54,91 +76,70 @@ const Dashboard: React.FC<DashboardProps> = ({
         </Avatar>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Goals Overview */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">Goals Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {goals.length > 0 ? (
-                goals.map(goal => (
-                  <div key={goal.id} className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span>{goal.title}</span>
-                      <span>{goal.progress}%</span>
-                    </div>
-                    <Progress value={goal.progress} className="h-2 bg-gray-700" />
-                  </div>
-                ))
-              ) : (
-                <p>No goals available.</p>
-              )}
-            </CardContent>
-          </Card>
-          
-          {/* Recent Challenges */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">Recent Challenges</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {challenges.length > 0 ? (
-                <ul className="space-y-2">
-                  {challenges.slice(0, 5).map(challenge => (
-                    <li key={challenge.id} className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-purple-500" />
-                      <span>{challenge.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No recent challenges.</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Progress Tracking */}
-        <Card className="mt-4 bg-gray-800 border-gray-700">
+        {/* Goal Overview */}
+        <Card className="bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Progress Tracking</CardTitle>
+            <CardTitle className="text-xl font-bold">Goals Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold">{streak} day streak!</p>
-                <p className="text-sm text-gray-400">Keep it up!</p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-semibold">Total Tasks Completed</p>
-                <p className="text-3xl font-bold text-green-500">{tasks.filter(task => task.completed).length}</p>
-              </div>
-            </div>
-          </CardContent>
+            {goals.length > 0 ? (
+              goals.map(goal => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  tasks={tasks.filter(task => task.goalId === goal.id)}
+                  deleteTask={deleteTask}
+                  toggleTaskCompletion={toggleTaskCompletion}
+                />
+        ))
+      ) : (
+        <p>No goals available.</p>
+      )}
+    </CardContent>
         </Card>
+
         
-        {/* AI Insights */}
-        <Card className="mt-4 bg-gray-800 border-gray-700">
+        {/* Generate/Update Today's Tasks */}
+        <Card className="mt-4 bg-card text-card-foreground border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">AI Insights</CardTitle>
+            <CardTitle className="text-xl font-bold">Today's Tasks</CardTitle>
           </CardHeader>
           <CardContent>
-            {aiInsights.length > 0 ? (
+            <Button onClick={generateTodaysTasks} className="mb-4 w-full">
+              Generate/Update Today's Tasks
+            </Button>
+            {todaysTasks.length > 0 ? (
               <ul className="space-y-2">
-                {aiInsights.map((insight, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-blue-500" />
-                    <span>{insight}</span>
+                {todaysTasks.map((task) => (
+                  <li key={task.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => updateTask(task.id, { completed: !task.completed })}
+                        className="form-checkbox h-4 w-4"
+                      />
+                      <span className={task.completed ? 'line-through' : ''}>{task.title}</span>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task.id)}>
+                      Delete
+                    </Button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>No AI insights available.</p>
+              <p>No tasks for today.</p>
             )}
-            <Button onClick={simulateAiInsights} className="mt-4 w-full bg-blue-600 hover:bg-blue-700">
-              Generate New Insight
-            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Voice Memo */}
+        <Card className="mt-4 bg-card text-card-foreground border-border">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">Express your thoughts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VoiceMemo voiceMemo={voiceMemo} user={user} />
           </CardContent>
         </Card>
       </CardContent>
