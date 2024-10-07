@@ -139,7 +139,7 @@ export default function Goals({
             step={1}
             value={[formData[currentQuestion.id] || currentQuestion.min]}
             onValueChange={(value) => handleSliderChange(value)}
-            className="w-full"
+            className="w-full white"
           />
         )
       case 'checkbox':

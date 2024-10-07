@@ -77,7 +77,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
       }
       try {
         console.log('Submitting formData:', formData);
-        await addDoc(collection(db, 'users', user.uid, "formResponses"), formData);
+        await addDoc(collection(db, 'users', user.uid, "userProfile"), formData);
 
         const userDocRef = doc(db, 'users', user.uid);
         await updateDoc(userDocRef, { firstLogin: false });
