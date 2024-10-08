@@ -1,43 +1,110 @@
-import { 
-  Star, CircleAlert, Clock, CheckCircle,
-  Book, Mountain, Trophy, MessageCircle,
-  Hourglass, Laptop, Building2, PersonStanding,
-  ThumbsUp, Bell, ClipboardList, Sun,
-  Flower, Compass, Accessibility, User
- } from 'lucide-react'
+// Updated questionsUser.ts
 
- export const questionsUser = [
-  { id: 'name',
+import { 
+  User, Heart, Flame, Sun,
+  Trophy, Rocket, Clock, Target,
+  Book, Mountain, Hourglass, Info,
+  Flower, Globe, Award, Star,
+  Swords
+} from 'lucide-react';
+
+export const questionsUser = [
+  {
+    id: 'name',
     question: "What's your name?",
     type: 'input',
-    icon: User 
+    icon: User,
+  },
+  {
+    id: 'coreValues',
+    question: "List your top five personal values that guide your decisions and actions.",
+    guidance: 'Values are fundamental beliefs like integrity, creativity, compassion, etc.',
+    type: 'textarea',
+    icon: Heart,
+  },
+  {
+    id: 'passions',
+    question: "What activities, subjects, or causes are you most passionate about?",
+    guidance: 'Consider hobbies, interests, or issues that excite you.',
+    type: 'textarea',
+    icon: Flame,
+  },
+  {
+    id: 'purposeAndFulfillment',
+    question: "Describe moments when you felt the most fulfilled or found deep meaning in what you were doing.",
+    type: 'textarea',
+    icon: Sun,
+  },
+  {
+    id: 'productivityLevel',
+    question: "How productive are you when focused on a task?",
+    type: 'slider',
+    min: 1,
+    max: 5,
+    icon: Target,
   },
   {
     id: 'topStrengths',
-    question: "What are your top three strengths that help you achieve your goals?",
+    question: "What are your key strengths, talents, or skills?",
+    guidance: 'Think about abilities you excel at or qualities others appreciate in you.',
     type: 'textarea',
     icon: Star,
   },
   {
-    id: 'mainChallenges',
-    question: "What are the main challenges or weaknesses you face when working towards your goals?",
+    id: 'pastAchievements',
+    question: "List accomplishments you're proud of and explain why they are significant to you.",
     type: 'textarea',
-    icon: CircleAlert,
+    icon: Trophy,
   },
   {
-    id: 'timeManagementSkills',
-    question: "How would you describe your time management skills?",
+    id: 'developmentOpportunities',
+    question: "What skills or areas would you like to improve?",
+    type: 'textarea',
+    icon: Rocket,
+  },
+  {
+    id: 'mainChallenges',
+    question: "What limitations or obstacles have held you back, and how do you wish to overcome them?",
+    type: 'checkbox',
+    options: [
+      'Time management',
+      'Lack of motivation',
+      'Limited resources',
+      'Unclear planning',
+      'Procrastination',
+      'Other',
+    ],
+    icon: Swords
+  },
+  {
+    id: 'envisionFuture',
+    question: "Where do you see yourself in the next 5 to 10 years?",
+    type: 'textarea',
+    icon: Mountain,
+  },
+  {
+    id: 'lifeGoals',
+    question: "What long-term goals do you aspire to achieve?",
+    type: 'textarea',
+    icon: Award,
+  },
+  {
+    id: 'desiredImpact',
+    question: "What positive impact do you want to make in your life, community, or the world?",
+    type: 'textarea',
+    icon: Globe,
+  },
+  {
+    id: 'availableTime',
+    question: "How much free time can you dedicate to your objectives each week?",
     type: 'radio',
     icon: Clock,
-    options: ['Excellent', 'Good', 'Average', 'Needs Improvement'],
-  },
-  {
-    id: 'disciplineLevel',
-    question: "On a scale of 1-5, how disciplined are you in sticking to a plan or schedule?",
-    type: 'slider',
-    icon: CheckCircle,
-    min: 1,
-    max: 5,
+    options: [
+      'Less than 5 hour',
+      '5-10 hours',
+      '10-20 hours',
+      'More than 20 hours'
+    ]
   },
   {
     id: 'learningStyle',
@@ -47,81 +114,11 @@ import {
     options: ['Visual (seeing)', 'Auditory (hearing)', 'Reading/Writing', 'Kinesthetic (doing)', 'Multimodal'],
   },
   {
-    id: 'responseToSetbacks',
-    question: "How do you usually respond to setbacks or obstacles?",
-    type: 'radio',
-    icon: Mountain,
-    options: ['Stay motivated and find solutions', 'Feel discouraged but keep going', 'Lose motivation easily', 'Other'],
-  },
-  {
-    id: 'motivationFactors',
-    question: "What motivates you the most when working towards a goal?",
-    type: 'radio',
-    icon: Trophy,
-    options: ['Personal satisfaction', 'External rewards', 'Recognition from others', 'Avoiding negative consequences', 'Other'],
-  },
-  {
-    id: 'feedbackPreference',
-    question: "How do you prefer to receive feedback or guidance?",
-    type: 'radio',
-    icon: MessageCircle,
-    options: ['Regular check-ins', 'As-needed basis', 'Only when I ask for it', 'Prefer minimal feedback'],
-  },
-  {
     id: 'procrastinationHabit',
     question: "Do you tend to procrastinate on tasks?",
     type: 'radio',
     icon: Hourglass,
     options: ['Never', 'Sometimes', 'Often', 'Always'],
-  },
-  {
-    id: 'techComfortLevel',
-    question: "How comfortable are you with using technology and digital tools to manage tasks?",
-    type: 'radio',
-    icon: Laptop,
-    options: ['Very comfortable', 'Somewhat comfortable', 'Not comfortable at all'],
-  },
-  {
-    id: 'preferredWorkEnvironment',
-    question: "Which environments do you work best in?",
-    type: 'radio',
-    icon: Building2,
-    options: ['Quiet and solitary', 'Busy and energetic', 'Structured and organized', 'Flexible and dynamic', 'Other'],
-  },
-  {
-    id: 'workPreference',
-    question: "Do you prefer working independently or collaboratively?",
-    type: 'radio',
-    icon: PersonStanding,
-    options: ['Independently', 'Collaboratively', 'A mix of both'],
-  },
-  {
-    id: 'confidenceLevel',
-    question: "How confident are you in your ability to achieve your goals?",
-    type: 'radio',
-    icon: ThumbsUp,
-    options: ['Very confident', 'Somewhat confident', 'Not very confident', 'Not confident at all'],
-  },
-  {
-    id: 'distractions',
-    question: "What distracts you the most when working on tasks?",
-    type: 'checkbox',
-    icon: Bell,
-    options: ['Social media', 'Emails/Notifications', 'Interruptions from others', 'Lack of interest', 'Multitasking', 'Other'],
-  },
-  {
-    id: 'taskPrioritization',
-    question: "How do you prioritize your tasks?",
-    type: 'radio',
-    icon: ClipboardList,
-    options: ['By deadline', 'By importance', 'By difficulty', 'Randomly', 'I struggle with prioritization'],
-  },
-  {
-    id: 'productiveTime',
-    question: "What time of day are you most productive?",
-    type: 'radio',
-    icon: Sun,
-    options: ['Morning', 'Afternoon', 'Evening', 'Late night', 'Varies day to day'],
   },
   {
     id: 'stressManagement',
@@ -131,16 +128,9 @@ import {
     options: ['Manage it well', 'Sometimes overwhelmed', 'Often stressed', 'Not sure'],
   },
   {
-    id: 'opennessToNewMethods',
-    question: "Are you open to trying new strategies or methods to achieve your goals?",
-    type: 'radio',
-    icon: Compass,
-    options: ['Very open', 'Somewhat open', 'Prefer familiar methods'],
-  },
-  {
-    id: 'accessibilityNeeds',
-    question: "Do you have any accessibility needs or preferences we should be aware of to enhance your experience?",
+    id: 'furtherInfo',
+    question: "Do you have any further information you'd like to share?",
     type: 'textarea',
-    icon: Accessibility,
+    icon: Info,
   },
 ];

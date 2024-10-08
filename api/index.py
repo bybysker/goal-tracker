@@ -1,5 +1,6 @@
 import os
 import io
+from rich import print
 from dotenv import load_dotenv
 from datetime import date
 from pydantic import BaseModel
@@ -26,12 +27,15 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 #doc_ref = db.collection("users").document("aturing")
 
-class Tasks(BaseModel):
+class Task(BaseModel):
     id: str
     title: str
     completed: bool
 #    date: date
     goal_id: str
+
+class DailyTasks(BaseModel):
+    tasks: list[Task]
 
 def generate_tasks(user_id: str, goal_id: str, augmented_context: str = "None"):
 
@@ -52,7 +56,7 @@ def generate_tasks(user_id: str, goal_id: str, augmented_context: str = "None"):
     completion = client.beta.chat.completions.parse(
         model='gpt-4o-2024-08-06',
         messages=[{"role": "user", "content": tasks_prompt}],
-        response_format=Tasks
+        response_format=DailyTasks
     )
     
     tasks = completion.choices[0].message.parsed
