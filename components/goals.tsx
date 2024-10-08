@@ -220,6 +220,9 @@ export default function Goals({
                             {currentQuestion.question}
                           </Label>
                         </div>
+                        <p className="text-sm italic text-white/80">
+                          {currentQuestion.guidance}
+                        </p>
                         {getInputComponent()}
                       </motion.div>
                     </AnimatePresence>
