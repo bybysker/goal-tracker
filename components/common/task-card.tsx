@@ -23,7 +23,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onToggle, onDelete, onUpdate 
       <div className="flex items-center">
         <Checkbox checked={task.completed} onCheckedChange={onToggle} />
         <span className={`ml-2 ${task.completed ? 'line-through text-gray-500' : 'text-gray-100'}`}>
-          {task.title} - {new Date(task.date).toLocaleDateString()}
+          {task.name} - {new Date(task.date).toLocaleDateString()}
         </span>
       </div>
       <div className="flex items-center space-x-2">

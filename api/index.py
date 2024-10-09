@@ -2,13 +2,12 @@ import os
 import io
 from rich import print
 from dotenv import load_dotenv
-from datetime import date
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
-from prompts import task_generation_prompt
+from goal_to_tasks import TasksGeneration, MilestonesGeneration
 
 
 #from some_vector_db_library import VectorDBClient
@@ -22,64 +21,16 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 app = FastAPI()
 
 # Initialize Firestore
-cred = credentials.Certificate("api/firebase_credentials.json")
+cred_path = os.path.join(os.path.dirname(__file__), "firebase_credentials.json")
+cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-#doc_ref = db.collection("users").document("aturing")
 
-class Task(BaseModel):
-    id: str
-    title: str
-    completed: bool
-#    date: date
-    goal_id: str
 
-class DailyTasks(BaseModel):
-    tasks: list[Task]
-
-def generate_tasks(user_id: str, goal_id: str, augmented_context: str = "None"):
-
-    # Get user profile
-    user_profile_docs = db.collection("users").document(user_id).collection("userProfile").stream()
-    user_profile_doc = next(user_profile_docs, None)  # Get the first document
-
-    user_profile_data = user_profile_doc.to_dict()
-
-    # Get the goal 
-    goal_doc = db.collection("users", user_id, "goals").document(goal_id).get()
-    #user_ids = [user.id for user in users.stream()]
-    goal_data = goal_doc.to_dict()
-
-    tasks_prompt = task_generation_prompt(user_profile_data, goal_data)
-
-    # Logic to generate tasks based on a prompt and augmented context
-    completion = client.beta.chat.completions.parse(
-        model='gpt-4o-2024-08-06',
-        messages=[{"role": "user", "content": tasks_prompt}],
-        response_format=DailyTasks
-    )
-    
-    tasks = completion.choices[0].message.parsed
-    return tasks
 
 @app.post('/define_tasks')
-def define_tasks(user_id: int, prompt: str):
-    # Logic to define tasks based on a prompt and augmented context from a vector database in Firestore
-
-    # Initialize Vector Database Client
-    #vector_db_client = VectorDBClient(api_key="your_vector_db_api_key")
-
-    # Fetch user history from Firestore
-    user_history_ref = db.collection('user_histories').document(str(user_id))
-    user_history = user_history_ref.get().to_dict()
-
-    # Augment context using vector database
-    augmented_context = vector_db_client.get_augmented_context(user_history)
-
-    # Define tasks based on prompt and augmented context
-    tasks = generate_tasks(prompt, augmented_context)  # Replace with actual task generation logic
-
-    return {"tasks": tasks}
+def define_tasks():
+    pass
 
 @app.post('/transcribe_voice')
 def transcribe_voice(voice_memo: UploadFile = File(...)):
@@ -118,6 +69,8 @@ def transcribe_voice(voice_memo: UploadFile = File(...)):
     #user_ids = [user.id for user in users.stream()]
 #goal_data = goal_doc.to_dict()
 
-print(generate_tasks("oQP2oJzlrtR84IjAlQYizLSFywT2", "XJoJ8iTirGwydAQ5pm5J"))
-
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").generate_tasks())
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").formulate_goal())
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").user_profile_data)
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").goal_data)
 

@@ -119,7 +119,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onChange={() => updateTask(task.id, { completed: !task.completed })}
                         className="form-checkbox h-4 w-4"
                       />
-                      <span className={task.completed ? 'line-through' : ''}>{task.title}</span>
+                      <span className={task.completed ? 'line-through' : ''}>{task.name}</span>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => deleteTask(task.id)}>
                       Delete

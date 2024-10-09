@@ -59,7 +59,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
                     htmlFor={`calendar-task-${task.id}`}
                     className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}
                   >
-                    {task.title}
+                    {task.name}
                   </Label>
                   <Button variant="ghost" size="sm" onClick={() => deleteTask(task.id)}>
                     <Trash className="h-4 w-4" />

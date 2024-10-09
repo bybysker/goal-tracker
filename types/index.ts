@@ -1,6 +1,6 @@
 export interface Goal {
   id: string;
-  title: string;
+  name: string;
   category: string;
   timeframe: string;
   importance: number;
@@ -11,7 +11,7 @@ export interface Goal {
 }
 export interface Task {
   id: string;
-  title: string;
+  name: string;
   completed: boolean;
   date: string;
   goalId: string;
