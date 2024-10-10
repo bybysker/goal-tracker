@@ -3,12 +3,11 @@ import io
 from rich import print
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
-from goal_to_tasks import TasksGeneration, MilestonesGeneration
-
+from api.goal_to_tasks import TasksGeneration, MilestonesGeneration, Goal
 
 #from some_vector_db_library import VectorDBClient
 embed_model = "text-embedding-ada-002"
@@ -26,11 +25,52 @@ cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+class GoalFormData(BaseModel):
+    user_id: str
+    goal_data: Goal
 
+@app.post('/generate_milestones')
+def generate_milestones(goal_form_data: GoalFormData):
+    """
+    Endpoint to generate milestones for a given user and goal.
 
-@app.post('/define_tasks')
-def define_tasks():
-    pass
+    Args:
+    - user_id (str): The ID of the user.
+    - goal_data (Goal): The ID of the goal.
+
+    Returns:
+    - dict: A dictionary containing the generated milestones.
+    """
+    user_id = goal_form_data.user_id
+    goal_data = goal_form_data.goal_data
+    try:
+        milestone_generator = MilestonesGeneration(db, client, user_id, goal_data)
+        milestones = milestone_generator.generate_milestones()
+        return {"milestones": milestones}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post('/generate_tasks')
+def generate_tasks(user_id: str, goal_id: str, milestone_id: str):
+    """
+    Endpoint to generate tasks for a given user, goal, and milestone.
+
+    Args:
+    - user_id (str): The ID of the user.
+    - goal_id (str): The ID of the goal.
+    - milestone_id (str): The ID of the milestone.
+
+    Returns:
+    - dict: A dictionary containing the generated tasks.
+    """
+    try:
+        task_generator = TasksGeneration(db, client, user_id, goal_id, milestone_id)
+        tasks = task_generator.generate_tasks()
+        return {"tasks": tasks}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post('/transcribe_voice')
 def transcribe_voice(voice_memo: UploadFile = File(...)):

@@ -1,11 +1,18 @@
-from pydantic import BaseModel
-from prompts import (MILESTONE_TO_TASK_SYS_MSG, 
+from pydantic import BaseModel, Field
+from api.prompts import (MILESTONE_TO_TASK_SYS_MSG, 
                      MILESTONE_TO_TASK_USR_MSG,
                      ENRICHED_GOAL_SYS_MSG,
                      ENRICHED_GOAL_USR_MSG,
                      GOAL_TO_MILESTONE_SYS_MSG,
                      GOAL_TO_MILESTONE_USR_MSG)
 
+class Goal(BaseModel):
+    name: str 
+    measurable: str 
+    achievable: str 
+    relevance: str 
+    timeframe: str 
+    time_commitment: int 
 
 class Task(BaseModel):
     id: str
@@ -18,6 +25,7 @@ class Task(BaseModel):
 class Milestone(BaseModel):
     id: str
     name: str
+    description: str
     duration_weeks: float
     completed: bool
     goal_id: str
@@ -31,22 +39,17 @@ class WeeklyTasks(BaseModel):
 
 class MilestonesGeneration:
 
-    def __init__(self, db, client, user_id: str, goal_id: str):
+    def __init__(self, db, client, user_id: str, goal_data: Goal):
 
         self.db = db
         self.client = client
         self.user_id = user_id
-        self.goal_id = goal_id
+        self.goal_data = goal_data
 
         # Fetch user profile data
         user_profile_docs = self.db.collection("users").document(user_id).collection("userProfile").stream()
         user_profile_doc = next(user_profile_docs, None)  # Get the first document
         self.user_profile_data = user_profile_doc.to_dict() if user_profile_doc else {}
-
-        # Fetch goal data
-        goal_doc = self.db.collection("users", self.user_id, "goals").document(self.goal_id).get()
-        self.goal_data = goal_doc.to_dict() if goal_doc.exists else {}
-
 
     def enrich_goal(self):
 
@@ -62,11 +65,8 @@ class MilestonesGeneration:
         return completion.choices[0].message.content
 
 
-
-
     def generate_milestones(self, augmented_context: str = "None"):
 
-        # Logic to generate tasks based on a prompt and augmented context
         completion = self.client.beta.chat.completions.parse(
             model='gpt-4o-2024-08-06',
             messages=[
@@ -76,8 +76,8 @@ class MilestonesGeneration:
             response_format=GoalMilestones,
             seed=42
         )
-        
-        return completion.choices[0].message.parsed
+        message_parsed = completion.choices[0].message.parsed
+        return message_parsed.milestones
     
 
 

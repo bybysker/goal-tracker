@@ -12,10 +12,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Plus, ChevronsRight, ChevronLeft, CheckCircle } from "lucide-react";
-import GoalCard from './common/goal-card';
+import { Plus, ChevronsRight, ChevronLeft, CheckCircle, Loader } from "lucide-react";
 
-import { Goal, Task } from '@/types';
+import axios from 'axios'
+import { User as FirebaseUser } from 'firebase/auth'
+
+import GoalCard from './common/goal-card';
+import { Goal, Task, Milestone } from '@/types';
 import { questionsGoal } from '@/config/questionsGoalConfig'
 
 interface GoalsProps {
@@ -25,8 +28,10 @@ interface GoalsProps {
   deleteGoal?: (id: string) => void;
   setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
+  addMilestone: (milestone: Milestone) => void;
   toggleTaskCompletion: (id: string) => void;
   deleteTask: (id: string) => void;
+  user: FirebaseUser | null; 
 }
 
 export default function Goals({
@@ -36,14 +41,19 @@ export default function Goals({
   deleteGoal,
   setIsEditing,
   updateGoal,
+  addMilestone,
   toggleTaskCompletion,
-  deleteTask
+  deleteTask,
+  user
 }: GoalsProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const [formData, setFormData] =  useState<Record<string, any>>({})
   const [progress, setProgress] = useState(0)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [showMilestonesDialog, setShowMilestonesDialog] = useState(false);
 
   useEffect(() => {
     setProgress(((currentQuestionIndex + 1) / questionsGoal.length) * 100)
@@ -86,13 +96,43 @@ export default function Goals({
     if (currentQuestionIndex < questionsGoal.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1)
     } else {
-      console.log('Submitting formData:', formData);
-      addGoal(formData as Omit<Goal, 'id' | 'progress'>);
-      showMessage();
+      setIsLoading(true);
+      if (!user) return;
+      try {
+        console.log('Submitting formData:', formData);
+        addGoal(formData as Omit<Goal, 'id' | 'progress'>);
+        const response = await axios.post('/api/generate_milestones',  {
+          user_id: user.uid,
+          goal_data: formData
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        const data = response.data;
+        setMilestones(data.milestones);
+        setShowMilestonesDialog(true);
+      } catch (error) {
+        console.error('Error generating milestones:', error);
+        // Handle error (e.g., show error message to user)
+      } finally {
+        setIsLoading(false);
+      }
+      //showMessage();
       resetForm();
     }
   }
-
+  const handleSaveMilestones = async () => {
+    // Here you would implement the logic to save milestones to Firebase
+    // This is a placeholder function
+    console.log('Saving milestones:', milestones);
+    milestones.forEach(milestone => {
+      addMilestone({ ...milestone } as Milestone);
+    });
+    // After saving, you might want to update the local state or fetch updated data
+    setShowMilestonesDialog(false);
+    showMessage();
+  }
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prevIndex => prevIndex - 1)
@@ -253,30 +293,49 @@ export default function Goals({
                       <span>Question {currentQuestionIndex + 1} of {questionsGoal.length}</span>
                       <span>{Math.round(progress)}% completed</span>
                     </div>
-                    <Progress value={progress} className="w-full h-2 bg-gray-700" />
+                    <Progress value={progress} className="w-full h-2 bg-gray-700 text-white" />
                   </CardFooter>
                 </form>
               </ScrollArea>
             </DialogContent>
           </Dialog>
+          {/* New dialog for displaying milestones */}
+          <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
+            <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="h-[60vh] pr-4">
+                {milestones.map((milestone, index) => (
+                  <Card key={index} className="mb-4 bg-gray-700">
+                    <CardContent className="p-4">
+                      <h3 className="text-lg font-semibold">{milestone.name}</h3>
+                      <p>Duration: {milestone.duration_weeks} weeks</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </ScrollArea>
+              <Button onClick={handleSaveMilestones} className="w-full mt-4">
+                Save Milestones
+              </Button>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
+      {/* Loading animation */}
       <AnimatePresence>
-        {showSuccessMessage && (
+        {isLoading && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           >
             <motion.div
-              className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
-              initial={{ y: -50 }}
-              animate={{ y: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             >
-              <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-              <h2 className="text-xl font-bold text-gray-800">Goal added successfully</h2>
+              <Loader className="w-12 h-12 text-blue-500" />
             </motion.div>
           </motion.div>
         )}

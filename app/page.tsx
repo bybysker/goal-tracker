@@ -16,7 +16,8 @@ import Settings from '@/components/settings';
 import Profile from '@/components/profile';
 
 // Import types
-import { Goal, Task, Memo } from '@/types';
+import { Goal, Task, Memo, Milestone } from '@/types';
+import axios from 'axios';
 
 const GoalTrackerApp: React.FC = () => {
   const { user, handleSignOut } = useAuth();
@@ -69,6 +70,18 @@ const GoalTrackerApp: React.FC = () => {
       await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 });
     } catch (error) {
       console.error("Error adding goal:", error);
+    }
+  }
+
+  const addMilestone = async (milestone: Omit<Milestone, 'id'>) => {
+    if (!user) {
+      alert("User not authenticated.");
+      return;
+    }
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'milestones'), milestone);
+    } catch (error) {
+      console.error("Error adding milestone:", error);
     }
   }
 
@@ -137,9 +150,19 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   // Generate/Update today's tasks
-  const generateTodaysTasks = () => {
+  const generateTodaysTasks = async () => {
     // Implement logic to generate or update tasks for today
     console.log("Generating today's tasks");
+    if (!user) return;
+    const response = await axios.post('/api/generate_tasks',  {
+      user_id: user.uid,
+      goal_id: user.uid,
+      milestone_id: user.uid
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
   }
 
   // Update Profile Function
@@ -194,8 +217,10 @@ const GoalTrackerApp: React.FC = () => {
                 updateGoal={updateGoal}
                 deleteGoal={deleteGoal}
                 setIsEditing={() => {/* function logic here */}}
+                addMilestone={addMilestone}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
+                user={user}
               />
             )}
             {activeTab === 'calendar' && (

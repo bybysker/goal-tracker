@@ -2,7 +2,7 @@ import { Target, Calendar, Gauge, Clock, Heart, Sliders } from 'lucide-react';
 
 export const questionsGoal = [
   {
-    id: 'title',
+    id: 'name',
     question: 'What is your goal? Please be clear and specific.',
     guidance: 'Avoid vague descriptions. Example: Instead of "I want to get fit," specify "I want to run a 5k race without stopping within 3 months."',
     type: 'textarea',
