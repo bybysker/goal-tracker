@@ -29,6 +29,11 @@ class GoalFormData(BaseModel):
     user_id: str
     goal_data: Goal
 
+class MilestoneFormInfo(BaseModel):
+    user_id: str
+    goal_id: str
+    milestone_id: str
+
 @app.post('/generate_milestones')
 def generate_milestones(goal_form_data: GoalFormData):
     """
@@ -52,7 +57,7 @@ def generate_milestones(goal_form_data: GoalFormData):
     
 
 @app.post('/generate_tasks')
-def generate_tasks(user_id: str, goal_id: str, milestone_id: str):
+def generate_tasks(milestone_form_info: MilestoneFormInfo):
     """
     Endpoint to generate tasks for a given user, goal, and milestone.
 
@@ -64,6 +69,10 @@ def generate_tasks(user_id: str, goal_id: str, milestone_id: str):
     Returns:
     - dict: A dictionary containing the generated tasks.
     """
+    user_id = milestone_form_info.user_id
+    goal_id = milestone_form_info.goal_id
+    milestone_id = milestone_form_info.milestone_id
+
     try:
         task_generator = TasksGeneration(db, client, user_id, goal_id, milestone_id)
         tasks = task_generator.generate_tasks()

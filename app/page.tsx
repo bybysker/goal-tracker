@@ -61,27 +61,28 @@ const GoalTrackerApp: React.FC = () => {
   }, [user, router]);
 
   // CRUD operations for Goals
-  const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>) => {
+  const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>): Promise<string> => {
     if (!user) {
-      alert("User not authenticated.");
-      return;
+      alert("User not authenticated.")
+      return ''
     }
     try {
-      await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 });
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 })
+      return docRef.id
     } catch (error) {
-      console.error("Error adding goal:", error);
+      console.error("Error adding goal:", error)
+      return ''
     }
   }
 
-  const addMilestone = async (milestone: Omit<Milestone, 'id'>) => {
-    if (!user) {
-      alert("User not authenticated.");
-      return;
-    }
+  const addMilestone = async (milestone: Omit<Milestone, 'id'>): Promise<string> => {
+    if (!user) return ''
     try {
-      await addDoc(collection(db, 'users', user.uid, 'milestones'), milestone);
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', milestone.goalId, 'milestones'), milestone)
+      return docRef.id
     } catch (error) {
-      console.error("Error adding milestone:", error);
+      console.error("Error adding milestone:", error)
+      return ''
     }
   }
 
@@ -112,12 +113,14 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  const addTask = async (task: Omit<Task, 'id'>) => {
-    if (!user) return;
+  const addTask = async (task: Omit<Task, 'id'>): Promise<string> => {
+    if (!user) return ''
     try {
-      await addDoc(collection(db, 'users', user.uid, 'tasks'), task);
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', task.goalId, 'milestones', task.milestoneId, 'tasks'), task)
+      return docRef.id
     } catch (error) {
-      console.error("Error adding task:", error);
+      console.error("Error adding task:", error)
+      return ''
     }
   }
 
@@ -218,6 +221,7 @@ const GoalTrackerApp: React.FC = () => {
                 deleteGoal={deleteGoal}
                 setIsEditing={() => {/* function logic here */}}
                 addMilestone={addMilestone}
+                addTask={addTask}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 user={user}

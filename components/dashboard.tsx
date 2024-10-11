@@ -90,6 +90,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   tasks={tasks.filter(task => task.goalId === goal.id)}
                   deleteTask={deleteTask}
                   toggleTaskCompletion={toggleTaskCompletion}
+                  isGoalsView={false}
                 />
         ))
       ) : (

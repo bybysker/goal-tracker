@@ -24,11 +24,12 @@ import { questionsGoal } from '@/config/questionsGoalConfig'
 interface GoalsProps {
   goals: Goal[];
   tasks: Task[];
-  addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => void;
+  addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => Promise<string>;
   deleteGoal?: (id: string) => void;
   setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
-  addMilestone: (milestone: Milestone) => void;
+  addMilestone: (milestone: Milestone) => Promise<string>;
+  addTask: (task: Omit<Task, 'id'>) => Promise<string>;
   toggleTaskCompletion: (id: string) => void;
   deleteTask: (id: string) => void;
   user: FirebaseUser | null; 
@@ -42,6 +43,7 @@ export default function Goals({
   setIsEditing,
   updateGoal,
   addMilestone,
+  addTask,
   toggleTaskCompletion,
   deleteTask,
   user
@@ -100,17 +102,43 @@ export default function Goals({
       if (!user) return;
       try {
         console.log('Submitting formData:', formData);
-        addGoal(formData as Omit<Goal, 'id' | 'progress'>);
-        const response = await axios.post('/api/generate_milestones',  {
+        // Step 1: Save the goal and get the ID
+        const goalId = await addGoal(formData as Omit<Goal, 'id' | 'progress'>);
+        if (!goalId) throw new Error("Failed to create goal");
+
+        const milestonesResponse = await axios.post('/api/generate_milestones',  {
           user_id: user.uid,
-          goal_data: formData
+          goal_data: { ...formData, id: goalId }
         }, {
           headers: {
             'Content-Type': 'application/json',
           }
         });
-        const data = response.data;
-        setMilestones(data.milestones);
+        const generatedMilestones = milestonesResponse.data.milestones;
+
+        // Step 3: Save milestones and generate tasks
+        for (const milestone of generatedMilestones) {
+          const milestoneId = await addMilestone({ ...milestone, goalId });
+          if (!milestoneId) continue;
+
+          // Generate tasks for each milestone
+          const tasksResponse = await axios.post('/api/generate_tasks', {
+            user_id: user.uid,
+            goal_id: goalId,
+            milestone_id: milestoneId
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          const generatedTasks = tasksResponse.data.tasks;
+
+          // Save tasks
+          for (const task of generatedTasks) {
+            await addTask({ ...task, goalId, milestoneId });
+          }
+        }
+        setMilestones(generatedMilestones);
         setShowMilestonesDialog(true);
       } catch (error) {
         console.error('Error generating milestones:', error);
@@ -214,113 +242,116 @@ export default function Goals({
         <CardTitle className="text-2xl font-bold">Goals</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {goals.map(goal => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              tasks={tasks.filter(task => task.goalId === goal.id)}
-              onDelete={deleteGoal ? () => deleteGoal(goal.id) : undefined}
-              toggleTaskCompletion={toggleTaskCompletion}
-              deleteTask={deleteTask}
-            />
-          ))}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="mr-2 h-4 w-4" /> Add Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold mb-4">Add New Goal</DialogTitle>
-              </DialogHeader>
-              <ScrollArea className="h-[calc(80vh-8rem)] pr-4">
-                <form onSubmit={handleNext}>
-                  <CardContent className="space-y-6 p-6">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentQuestion.id}
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <motion.div
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-2"
-                          >
-                            {React.createElement(currentQuestion.icon, { className: "w-6 h-6 text-white" })}
-                          </motion.div>
-                          <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
-                            {currentQuestion.question}
-                          </Label>
-                        </div>
-                        <p className="text-sm italic text-white/80">
-                          {currentQuestion.guidance}
-                        </p>
-                        {getInputComponent()}
-                      </motion.div>
-                    </AnimatePresence>
-                  </CardContent>
-                  <CardFooter className="flex flex-col space-y-4">
-                    <div className="flex w-full space-x-4">
-                      <Button 
-                        type="button" 
-                        onClick={handleBack} 
-                        className="flex-1 bg-gray-700 hover:bg-gray-600 text-white"
-                        disabled={currentQuestionIndex === 0}
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-2" />
-                        Back
-                      </Button>
-                      <Button type="submit" className="flex-1 text-lg font-semibold group bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">
-                        <span className="mr-2">{currentQuestionIndex < questionsGoal.length - 1 ? 'Next' : 'Submit'}</span>
+        <ScrollArea className="h-[750px] w-full pr-4">
+          <div className="space-y-4">
+            {goals.map(goal => (
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                tasks={tasks.filter(task => task.goalId === goal.id)}
+                onDelete={deleteGoal ? () => deleteGoal(goal.id) : undefined}
+                toggleTaskCompletion={toggleTaskCompletion}
+                deleteTask={deleteTask}
+                isGoalsView={true}
+              />
+            ))}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <Plus className="mr-2 h-4 w-4" /> Add Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full max-h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold mb-4">Add New Goal</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[calc(80vh-8rem)] pr-4">
+                  <form onSubmit={handleNext}>
+                    <CardContent className="space-y-6 p-6">
+                      <AnimatePresence mode="wait">
                         <motion.div
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{ repeat: Infinity, duration: 1 }}
-                          className="inline-block"
+                          key={currentQuestion.id}
+                          initial={{ opacity: 0, x: 50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -50 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-4"
                         >
-                          <ChevronsRight className="w-5 h-5 inline" />
+                          <div className="flex items-center space-x-3">
+                            <motion.div
+                              initial={{ scale: 0, rotate: -180 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
+                              className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-2"
+                            >
+                              {React.createElement(currentQuestion.icon, { className: "w-6 h-6 text-white" })}
+                            </motion.div>
+                            <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
+                              {currentQuestion.question}
+                            </Label>
+                          </div>
+                          <p className="text-sm italic text-white/80">
+                            {currentQuestion.guidance}
+                          </p>
+                          {getInputComponent()}
                         </motion.div>
-                      </Button>
-                    </div>
-                    <div className="text-sm text-gray-400 flex justify-between w-full">
-                      <span>Question {currentQuestionIndex + 1} of {questionsGoal.length}</span>
-                      <span>{Math.round(progress)}% completed</span>
-                    </div>
-                    <Progress value={progress} className="w-full h-2 bg-gray-700 text-white" />
-                  </CardFooter>
-                </form>
-              </ScrollArea>
-            </DialogContent>
-          </Dialog>
-          {/* New dialog for displaying milestones */}
-          <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
-            <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
-              </DialogHeader>
-              <ScrollArea className="h-[60vh] pr-4">
-                {milestones.map((milestone, index) => (
-                  <Card key={index} className="mb-4 bg-gray-700">
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold">{milestone.name}</h3>
-                      <p>Duration: {milestone.duration_weeks} weeks</p>
+                      </AnimatePresence>
                     </CardContent>
-                  </Card>
-                ))}
-              </ScrollArea>
-              <Button onClick={handleSaveMilestones} className="w-full mt-4">
-                Save Milestones
-              </Button>
-            </DialogContent>
-          </Dialog>
-        </div>
+                    <CardFooter className="flex flex-col space-y-4">
+                      <div className="flex w-full space-x-4">
+                        <Button 
+                          type="button" 
+                          onClick={handleBack} 
+                          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white"
+                          disabled={currentQuestionIndex === 0}
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-2" />
+                          Back
+                        </Button>
+                        <Button type="submit" className="flex-1 text-lg font-semibold group bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">
+                          <span className="mr-2">{currentQuestionIndex < questionsGoal.length - 1 ? 'Next' : 'Submit'}</span>
+                          <motion.div
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ repeat: Infinity, duration: 1 }}
+                            className="inline-block"
+                          >
+                            <ChevronsRight className="w-5 h-5 inline" />
+                          </motion.div>
+                        </Button>
+                      </div>
+                      <div className="text-sm text-gray-400 flex justify-between w-full">
+                        <span>Question {currentQuestionIndex + 1} of {questionsGoal.length}</span>
+                        <span>{Math.round(progress)}% completed</span>
+                      </div>
+                      <Progress value={progress} className="w-full h-2 bg-gray-700 text-white" />
+                    </CardFooter>
+                  </form>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+            {/* New dialog for displaying milestones */}
+            <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
+              <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[60vh] pr-4">
+                  {milestones.map((milestone, index) => (
+                    <Card key={index} className="mb-4 bg-gray-700">
+                      <CardContent className="p-4">
+                        <h3 className="text-lg font-semibold">{milestone.name}</h3>
+                        <p>Duration: {milestone.duration_weeks} weeks</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </ScrollArea>
+                <Button onClick={handleSaveMilestones} className="w-full mt-4">
+                  Save Milestones
+                </Button>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </ScrollArea>
       </CardContent>
       {/* Loading animation */}
       <AnimatePresence>

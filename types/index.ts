@@ -1,6 +1,6 @@
 export interface Goal {
   id: string;
-  progress: string;
+  progress: number;
   name: string;
   measurable: string;
   achievable: string;
@@ -14,6 +14,7 @@ export interface Task {
   completed: boolean;
   date: string;
   goalId: string;
+  milestoneId: string;
 }
 export interface Memo {
   id: string;

@@ -119,4 +119,10 @@ class TasksGeneration:
             seed=42
         )
         
-        return completion.choices[0].message.parsed
+        message_parsed = completion.choices[0].message.parsed
+        tasks_list = message_parsed.tasks
+        for task in tasks_list:
+            task.goal_id = self.goal_id
+            task.milestone_id = self.milestone_id
+
+        return tasks_list

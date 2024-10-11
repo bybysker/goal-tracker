@@ -1,59 +1,90 @@
 import React from 'react';
 import { Goal, Task } from '@/types';
 import { Button } from "@/components/ui/button";
-import { Trash, Edit } from "lucide-react";
-import TaskCard from './task-card'; // Import TaskCard component
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import TaskCard from './task-card';
 
 interface GoalCardProps {
   goal: Goal;
-  tasks: Task[]; // Add tasks prop
-  onEdit?: () => void;
+  tasks: Task[];
   onDelete?: () => void;
-  onUpdate?: () => void; // Optional, for editing
-  toggleTaskCompletion: (id: string) => void; // Add toggleTaskCompletion prop
-  deleteTask: (id: string) => void; // Add deleteTask prop
+  toggleTaskCompletion: (id: string) => void;
+  deleteTask: (id: string) => void;
+  isGoalsView: boolean; // New prop to determine if we're in the Goals view
 }
 
 const GoalCard: React.FC<GoalCardProps> = ({ 
   goal, 
   tasks, 
-  onEdit, 
-  onDelete = () => {}, 
-  onUpdate, 
-  toggleTaskCompletion = () => {},
-  deleteTask = () => {}
+  onDelete, 
+  toggleTaskCompletion,
+  deleteTask,
+  isGoalsView
 }) => {
   return (
-    <div className="flex flex-col p-4 bg-gray-800 rounded">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold">{goal.name}</h3>
-          <p className="text-sm text-gray-400">Deadline: {new Date(goal.timeframe).toLocaleDateString()}</p>
-          <p className="text-sm text-gray-400">Category: {goal.category}</p>
-          <p className="text-sm text-gray-400">Progress: {goal.progress}%</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          {onUpdate && (
-            <Button variant="ghost" size="sm" onClick={onUpdate}>
-              <Edit className="h-4 w-4" />
-            </Button>
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>{goal.name}</CardTitle>
+            <CardDescription>Deadline: {new Date(goal.timeframe).toLocaleDateString()}</CardDescription>
+          </div>
+          {isGoalsView && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Trash className="h-4 w-4 text-destructive" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this goal?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the goal and all associated tasks.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
-          <Button variant="ghost" size="sm" onClick={onDelete}>
-            <Trash className="h-4 w-4 text-red-500" />
-          </Button>
         </div>
-      </div>
-      <div className="mt-4 space-y-2">
-        {tasks.map(task => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onToggle={() => toggleTaskCompletion(task.id)}
-            onDelete={() => deleteTask(task.id)}
-          />
-        ))}
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span>Progress</span>
+            <span>{goal.progress}%</span>
+          </div>
+          <Progress value={goal.progress} className="w-full" />
+        </div>
+        <div className="mt-4 space-y-2">
+          {tasks.map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggle={() => toggleTaskCompletion(task.id)}
+              onDelete={() => deleteTask(task.id)}
+            />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
