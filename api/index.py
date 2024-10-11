@@ -31,8 +31,8 @@ class GoalFormData(BaseModel):
 
 class MilestoneFormInfo(BaseModel):
     user_id: str
-    goal_id: str
-    milestone_id: str
+    guid: str
+    muid: str
 
 @app.post('/generate_milestones')
 def generate_milestones(goal_form_data: GoalFormData):
@@ -63,18 +63,18 @@ def generate_tasks(milestone_form_info: MilestoneFormInfo):
 
     Args:
     - user_id (str): The ID of the user.
-    - goal_id (str): The ID of the goal.
-    - milestone_id (str): The ID of the milestone.
+    - guid (str): The ID of the goal.
+    - muid (str): The ID of the milestone.
 
     Returns:
     - dict: A dictionary containing the generated tasks.
     """
     user_id = milestone_form_info.user_id
-    goal_id = milestone_form_info.goal_id
-    milestone_id = milestone_form_info.milestone_id
+    guid = milestone_form_info.guid
+    muid = milestone_form_info.muid
 
     try:
-        task_generator = TasksGeneration(db, client, user_id, goal_id, milestone_id)
+        task_generator = TasksGeneration(db, client, user_id, guid, muid)
         tasks = task_generator.generate_tasks()
         return {"tasks": tasks}
     except Exception as e:

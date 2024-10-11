@@ -39,12 +39,12 @@ const GoalTrackerApp: React.FC = () => {
 
     // Firestore listeners (goals, tasks, memos)
     const goalsUnsub = onSnapshot(collection(db, 'users', user.uid, 'goals'), (snapshot) => {
-      const fetchedGoals: Goal[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Goal));
+      const fetchedGoals: Goal[] = snapshot.docs.map(doc => ({ guid: doc.id, ...doc.data() } as Goal));
       setGoals(fetchedGoals);
     });
 
     const tasksUnsub = onSnapshot(collection(db, 'users', user.uid, 'tasks'), (snapshot) => {
-      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({ tuid: doc.id, ...doc.data() } as Task));
       setTasks(fetchedTasks);
     });
 
@@ -61,7 +61,7 @@ const GoalTrackerApp: React.FC = () => {
   }, [user, router]);
 
   // CRUD operations for Goals
-  const addGoal = async (goal: Omit<Goal, 'id' | 'progress'>): Promise<string> => {
+  const addGoal = async (goal: Omit<Goal, 'guid' | 'progress'>): Promise<string> => {
     if (!user) {
       alert("User not authenticated.")
       return ''
@@ -78,7 +78,7 @@ const GoalTrackerApp: React.FC = () => {
   const addMilestone = async (milestone: Omit<Milestone, 'id'>): Promise<string> => {
     if (!user) return ''
     try {
-      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', milestone.goalId, 'milestones'), milestone)
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', milestone.guid, 'milestones'), milestone)
       return docRef.id
     } catch (error) {
       console.error("Error adding milestone:", error)
@@ -116,7 +116,7 @@ const GoalTrackerApp: React.FC = () => {
   const addTask = async (task: Omit<Task, 'id'>): Promise<string> => {
     if (!user) return ''
     try {
-      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', task.goalId, 'milestones', task.milestoneId, 'tasks'), task)
+      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks'), task)
       return docRef.id
     } catch (error) {
       console.error("Error adding task:", error)
@@ -133,7 +133,7 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
   const toggleTaskCompletion = async (id: string) => {
-    const task = tasks.find(t => t.id === id);
+    const task = tasks.find(t => t.tuid === id);
     if (!task || !user) return;
     try {
       await updateTask(id, { completed: !task.completed });
@@ -159,8 +159,8 @@ const GoalTrackerApp: React.FC = () => {
     if (!user) return;
     const response = await axios.post('/api/generate_tasks',  {
       user_id: user.uid,
-      goal_id: user.uid,
-      milestone_id: user.uid
+      guid: user.uid,
+      muid: user.uid
     }, {
       headers: {
         'Content-Type': 'application/json',

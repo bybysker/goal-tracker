@@ -85,9 +85,9 @@ const Dashboard: React.FC<DashboardProps> = ({
             {goals.length > 0 ? (
               goals.map(goal => (
                 <GoalCard
-                  key={goal.id}
+                  key={goal.guid}
                   goal={goal}
-                  tasks={tasks.filter(task => task.goalId === goal.id)}
+                  tasks={tasks.filter(task => task.guid === goal.guid)}
                   deleteTask={deleteTask}
                   toggleTaskCompletion={toggleTaskCompletion}
                   isGoalsView={false}
@@ -112,17 +112,17 @@ const Dashboard: React.FC<DashboardProps> = ({
             {todaysTasks.length > 0 ? (
               <ul className="space-y-2">
                 {todaysTasks.map((task) => (
-                  <li key={task.id} className="flex items-center justify-between">
+                  <li key={task.tuid} className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={task.completed}
-                        onChange={() => updateTask(task.id, { completed: !task.completed })}
+                        onChange={() => updateTask(task.tuid, { completed: !task.completed })}
                         className="form-checkbox h-4 w-4"
                       />
                       <span className={task.completed ? 'line-through' : ''}>{task.name}</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task.id)}>
+                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task.tuid)}>
                       Delete
                     </Button>
                   </li>

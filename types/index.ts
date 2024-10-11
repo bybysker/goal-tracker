@@ -1,32 +1,33 @@
 export interface Goal {
-  id: string;
+  guid: string;
   progress: number;
   name: string;
   measurable: string;
   achievable: string;
   relevance: number;
   timeframe: string;
-  time_commitment: number;// sorry for not respecting the convention (its to ensure iso with api
+  bandwidth: number;// time commitment in hours 
 }
+
+export interface Milestone {
+  muid: string;
+  name: string;
+  description: string;
+  duration: string; // duration is in weeks  
+  completed: boolean;
+  guid: string;
+}
+
 export interface Task {
-  id: string;
+  tuid: string;
   name: string;
   completed: boolean;
   date: string;
-  goalId: string;
-  milestoneId: string;
+  guid: string;
+  muid: string;
 }
 export interface Memo {
   id: string;
   text: string;
   createdAt: Date;
-}
-
-export interface Milestone {
-  id: string;
-  name: string;
-  description: string;
-  duration_weeks: string; // sorry for not respecting the convention 
-  completed: boolean;
-  goalId: string;
 }

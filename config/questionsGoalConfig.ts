@@ -44,7 +44,7 @@ export const questionsGoal = [
     icon: Calendar,
   },
   {
-    id: 'time_commitment',
+    id: 'bandwidth',
     question: 'How many hours per week can you dedicate to this goal?',
     guidance: 'Be honest about your availability. Example: "I can dedicate around 3-5 hours per week to running."',
     type: 'slider',

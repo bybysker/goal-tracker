@@ -7,28 +7,27 @@ from api.prompts import (MILESTONE_TO_TASK_SYS_MSG,
                      GOAL_TO_MILESTONE_USR_MSG)
 
 class Goal(BaseModel):
+    guid: str
     name: str 
     measurable: str 
     achievable: str 
     relevance: str 
     timeframe: str 
-    time_commitment: int 
+    bandwidth: int 
+
+class Milestone(BaseModel):
+    name: str
+    description: str
+    duration: float
+    completed: bool
+    guid: str
 
 class Task(BaseModel):
-    id: str
     name: str
     completed: bool
     duration_hours: float
-    goal_id: str
-    milestone_id: str
-
-class Milestone(BaseModel):
-    id: str
-    name: str
-    description: str
-    duration_weeks: float
-    completed: bool
-    goal_id: str
+    guid: str
+    muid: str
 
 class GoalMilestones(BaseModel):
     milestones: list[Milestone]
@@ -45,6 +44,7 @@ class MilestonesGeneration:
         self.client = client
         self.user_id = user_id
         self.goal_data = goal_data
+        self.guid = goal_data.guid
 
         # Fetch user profile data
         user_profile_docs = self.db.collection("users").document(user_id).collection("userProfile").stream()
@@ -77,19 +77,23 @@ class MilestonesGeneration:
             seed=42
         )
         message_parsed = completion.choices[0].message.parsed
-        return message_parsed.milestones
+        milestones_list = message_parsed.milestones
+        for milestone in milestones_list:
+            milestone.guid = self.guid
+        
+        return milestones_list
     
 
 
 class TasksGeneration:
 
-    def __init__(self, db, client, user_id: str, goal_id: str, milestone_id: str):
+    def __init__(self, db, client, user_id: str, guid: str, muid: str):
 
         self.db = db
         self.client = client
         self.user_id = user_id
-        self.goal_id = goal_id
-        self.milestone_id = milestone_id
+        self.guid = guid
+        self.muid = muid
 
         # Fetch user profile data
         user_profile_docs = self.db.collection("users").document(user_id).collection("userProfile").stream()
@@ -97,10 +101,10 @@ class TasksGeneration:
         self.user_profile_data = user_profile_doc.to_dict() if user_profile_doc else {}
 
         # Fetch goal data
-        goal_doc = self.db.collection("users", self.user_id, "goals").document(self.goal_id).get()
+        goal_doc = self.db.collection("users", self.user_id, "goals").document(self.guid).get()
         self.goal_data = goal_doc.to_dict() if goal_doc.exists else {}
 
-        milestone_doc = self.db.collection("users", self.user_id, "goals").document(self.goal_id).get()
+        milestone_doc = self.db.collection("users", self.user_id, "goals", self.guid, "milestones").document(self.muid).get()
         self.milestone_data =  milestone_doc.to_dict() if goal_doc.exists else {}
 
 
@@ -122,7 +126,7 @@ class TasksGeneration:
         message_parsed = completion.choices[0].message.parsed
         tasks_list = message_parsed.tasks
         for task in tasks_list:
-            task.goal_id = self.goal_id
-            task.milestone_id = self.milestone_id
+            task.guid = self.guid
+            task.muid = self.muid
 
         return tasks_list

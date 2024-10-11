@@ -20,11 +20,12 @@ import { User as FirebaseUser } from 'firebase/auth'
 import GoalCard from './common/goal-card';
 import { Goal, Task, Milestone } from '@/types';
 import { questionsGoal } from '@/config/questionsGoalConfig'
+import { useToast } from '@/hooks/use-toast';
 
 interface GoalsProps {
   goals: Goal[];
   tasks: Task[];
-  addGoal: (goal: Omit<Goal, 'id' | 'progress'>) => Promise<string>;
+  addGoal: (goal: Omit<Goal, 'guid' | 'progress'>) => Promise<string>;
   deleteGoal?: (id: string) => void;
   setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
@@ -56,6 +57,7 @@ export default function Goals({
   const [isLoading, setIsLoading] = useState(false);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [showMilestonesDialog, setShowMilestonesDialog] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setProgress(((currentQuestionIndex + 1) / questionsGoal.length) * 100)
@@ -95,6 +97,18 @@ export default function Goals({
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    const currentAnswer = formData[currentQuestion.id];
+    if (!currentAnswer || (Array.isArray(currentAnswer) && currentAnswer.length === 0)) {
+      console.log("Triggering toast for incomplete answer");
+      toast({
+        title: "Incomplete Answer",
+        description: "Please answer the current question before proceeding.",
+        variant: "destructive",
+        duration: 1500,
+      });;
+      return;
+    }
     if (currentQuestionIndex < questionsGoal.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1)
     } else {
@@ -103,12 +117,12 @@ export default function Goals({
       try {
         console.log('Submitting formData:', formData);
         // Step 1: Save the goal and get the ID
-        const goalId = await addGoal(formData as Omit<Goal, 'id' | 'progress'>);
-        if (!goalId) throw new Error("Failed to create goal");
+        const guid = await addGoal(formData as Omit<Goal, 'guid' | 'progress'>);
+        if (!guid) throw new Error("Failed to create goal");
 
         const milestonesResponse = await axios.post('/api/generate_milestones',  {
           user_id: user.uid,
-          goal_data: { ...formData, id: goalId }
+          goal_data: { ...formData, guid: guid }
         }, {
           headers: {
             'Content-Type': 'application/json',
@@ -116,28 +130,6 @@ export default function Goals({
         });
         const generatedMilestones = milestonesResponse.data.milestones;
 
-        // Step 3: Save milestones and generate tasks
-        for (const milestone of generatedMilestones) {
-          const milestoneId = await addMilestone({ ...milestone, goalId });
-          if (!milestoneId) continue;
-
-          // Generate tasks for each milestone
-          const tasksResponse = await axios.post('/api/generate_tasks', {
-            user_id: user.uid,
-            goal_id: goalId,
-            milestone_id: milestoneId
-          }, {
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          });
-          const generatedTasks = tasksResponse.data.tasks;
-
-          // Save tasks
-          for (const task of generatedTasks) {
-            await addTask({ ...task, goalId, milestoneId });
-          }
-        }
         setMilestones(generatedMilestones);
         setShowMilestonesDialog(true);
       } catch (error) {
@@ -153,13 +145,38 @@ export default function Goals({
   const handleSaveMilestones = async () => {
     // Here you would implement the logic to save milestones to Firebase
     // This is a placeholder function
-    console.log('Saving milestones:', milestones);
-    milestones.forEach(milestone => {
-      addMilestone({ ...milestone } as Milestone);
-    });
-    // After saving, you might want to update the local state or fetch updated data
-    setShowMilestonesDialog(false);
-    showMessage();
+    if (!user) return;
+    try {
+      console.log('Saving milestones:', milestones);
+      // Step 3: Save milestones and generate tasks
+      for (const milestone of milestones) {
+        const milestoneId = await addMilestone({ ...milestone } as Milestone);
+        if (!milestoneId) continue;
+
+        // Generate tasks for each milestone
+        const tasksResponse = await axios.post('/api/generate_tasks', {
+          user_id: user.uid,
+          guid: milestone.guid,
+          muid: milestoneId
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        const generatedTasks = tasksResponse.data.tasks;
+
+        // Save tasks
+        for (const task of generatedTasks) {
+          await addTask({ ...task } as Task);
+        }
+      }
+      // After saving, you might want to update the local state or fetch updated data
+      setShowMilestonesDialog(false);
+      showMessage();
+    } catch (error) {
+      console.error('Error generating milestones:', error);
+      // Handle error (e.g., show error message to user)
+    }
   }
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
@@ -246,10 +263,10 @@ export default function Goals({
           <div className="space-y-4">
             {goals.map(goal => (
               <GoalCard
-                key={goal.id}
+                key={goal.guid}
                 goal={goal}
-                tasks={tasks.filter(task => task.goalId === goal.id)}
-                onDelete={deleteGoal ? () => deleteGoal(goal.id) : undefined}
+                tasks={tasks.filter(task => task.guid === goal.guid)}
+                onDelete={deleteGoal ? () => deleteGoal(goal.guid) : undefined}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 isGoalsView={true}
@@ -340,7 +357,7 @@ export default function Goals({
                     <Card key={index} className="mb-4 bg-gray-700">
                       <CardContent className="p-4">
                         <h3 className="text-lg font-semibold">{milestone.name}</h3>
-                        <p>Duration: {milestone.duration_weeks} weeks</p>
+                        <p>Duration: {milestone.duration} weeks</p>
                       </CardContent>
                     </Card>
                   ))}

@@ -18,7 +18,7 @@ const MilestoneCard: React.FC<MilestoneCardProps> = ({ milestone, onEdit, onDele
     <div className="flex items-center justify-between p-4 bg-gray-800 rounded">
       <div className="flex flex-col">
         <span className="text-lg font-semibold text-gray-100">{milestone.name}</span>
-        <span className="text-sm text-gray-400">Duration: {milestone.duration_weeks} weeks</span>
+        <span className="text-sm text-gray-400">Duration: {milestone.duration} weeks</span>
         <span className={`text-sm ${milestone.completed ? 'text-green-500' : 'text-red-500'}`}>
           {milestone.completed ? 'Completed' : 'In Progress'}
         </span>

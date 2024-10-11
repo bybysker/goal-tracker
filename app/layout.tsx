@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Providers from '@/components/common/providers'; 
 import React from 'react';
+import { Toaster } from "@/components/ui/toaster";
 
 
 const geistSans = localFont({
@@ -30,6 +31,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Providers>
           {/* You can place components that should be present on all pages here */}
           {children}
+          <Toaster />
         </Providers>
       </body>
     </html>
