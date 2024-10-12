@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 // Import components
+import DockNavigation from '@/components/nav-dock';
 import Sidebar from '@/components/sidebar';
 import Dashboard from '@/components/dashboard';
 import Goals from '@/components/goals';
@@ -189,7 +190,7 @@ const GoalTrackerApp: React.FC = () => {
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex`}>
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
-      
+      <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
       <main className="flex-1 p-8">
         <AnimatePresence mode="wait">
           <motion.div
