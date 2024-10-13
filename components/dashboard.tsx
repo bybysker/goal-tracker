@@ -18,24 +18,18 @@ interface DashboardProps {
   user: FirebaseUser | null;
   goals: Goal[];
   tasks: Task[];
-  memos: Memo[];
-  addMemo: (memo: Omit<Memo, 'id'>) => Promise<void>;
   generateTodaysTasks: () => void;
-  updateTask: (id: string, updatedTask: Partial<Task>) => Promise<void>;
-  deleteTask: (id: string) => Promise<void>;
-  toggleTaskCompletion: (id: string) => void;
+  updateTask: (task: Task, modifications: Partial<Task>) => void;
+  deleteTask: (task: Task) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   user,
   goals,
   tasks,
-  memos,
-  addMemo,
   generateTodaysTasks,
   updateTask,
   deleteTask,
-  toggleTaskCompletion
 
 }) => {
   const [memoText, setMemoText] = useState('');
@@ -51,12 +45,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     );
   }
 
-  const handleAddMemo = () => {
-    if (memoText.trim()) {
-      addMemo({ text: memoText, createdAt: new Date() });
-      setMemoText('');
-    }
-  };
 
   const todaysTasks = tasks.filter(task => 
     new Date(task.date).toDateString() === new Date().toDateString()
@@ -90,10 +78,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <GoalCard
                       key={goal.guid}
                       goal={goal}
-                      tasks={tasks.filter(task => task.guid === goal.guid)}
+                      user={user}
                       deleteTask={deleteTask}
-                      toggleTaskCompletion={toggleTaskCompletion}
                       isGoalsView={false}
+                      updateTask={updateTask}
                 />
                   ))
                 ) : (
@@ -124,12 +112,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <input
                         type="checkbox"
                         checked={task.completed}
-                        onChange={() => updateTask(task.tuid, { completed: !task.completed })}
+                        onChange={() => updateTask(task, { completed: !task.completed })}
                         className="form-checkbox h-4 w-4"
                       />
                       <span className={task.completed ? 'line-through' : ''}>{task.name}</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task.tuid)}>
+                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task)}>
                       Delete
                     </Button>
                   </li>

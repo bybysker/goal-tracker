@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from api.prompts import (MILESTONE_TO_TASK_SYS_MSG, 
                      MILESTONE_TO_TASK_USR_MSG,
                      ENRICHED_GOAL_SYS_MSG,

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs } from 'firebase/firestore';
 import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ import Settings from '@/components/settings';
 import Profile from '@/components/profile';
 
 // Import types
-import { Goal, Task, Memo, Milestone } from '@/types';
+import { Goal, Task, Milestone } from '@/types';
 import axios from 'axios';
 
 const GoalTrackerApp: React.FC = () => {
@@ -26,11 +26,12 @@ const GoalTrackerApp: React.FC = () => {
 
   // Application data
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [memos, setMemos] = useState<Memo[]>([]);
+  const [tasks, setTasks] = useState<Record<string, Task[]>>({});
+  const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [darkMode, setDarkMode] = useState<boolean>(true);
+  const tasksArray: Task[] = Object.values(tasks).flat();
 
   useEffect(() => {
     if (!user) {
@@ -38,26 +39,56 @@ const GoalTrackerApp: React.FC = () => {
       return;
     }
 
-    // Firestore listeners (goals, tasks, memos)
-    const goalsUnsub = onSnapshot(collection(db, 'users', user.uid, 'goals'), (snapshot) => {
-      const fetchedGoals: Goal[] = snapshot.docs.map(doc => ({ guid: doc.id, ...doc.data() } as Goal));
+    // Firestore listeners for goals
+    const goalsUnsub = onSnapshot(collection(db, 'users', user.uid, 'goals'), (goalsSnapshot) => {
+      const fetchedGoals: Goal[] = goalsSnapshot.docs.map(goalDoc => {
+        const goalData = { guid: goalDoc.id, ...goalDoc.data() } as Goal;
+        return goalData;
+      });
       setGoals(fetchedGoals);
+
+      // For each goal, set up listeners for milestones
+      const milestonesUnsubs = fetchedGoals.map(goal => {
+        return onSnapshot(collection(db, 'users', user.uid, 'goals', goal.guid, 'milestones'), (milestonesSnapshot) => {
+          const fetchedMilestones: Milestone[] = milestonesSnapshot.docs.map(milestoneDoc => ({
+            muid: milestoneDoc.id,
+            ...milestoneDoc.data(),
+          } as Milestone));
+
+          // Update the milestones for this specific goal
+          setMilestones(prevMilestones => ({
+            ...prevMilestones,
+            [goal.guid]: fetchedMilestones,
+          }));
+
+          // For each milestone, set up listeners for tasks
+          const tasksUnsubs = fetchedMilestones.map(milestone => {
+            return onSnapshot(collection(db, 'users', user.uid, 'goals', goal.guid, 'milestones', milestone.muid, 'tasks'), (tasksSnapshot) => {
+              const fetchedTasks: Task[] = tasksSnapshot.docs.map(taskDoc => ({
+                tuid: taskDoc.id,
+                ...taskDoc.data(),
+              } as Task));
+
+              // Update the tasks for this specific milestone
+              setTasks(prevTasks => ({
+                ...prevTasks,
+                [milestone.muid]: fetchedTasks,
+              }));
+            });
+          });
+
+          // Return function to unsubscribe from tasks listeners
+          return () => tasksUnsubs.forEach(unsub => unsub());
+        });
+      });
+
+      // Cleanup function to unsubscribe from milestones listeners
+      return () => milestonesUnsubs.forEach(unsub => unsub());
     });
 
-    const tasksUnsub = onSnapshot(collection(db, 'users', user.uid, 'tasks'), (snapshot) => {
-      const fetchedTasks: Task[] = snapshot.docs.map(doc => ({ tuid: doc.id, ...doc.data() } as Task));
-      setTasks(fetchedTasks);
-    });
-
-    const memosUnsub = onSnapshot(collection(db, 'users', user.uid, 'memos'), (snapshot) => {
-      const fetchedMemos: Memo[] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Memo));
-      setMemos(fetchedMemos);
-    });
-
+    // Cleanup function to unsubscribe from goals listener
     return () => {
       goalsUnsub();
-      tasksUnsub();
-      memosUnsub();
     };
   }, [user, router]);
 
@@ -99,18 +130,31 @@ const GoalTrackerApp: React.FC = () => {
   const deleteGoal = async (id: string) => {
     if (!user) return;
     try {
+      // Fetch milestones for the goal
+      const milestonesSnapshot = await getDocs(collection(db, 'users', user.uid, 'goals', id, 'milestones'));
+      
+      // Delete each milestone and its tasks
+      const deletePromises = milestonesSnapshot.docs.map(async (milestoneDoc) => {
+        const milestoneId = milestoneDoc.id;
+        
+        // Fetch tasks for the milestone
+        const tasksSnapshot = await getDocs(collection(db, 'users', user.uid, 'goals', id, 'milestones', milestoneId, 'tasks'));
+        
+        // Delete each task
+        const taskDeletePromises = tasksSnapshot.docs.map(taskDoc => deleteDoc(doc(db, 'users', user.uid, 'goals', id, 'milestones', milestoneId, 'tasks', taskDoc.id)));
+        await Promise.all(taskDeletePromises);
+        
+        // Delete the milestone
+        return deleteDoc(doc(db, 'users', user.uid, 'goals', id, 'milestones', milestoneId));
+      });
+
+      // Wait for all milestones and their tasks to be deleted
+      await Promise.all(deletePromises);
+      
+      // Finally, delete the goal
       await deleteDoc(doc(db, 'users', user.uid, 'goals', id));
     } catch (error) {
       console.error("Error deleting goal:", error);
-    }
-  }
-
-  const addMemo = async (memo: Omit<Memo, 'id'>) => {
-    if (!user) return;
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'memos'), memo);
-    } catch (error) {
-      console.error("Error adding memo:", error);
     }
   }
 
@@ -125,29 +169,37 @@ const GoalTrackerApp: React.FC = () => {
     }
   }
 
-  const updateTask = async (id: string, updatedTask: Partial<Task>) => {
+  const updateTask = async (task: Task, updatedTask: Partial<Task>): Promise<void> => {
+  if (!user) {
+    console.error("User not authenticated.");
+    return;
+  }
+  try {
+    const taskDocRef = doc(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks', task.tuid);
+    await updateDoc(taskDocRef, updatedTask);
+    console.log("Task updated successfully");
+  } catch (error) {
+    console.error("Error updating task:", error);
+  }
+}
+  
+  const toggleTaskCompletion = async (task: Omit<Task, 'id'>) => {
     if (!user) return;
     try {
-      await updateDoc(doc(db, 'users', user.uid, 'tasks', id), updatedTask);
-    } catch (error) {
-      console.error("Error updating task:", error);
-    }
-  }
-  const toggleTaskCompletion = async (id: string) => {
-    const task = tasks.find(t => t.tuid === id);
-    if (!task || !user) return;
-    try {
-      await updateTask(id, { completed: !task.completed });
+      const taskDocRef = doc(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks', task.tuid);
+      const newCompletionStatus = !task.completed;
+      await updateDoc(taskDocRef, { completed: newCompletionStatus });
+      console.log(`Task completion status updated to ${newCompletionStatus}`);
     } catch (error) {
       console.error("Error toggling task completion:", error);
     }
-  }
+  };
 
 
-  const deleteTask = async (id: string) => {
+  const deleteTask = async (task: Omit<Task, 'id'>) => {
     if (!user) return;
     try {
-      await deleteDoc(doc(db, 'users', user.uid, 'tasks', id));
+      await deleteDoc(doc(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks', task.tuid));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -186,7 +238,7 @@ const GoalTrackerApp: React.FC = () => {
       .then(() => console.log("Settings saved"))
       .catch(error => console.error("Error saving settings:", error));
   }
-
+  
   return (
     <div className={`h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex `}>
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
@@ -204,24 +256,21 @@ const GoalTrackerApp: React.FC = () => {
               <Dashboard
                 user={user}
                 goals={goals}
-                addMemo={addMemo}
-                memos={memos}
                 generateTodaysTasks={generateTodaysTasks}
-                tasks={tasks}
+                tasks={tasksArray}
                 updateTask={updateTask}
                 deleteTask={deleteTask}
-                toggleTaskCompletion={toggleTaskCompletion}
               />
             )}
             {activeTab === 'goals' && (
               <Goals
                 goals={goals}
-                tasks={tasks}
                 addGoal={addGoal}
                 updateGoal={updateGoal}
                 deleteGoal={deleteGoal}
                 setIsEditing={() => {/* function logic here */}}
                 addMilestone={addMilestone}
+                updateTask={updateTask}
                 addTask={addTask}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
@@ -232,7 +281,7 @@ const GoalTrackerApp: React.FC = () => {
               <CalendarComponent
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
-                tasks={tasks.filter(task => new Date(task.date).toDateString() === selectedDate.toDateString())}
+                tasks={tasksArray.filter(task => new Date(task.date).toDateString() === selectedDate.toDateString())}
                 toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
               />

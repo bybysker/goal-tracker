@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Goal, Task } from '@/types';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -16,28 +16,35 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import TaskCard from './task-card';
-import { BorderBeam } from '../ui/border-beam';
-import ShineBorder from '../ui/shine-border';
+import GoalDialog from '@/components/common/goal-dialog';
+import { User as FirebaseUser } from 'firebase/auth';
+
 
 interface GoalCardProps {
   goal: Goal;
-  tasks: Task[];
+  user: FirebaseUser | null;
   onDelete?: () => void;
-  toggleTaskCompletion: (id: string) => void;
-  deleteTask: (id: string) => void;
+  deleteTask: (task: Task) => void;
+  updateTask: (task: Task, updatedTask: Partial<Task>) => void;
   isGoalsView: boolean; // New prop to determine if we're in the Goals view
 }
 
 const GoalCard: React.FC<GoalCardProps> = ({ 
   goal, 
-  tasks, 
+  user,
   onDelete, 
-  toggleTaskCompletion,
   deleteTask,
+  updateTask,
   isGoalsView
 }) => {
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   return (
-      <Card className="w-full">
+    <>
+      <Card
+        className="w-full cursor-pointer hover:bg-gray-200 transition-colors"
+        onClick={() => setIsDialogOpen(true)}
+        >
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -77,17 +84,18 @@ const GoalCard: React.FC<GoalCardProps> = ({
             <Progress value={goal.progress} className="w-full" />
           </div>
           <div className="mt-4 space-y-2">
-            {tasks.map(task => (
-              <TaskCard
-                key={task.tuid}
-                task={task}
-                onToggle={() => toggleTaskCompletion(task.tuid)}
-                onDelete={() => deleteTask(task.tuid)}
-              />
-            ))}
+         show tasks
           </div>
         </CardContent>
       </Card>
+      <GoalDialog 
+      goal={goal}
+      isOpen={isDialogOpen}
+      onClose={() => setIsDialogOpen(false)}
+      userId={user?.uid || ''}
+      updateTask={updateTask}
+      />
+    </>
   );
 };
 

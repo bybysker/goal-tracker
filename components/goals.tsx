@@ -19,7 +19,6 @@ import axios from 'axios'
 import { User as FirebaseUser } from 'firebase/auth'
 
 import GoalCard from '@/components/common/goal-card';
-import GoalDialog from '@/components/common/goal-dialog';
 import { Goal, Task, Milestone } from '@/types';
 import { questionsGoal } from '@/config/questionsGoalConfig'
 import { useToast } from '@/hooks/use-toast';
@@ -27,21 +26,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 interface GoalsProps {
   goals: Goal[];
-  tasks: Task[];
   addGoal: (goal: Omit<Goal, 'guid' | 'progress'>) => Promise<string>;
   deleteGoal?: (id: string) => void;
   setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
   addMilestone: (milestone: Milestone) => Promise<string>;
   addTask: (task: Omit<Task, 'id'>) => Promise<string>;
-  toggleTaskCompletion: (id: string) => void;
-  deleteTask: (id: string) => void;
+  toggleTaskCompletion: (task: Task) => void
+  updateTask: (task: Task, modifications: Partial<Task>) => void;
+  deleteTask: (task: Task) => void;
   user: FirebaseUser | null; 
 }
 
 export default function Goals({
   goals,
-  tasks,
   addGoal,
   deleteGoal,
   setIsEditing,
@@ -49,6 +47,7 @@ export default function Goals({
   addMilestone,
   addTask,
   toggleTaskCompletion,
+  updateTask,
   deleteTask,
   user
 }: GoalsProps) {
@@ -181,7 +180,9 @@ export default function Goals({
 
         // Save tasks
         for (const task of generatedTasks) {
-          await addTask({ ...task } as Task);
+          const taskID = await addTask({ ...task } as Task);
+          task.tuid = taskID;
+          await updateTask(task, { tuid: taskID }); 
         }
         i+=1;
       }
@@ -324,11 +325,11 @@ export default function Goals({
               <GoalCard
                 key={goal.guid}
                 goal={goal}
-                tasks={tasks.filter(task => task.guid === goal.guid)}
+                user={user}
                 onDelete={deleteGoal ? () => deleteGoal(goal.guid) : undefined}
-                toggleTaskCompletion={toggleTaskCompletion}
                 deleteTask={deleteTask}
                 isGoalsView={true}
+                updateTask={updateTask}
               />
             ))}
           </div>

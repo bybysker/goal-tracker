@@ -16,8 +16,8 @@ interface CalendarComponentProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   tasks: Task[];
-  toggleTaskCompletion: (id: string) => void;
-  deleteTask: (id: string) => void;
+  toggleTaskCompletion: (task: Task) => void;
+  deleteTask: (task: Task) => void;
 }
 
 const CalendarComponent: React.FC<CalendarComponentProps> = ({
@@ -49,19 +49,19 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
             <h3 className="text-lg font-semibold mb-2">Tasks for {format(selectedDate, 'MMMM d, yyyy')}</h3>
             <ul className="space-y-2">
               {tasksForSelectedDate.map(task => (
-                <li key={task.id} className="flex items-center space-x-2">
+                <li key={task.name} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`calendar-task-${task.id}`}
+                    id={`calendar-task-${task.name}`}
                     checked={task.completed}
-                    onCheckedChange={() => toggleTaskCompletion(task.id)}
+                    onCheckedChange={() => toggleTaskCompletion(task)}
                   />
                   <Label
-                    htmlFor={`calendar-task-${task.id}`}
+                    htmlFor={`calendar-task-${task.name}`}
                     className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}
                   >
                     {task.name}
                   </Label>
-                  <Button variant="ghost" size="sm" onClick={() => deleteTask(task.id)}>
+                  <Button variant="ghost" size="sm" onClick={() => deleteTask(task)}>
                     <Trash className="h-4 w-4" />
                   </Button>
                 </li>
