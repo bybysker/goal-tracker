@@ -18,12 +18,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onToggle, onDelete }) => {
         <CardTitle className="text-sm font-medium">
           <div className="flex items-center space-x-2">
             <Checkbox
-              id={`task-${task.id}`}
+              id={`task-${task.tuid}`}
               checked={task.completed}
               onCheckedChange={onToggle}
             />
             <label
-              htmlFor={`task-${task.id}`}
+              htmlFor={`task-${task.tuid}`}
               className={`${task.completed ? 'line-through text-muted-foreground' : ''}`}
             >
               {task.name}

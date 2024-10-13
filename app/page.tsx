@@ -188,10 +188,10 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex`}>
+    <div className={`h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex `}>
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
-      <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
-      <main className="flex-1 p-8">
+
+      <main className="flex-1 px-8 py-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

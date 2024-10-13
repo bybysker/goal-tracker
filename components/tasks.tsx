@@ -36,12 +36,12 @@ const Tasks: React.FC<TasksProps> = ({
         <div className="space-y-4">
           {tasks.map(task => (
             <TaskCard
-              key={task.id}
+              key={task.tuid}
               task={task}
-              onToggle={() => toggleTaskCompletion(task.id)}
-              onDelete={() => deleteTask(task.id)}
+              onToggle={() => toggleTaskCompletion(task.tuid)}
+              onDelete={() => deleteTask(task.tuid)}
               // Pass updateTask if editing functionality is implemented
-               onUpdate={updateTask ? () => updateTask(task.id, {/* updated fields */}) : undefined}
+               onUpdate={updateTask ? () => updateTask(task.tuid, {/* updated fields */}) : undefined}
             />
           ))}
           <Dialog>
@@ -63,7 +63,7 @@ const Tasks: React.FC<TasksProps> = ({
                 addTask({
                   name: target.title.value,
                   date: target.date.value,
-                  goalId: target.goalId.value,
+                  guid: target.guid.value,
                 });
                 target.reset();
               }}>

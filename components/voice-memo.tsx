@@ -142,19 +142,21 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
   return (
 
     <div >
-      <Card className="bg-gray-900 text-gray-100 border-gray-700">
+      <Card className="bg-background text-foreground border-border">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Reflexion box</CardTitle>
+          <CardTitle className="text-2xl font-bold">Express your thoughts</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Button 
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`w-full ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
-            >
-              {isRecording ? <StopCircle className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
-              {isRecording ? 'Stop Recording' : 'Start Recording'}
-            </Button>
+            <div className="flex justify-center pt-4">
+              <Button 
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`w-full ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {isRecording ? <StopCircle className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+                {isRecording ? 'Stop Recording' : 'Start Recording'}
+              </Button>
+            </div>
             {voiceMemo && (
               <div className="bg-gray-800 p-4 rounded-md">
                 <audio src={voiceMemo} controls className="w-full" />
@@ -166,12 +168,14 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
               value={transcription}
               onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
             />
-            <Button 
-              onClick={() => { handleSaveReflection(); showMessage(); }}
-              className="w-full bg-green-600 hover:bg-green-700"
-            >
-              Save Reflection
-            </Button>
+            <div className="flex justify-center pt-4">
+              <Button 
+                onClick={() => { handleSaveReflection(); showMessage(); }}
+                className="w-1/3 min-w-44 bg-green-600 hover:bg-green-700"
+              >
+                Save Reflection
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
