@@ -24,6 +24,7 @@ Act as an expert in goal setting and task management
 1. Given a GOAL, divide that GOAL into 3-5 distinct milestones.
 2. For each milestone, provide a brief description of its objective and the specific timeframe or duration needed to complete it.
 3. Ensure that milestones reflect progressive stages toward achieving the goal and consider any constraints or challenges mentioned
+4. Number the milestones sequentially (1, 2, 3, ...) to indicate their order and indicate first the number in the name of the milestone.
 """
 
 
@@ -41,6 +42,7 @@ Act as an expert in goal setting and task management
 2. For each task, specify the activity and its duration or timeframe. 
 3. Ensure that tasks are actionable, concrete, and lead towards the completion of the milestone 
 while also being aligned with overcoming any mentioned challenges or leveraging available resources.
+4. Number the tasks sequentially (1, 2, 3, ...) to indicate their order and indicate first the number in the name of the task.
 """
 
 MILESTONE_TO_TASK_USR_MSG = """

@@ -37,7 +37,7 @@ export default function LoadingAnimation() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
     >
       <motion.div
         className="flex space-x-2"
@@ -49,7 +49,7 @@ export default function LoadingAnimation() {
         {[...Array(3)].map((_, index) => (
           <motion.span
             key={index}
-            className="w-4 h-4 bg-blue-500 rounded-full"
+            className="w-4 h-4 bg-blue-800 rounded-full"
             variants={dotVariants}
             transition={{
               duration: 0.5,

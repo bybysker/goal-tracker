@@ -13,13 +13,11 @@ const Auth: React.FC = () => {
   const router = useRouter();
   const {
     user,
-    isLoading,
     handleGoogleSignIn,
     handleGithubSignIn,
     handleAppleSignIn,
     handleEmailPasswordSignIn,
     registerUser,
-    redirectIfAuthenticated
   } = useAuth();
 
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');

@@ -19,6 +19,7 @@ import axios from 'axios'
 import { User as FirebaseUser } from 'firebase/auth'
 
 import GoalCard from '@/components/common/goal-card';
+import GoalDialog from '@/components/common/goal-dialog';
 import { Goal, Task, Milestone } from '@/types';
 import { questionsGoal } from '@/config/questionsGoalConfig'
 import { useToast } from '@/hooks/use-toast';
@@ -68,7 +69,7 @@ export default function Goals({
 
 
   useEffect(() => {
-    setProgress(((currentQuestionIndex + 1) / questionsGoal.length) * 100)
+    setProgress(((currentQuestionIndex) / questionsGoal.length) * 100)
   }, [currentQuestionIndex])
 
   const currentQuestion = questionsGoal[currentQuestionIndex]
@@ -190,11 +191,10 @@ export default function Goals({
 
       setIsLoading(false); // Stop loading animation
       showMessage();
-      setShowGoalDialog(true); // Open the goal dialog
+      //setShowGoalDialog(true); // Open the goal dialog
 
     } catch (error) {
       console.error('Error generating milestones:', error);
-      // Handle error (e.g., show error message to user)
     }
   }
   const handleBack = () => {

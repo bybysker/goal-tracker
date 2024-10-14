@@ -37,6 +37,10 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
         muid: doc.id,
         ...doc.data(),
       } as Milestone));
+
+      // Sort milestones by name in ascending order
+      milestonesData.sort((a, b) => a.name.localeCompare(b.name));
+
       setMilestones(milestonesData);
   
       // Step 2: Fetch tasks for each milestone
@@ -46,7 +50,11 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
           tuid: doc.id,
           ...doc.data(),
         } as Task));
-        return tasksData; // Return tasks for this milestone
+        
+        // Sort tasks by name in ascending order
+        tasksData.sort((a, b) => a.name.localeCompare(b.name));
+
+        return tasksData; // Return sorted tasks for this milestone
       }));
 
       setTasks(allTasks.flat()); // Set the tasks state
