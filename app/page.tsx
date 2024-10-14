@@ -28,7 +28,7 @@ const GoalTrackerApp: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [tasks, setTasks] = useState<Record<string, Task[]>>({});
   const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('goals');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const tasksArray: Task[] = Object.values(tasks).flat();
