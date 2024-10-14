@@ -1,19 +1,27 @@
 {
   "version": 2,
   "builds": [
-  {
-  "src": "api//*.py",
-  "use": "@vercel/python",
-  "config": {
-  "excludeFiles": "/{.next,*.cache,node_modules,public,app}/**"
-  }
-  },
-  {
-  "src": "next.config.js",
-  "use": "@vercel/next"
-  }
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": { 
+        "maxLambdaSize": "250mb",
+        "excludeFiles": "{.next,*.cache,node_modules,public,app}/**"
+      }
+    },
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    }
   ],
   "routes": [
-  { "src": "/api/(.*)", "dest": "api/index.py" }
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ]
 }
