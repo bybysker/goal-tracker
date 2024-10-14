@@ -170,17 +170,17 @@ const GoalTrackerApp: React.FC = () => {
   }
 
   const updateTask = async (task: Task, updatedTask: Partial<Task>): Promise<void> => {
-  if (!user) {
-    console.error("User not authenticated.");
-    return;
-  }
-  try {
-    const taskDocRef = doc(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks', task.tuid);
-    await updateDoc(taskDocRef, updatedTask);
-    console.log("Task updated successfully");
-  } catch (error) {
-    console.error("Error updating task:", error);
-  }
+    if (!user) {
+      console.error("User not authenticated.");
+      return;
+    }
+    try {
+      const taskDocRef = doc(db, 'users', user.uid, 'goals', task.guid, 'milestones', task.muid, 'tasks', task.tuid);
+      await updateDoc(taskDocRef, updatedTask);
+      console.log("Task updated successfully");
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
 }
   
   const toggleTaskCompletion = async (task: Omit<Task, 'id'>) => {

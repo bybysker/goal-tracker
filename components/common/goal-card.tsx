@@ -54,7 +54,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
             {isGoalsView && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
                     <Trash className="h-4 w-4 text-destructive" />
                   </Button>
                 </AlertDialogTrigger>
@@ -83,8 +83,8 @@ const GoalCard: React.FC<GoalCardProps> = ({
             </div>
             <Progress value={goal.progress} className="w-full" />
           </div>
-          <div className="mt-4 space-y-2">
-         show tasks
+          <div className="mt-4 space-y-2 text-sm text-gray-500">
+         Click to show related tasks
           </div>
         </CardContent>
       </Card>

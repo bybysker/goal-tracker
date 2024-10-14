@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Goal, Milestone, Task } from '@/types';
 import { db } from '@/db/configFirebase';
 import MilestoneAccordion from './milestone-accordion';
 import { getFirestore, collection, getDocs } from 'firebase/firestore'; // Import necessary Firestore functions
+import { ScrollArea } from '@/components/ui/scroll-area'; // Import ScrollArea component
 
 
 interface GoalDialogProps {
@@ -27,39 +28,33 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
   const [typedDescription, setTypedDescription] = useState('');
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  useEffect(() => {
-    if (isOpen) {
-      setTypedName('');
-      setTypedDescription('');
-      typeText(goal.name, setTypedName, 50, () => {
-        typeText('No description available.', setTypedDescription, 30);
-      });
-      const fetchMilestones = async () => {
-        try {
-          const snapshot = await getDocs(collection(db, 'users', userId, 'goals', goal.guid, 'milestones')); // Use getDocs and collection
-          const milestonesData = snapshot.docs.map(doc => ({
-            muid: doc.id,
-            ...doc.data(),
-          } as Milestone));
-          setMilestones(milestonesData);
-        } catch (error) {
-          console.error("Error fetching milestones: ", error);
-        }
-      };
-  
-      fetchMilestones();
 
-        const fetchTasks = async (milestone: Milestone) => {
-        const snapshot = await getDocs(collection(db, 'users', userId, 'goals', goal.guid, 'milestones', milestone.muid, 'tasks'));
-        const tasksData = snapshot.docs.map(doc => ({
+  const fetchAllTasksForGoal = async () => {
+    try {
+      // Step 1: Fetch milestones for the goal
+      const milestonesSnapshot = await getDocs(collection(db, 'users', userId, 'goals', goal.guid, 'milestones'));
+      const milestonesData = milestonesSnapshot.docs.map(doc => ({
+        muid: doc.id,
+        ...doc.data(),
+      } as Milestone));
+      setMilestones(milestonesData);
+  
+      // Step 2: Fetch tasks for each milestone
+      const allTasks = await Promise.all(milestonesData.map(async (milestone) => {
+        const tasksSnapshot = await getDocs(collection(db, 'users', userId, 'goals', goal.guid, 'milestones', milestone.muid, 'tasks'));
+        const tasksData = tasksSnapshot.docs.map(doc => ({
           tuid: doc.id,
           ...doc.data(),
         } as Task));
-        setTasks(tasksData);
-      };
-      milestones.forEach(fetchTasks);
+        return tasksData; // Return tasks for this milestone
+      }));
+
+      setTasks(allTasks.flat()); // Set the tasks state
+      console.log('All fetched tasks for goal:', allTasks.flat()); // Debug log
+    } catch (error) {
+      console.error("Error fetching tasks for goal:", error);
     }
-  }, [isOpen, goal, userId]); // Added userId to the dependency array
+  };
 
   const typeText = (text: string, setter: React.Dispatch<React.SetStateAction<string>>, speed: number, callback?: () => void) => {
     let i = 0;
@@ -74,24 +69,38 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
     }, speed);
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      setTypedName('');
+      setTypedDescription('');
+      typeText(goal.name, setTypedName, 2, () => {
+        typeText('No description available yet.', setTypedDescription, 10);
+      });
+      fetchAllTasksForGoal();
+    }
+  }, [isOpen, goal, userId]); 
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 text-white">
+      <DialogContent className="bg-gray-800 text-white max-w-4xl w-full " >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{typedName}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">{goal.name}</DialogTitle>
+          <DialogDescription>
+            {typedDescription}
+          </DialogDescription>
         </DialogHeader>
-        <p className="mt-4 text-gray-300">{typedDescription}</p>
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-4">Milestones</h3>
-          {milestones.map((milestone) => (
-            <MilestoneAccordion
-              key={milestone.muid}
-              milestone={milestone}
-              tasks={tasks.filter(task => task.muid === milestone.muid)}
-              updateTask={updateTask}
-              //onTaskComplete={onTaskComplete}
-            />
-          ))}
+          <ScrollArea className="h-[70dvh] w-full pr-4"> {/* Adjust max height as needed */}
+            {milestones.map((milestone) => (
+              <MilestoneAccordion
+                key={milestone.muid}
+                milestone={milestone}
+                tasks={tasks.filter(task => task.muid === milestone.muid)}
+                updateTask={updateTask}
+              />
+            ))}
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>

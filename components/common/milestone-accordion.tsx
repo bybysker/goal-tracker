@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react';
 import { Milestone, Task } from '@/types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -26,7 +24,10 @@ const MilestoneAccordion: React.FC<MilestoneAccordionProps> = ({ milestone, task
               <TaskCheckbox
                 key={task.tuid}
                 task={task}
-                onComplete={() => updateTask(task, { completed: !task.completed })}
+                onComplete={(task) => {
+                  task.completed = !task.completed;
+                  updateTask(task, { completed: task.completed });
+                }}
               />
             ))}
           </div>
