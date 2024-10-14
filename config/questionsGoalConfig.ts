@@ -1,32 +1,38 @@
-// questionsConfig.ts
-
-import { Target, List, Calendar, Star, Gauge, AlertTriangle, Clock, Heart, Sliders } from 'lucide-react';
+import { Target, Calendar, Gauge, Clock, Heart, Sliders } from 'lucide-react';
 
 export const questionsGoal = [
   {
-    id: 'title',
-    question: 'What is the goal that you want to achieve?',
+    id: 'name',
+    question: 'What is your goal? Please be clear and specific.',
+    guidance: 'Avoid vague descriptions. Example: Instead of "I want to get fit," specify "I want to run a 5k race without stopping within 3 months."',
     type: 'textarea',
     icon: Target,
   },
   {
-    id: 'category',
-    question: 'Which category best describes your goal?',
-    type: 'radio',
-    options: [
-      'Health & Fitness',
-      'Career & Professional Development',
-      'Education & Learning',
-      'Personal Finance',
-      'Relationships & Social',
-      'Hobbies & Interests',
-      'Other',
-    ],
-    icon: List,
+    id: 'measurable',
+    question: "How will you measure your progress and know when you've achieved your goal?",
+    guidance: 'Use quantifiable indicators to track progress. Example: "I will track my running distance and time weekly."',
+    type: 'textarea',
+    icon: Gauge,
+  },
+  {
+    id: 'achievable',
+    question: 'Is this goal realistic in your current circumstances / setup?',
+    guidance: 'Consider whether you have the resources and time, to achieve this goal. Example: "I will start by allocating 30 min to run 2km twice a week and gradually increase my distance over time."',
+    type: 'textarea',
+    icon: Sliders,
+  },
+  {
+    id: 'relevance',
+    question: 'What bigger purpose will this goal serve?',
+    guidance: 'Explain why this goal is important. Example: "Running a 5k will improve my health and help me build discipline, which supports my overall fitness journey."',
+    type: 'textarea',
+    icon: Heart,
   },
   {
     id: 'timeframe',
     question: 'What is your desired timeframe for achieving this goal?',
+    guidance: 'Set a realistic deadline. Example: "I want to complete the 5k race within the next 3 months."',
     type: 'radio',
     options: [
       'Less than 1 month',
@@ -38,61 +44,13 @@ export const questionsGoal = [
     icon: Calendar,
   },
   {
-    id: 'importance',
-    question: 'On a scale of 1-5, how important is this goal to you?',
+    id: 'bandwidth',
+    question: 'How many hours per week can you dedicate to this goal?',
+    guidance: 'Be honest about your availability. Example: "I can dedicate around 3-5 hours per week to running."',
     type: 'slider',
-    min: 1,
-    max: 5,
-    icon: Star,
-  },
-  {
-    id: 'progress',
-    question: 'How would you rate your current progress toward this goal?',
-    type: 'radio',
-    options: [
-      'Just starting out',
-      'Made some progress',
-      'Halfway there',
-      'Nearly complete',
-    ],
-    icon: Gauge,
-  },
-  {
-    id: 'obstacles',
-    question: 'What obstacles do you anticipate in reaching your goal?',
-    type: 'checkbox',
-    options: [
-      'Time management',
-      'Lack of motivation',
-      'Limited resources',
-      'Unclear planning',
-      'Procrastination',
-      'Other',
-    ],
-    icon: AlertTriangle,
-  },
-  {
-    id: 'time_commitment',
-    question: 'How much time can you commit to working on this goal each week?',
-    type: 'radio',
-    options: [
-      'Less than 1 hour',
-      '1-3 hours',
-      '3-5 hours',
-      'More than 5 hours',
-    ],
+    min: 0,
+    max: 10,
+    step: 1,
     icon: Clock,
-  },
-  {
-    id: 'approach',
-    question: 'Do you prefer a structured plan or a flexible approach?',
-    type: 'radio',
-    options: [
-      'Highly structured',
-      'Moderately structured',
-      'Flexible',
-      'Very flexible',
-    ],
-    icon: Sliders,
   },
 ];

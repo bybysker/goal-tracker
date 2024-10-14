@@ -1,14 +1,13 @@
 import os
 import io
+from rich import print
 from dotenv import load_dotenv
-from datetime import date
 from pydantic import BaseModel
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
-from prompts import task_generation_prompt
-
+from api.goal_to_tasks import TasksGeneration, MilestonesGeneration, Goal
 
 #from some_vector_db_library import VectorDBClient
 embed_model = "text-embedding-ada-002"
@@ -21,61 +20,66 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 app = FastAPI()
 
 # Initialize Firestore
-cred = credentials.Certificate("api/firebase_credentials.json")
+cred_path = os.path.join(os.path.dirname(__file__), "firebase_credentials.json")
+cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-#doc_ref = db.collection("users").document("aturing")
 
-class Tasks(BaseModel):
-    id: str
-    title: str
-    completed: bool
-#    date: date
-    goal_id: str
+class GoalFormData(BaseModel):
+    user_id: str
+    goal_data: Goal
 
-def generate_tasks(user_id: str, goal_id: str, augmented_context: str = "None"):
+class MilestoneFormInfo(BaseModel):
+    user_id: str
+    guid: str
+    muid: str
 
-    # Get user profile
-    user_profile_docs = db.collection("users").document(user_id).collection("userProfile").stream()
-    user_profile_doc = next(user_profile_docs, None)  # Get the first document
+@app.post('/generate_milestones')
+def generate_milestones(goal_form_data: GoalFormData):
+    """
+    Endpoint to generate milestones for a given user and goal.
 
-    user_profile_data = user_profile_doc.to_dict()
+    Args:
+    - user_id (str): The ID of the user.
+    - goal_data (Goal): The ID of the goal.
 
-    # Get the goal 
-    goal_doc = db.collection("users", user_id, "goals").document(goal_id).get()
-    #user_ids = [user.id for user in users.stream()]
-    goal_data = goal_doc.to_dict()
-
-    tasks_prompt = task_generation_prompt(user_profile_data, goal_data)
-
-    # Logic to generate tasks based on a prompt and augmented context
-    completion = client.beta.chat.completions.parse(
-        model='gpt-4o-2024-08-06',
-        messages=[{"role": "user", "content": tasks_prompt}],
-        response_format=Tasks
-    )
+    Returns:
+    - dict: A dictionary containing the generated milestones.
+    """
+    user_id = goal_form_data.user_id
+    goal_data = goal_form_data.goal_data
+    try:
+        milestone_generator = MilestonesGeneration(db, client, user_id, goal_data)
+        milestones = milestone_generator.generate_milestones()
+        return {"milestones": milestones}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
-    tasks = completion.choices[0].message.parsed
-    return tasks
 
-@app.post('/define_tasks')
-def define_tasks(user_id: int, prompt: str):
-    # Logic to define tasks based on a prompt and augmented context from a vector database in Firestore
+@app.post('/generate_tasks')
+def generate_tasks(milestone_form_info: MilestoneFormInfo):
+    """
+    Endpoint to generate tasks for a given user, goal, and milestone.
 
-    # Initialize Vector Database Client
-    #vector_db_client = VectorDBClient(api_key="your_vector_db_api_key")
+    Args:
+    - user_id (str): The ID of the user.
+    - guid (str): The ID of the goal.
+    - muid (str): The ID of the milestone.
 
-    # Fetch user history from Firestore
-    user_history_ref = db.collection('user_histories').document(str(user_id))
-    user_history = user_history_ref.get().to_dict()
+    Returns:
+    - dict: A dictionary containing the generated tasks.
+    """
+    user_id = milestone_form_info.user_id
+    guid = milestone_form_info.guid
+    muid = milestone_form_info.muid
 
-    # Augment context using vector database
-    augmented_context = vector_db_client.get_augmented_context(user_history)
+    try:
+        task_generator = TasksGeneration(db, client, user_id, guid, muid)
+        tasks = task_generator.generate_tasks()
+        return {"tasks": tasks}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # Define tasks based on prompt and augmented context
-    tasks = generate_tasks(prompt, augmented_context)  # Replace with actual task generation logic
-
-    return {"tasks": tasks}
 
 @app.post('/transcribe_voice')
 def transcribe_voice(voice_memo: UploadFile = File(...)):
@@ -114,6 +118,8 @@ def transcribe_voice(voice_memo: UploadFile = File(...)):
     #user_ids = [user.id for user in users.stream()]
 #goal_data = goal_doc.to_dict()
 
-print(generate_tasks("oQP2oJzlrtR84IjAlQYizLSFywT2", "XJoJ8iTirGwydAQ5pm5J"))
-
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").generate_tasks())
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").formulate_goal())
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").user_profile_data)
+#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").goal_data)
 

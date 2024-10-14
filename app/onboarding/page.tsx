@@ -212,7 +212,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
             transition={{ duration: 0.5 }}
           >
             <CardTitle className="text-3xl font-bold text-white mt-4">Welcome, {formData.name || 'Explorer'}!</CardTitle>
-            <CardDescription className="text-lg text-white/80">Let's embark on a journey of discovery</CardDescription>
+            <CardDescription className="text-lg text-white/80">Let&apos;s embark on a journey of discovery</CardDescription>
           </motion.div>
         </CardHeader>
         <form onSubmit={handleNext}>
@@ -239,6 +239,9 @@ const FuturisticFirstLoginForm: React.FC = () => {
                     {currentQuestion.question}
                   </Label>
                 </div>
+                <p className="text-sm italic text-white/80">
+                  {currentQuestion.guidance}
+                </p>
                 {getInputComponent()}
               </motion.div>
             </AnimatePresence>
