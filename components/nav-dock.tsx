@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, Target, Calendar, User, Settings, LogOut } from 'lucide-react';
 import { Dock, DockIcon } from "@/components/ui/dock";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface DockNavigationProps {
   activeTab: string;
@@ -18,41 +19,48 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
   ];
 
   return (
-    <div className="fixed bottom-0 w-full bg-gray-800">
-      <Dock direction="middle">
-        {tabs.map((tab) => (
-          <button 
-            key={tab.name} 
-            onClick={() => setActiveTab(tab.name)} 
-            className="focus:outline-none"
-          >
-            <DockIcon>
-              <tab.icon
-                className={`size-6 ${
-                  activeTab === tab.name ? 'text-white' : 'text-gray-400'
-                }`}
-              />
-              <span
-                className={`text-xs ${
-                  activeTab === tab.name ? 'text-white' : 'text-gray-400'
-                }`}
-              >
+    <TooltipProvider>
+      <div className="fixed bottom-0 w-full bg-gray-800 py-2 z-10">
+        <Dock direction="middle" className="justify-around">
+          {tabs.map((tab) => (
+            <Tooltip key={tab.name}>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={() => setActiveTab(tab.name)} 
+                  className="focus:outline-none flex flex-col items-center"
+                >
+                  <DockIcon>
+                    <tab.icon
+                      className={`w-8 h-8 ${
+                        activeTab === tab.name ? 'text-white' : 'text-gray-400'
+                      }`}
+                    />
+                  </DockIcon>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" align="center" className="z-50">
                 {tab.label}
-              </span>
-            </DockIcon>
-          </button>
-        ))}
-        <button 
-          onClick={handleSignOut} 
-          className="focus:outline-none"
-        >
-          <DockIcon>
-            <LogOut className="size-6 text-gray-400 hover:text-white" />
-            <span className="text-xs text-gray-400">Sign Out</span>
-          </DockIcon>
-        </button>
-      </Dock>
-    </div>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={handleSignOut} 
+                className="focus:outline-none flex flex-col items-center"
+              >
+                <DockIcon>
+                  <LogOut className="w-8 h-8 text-gray-400 hover:text-white" />
+                </DockIcon>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" align="center" className="z-50">
+              Sign Out
+            </TooltipContent>
+          </Tooltip>
+        </Dock>
+      </div>
+    </TooltipProvider>
   );
 };
 

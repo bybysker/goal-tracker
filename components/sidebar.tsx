@@ -13,32 +13,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, handleSignOu
     { name: 'goals', icon: Target, label: 'Goals' },
     //{ name: 'calendar', icon: Calendar, label: 'Calendar' },
     { name: 'profile', icon: User, label: 'Profile' },
-    //{ name: 'settings', icon: Settings, label: 'Settings' },
+    { name: 'settings', icon: Settings, label: 'Settings' },
   ];
 
   return (
-    <aside className="w-64 bg-gray-800 text-white p-4">
-      <nav className="space-y-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab.name}
-            onClick={() => setActiveTab(tab.name)}
-            className={`flex items-center space-x-2 w-full p-2 rounded ${
-              activeTab === tab.name ? 'bg-gray-700' : 'hover:bg-gray-700'
-            }`}
-          >
-            <tab.icon className="w-5 h-5" />
-            <span>{tab.label}</span>
-          </button>
-        ))}
+    <aside className="fixed bottom-0 left-0 right-0 bg-background text-foreground p-4 flex justify-around">
+      {tabs.map((tab) => (
         <button
-          onClick={handleSignOut}
-          className="flex items-center space-x-2 w-full p-2 rounded hover:bg-gray-700"
+          key={tab.name}
+          onClick={() => setActiveTab(tab.name)}
+          className={`flex items-center space-x-2 p-2 rounded ${activeTab === tab.name ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
         >
-          <LogOut className="w-5 h-5" />
-          <span>Sign Out</span>
+          <tab.icon className="w-5 h-5" />
+          <span>{tab.label}</span>
         </button>
-      </nav>
+      ))}
+      <button onClick={handleSignOut} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
+        <LogOut className="w-5 h-5" />
+        <span>Sign Out</span>
+      </button>
     </aside>
   );
 };

@@ -51,27 +51,27 @@ const Dashboard: React.FC<DashboardProps> = ({
   );
 
   return (
-    <Card className="bg-background text-foreground border-border max-h-screen">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-2xl font-bold">Dashboard</CardTitle>
-        <Avatar>
+    <Card className="bg-background text-foreground border-border max-h-screen p-6">
+      <CardHeader className="flex flex-row items-center justify-between pb-6">
+        <CardTitle className="text-3xl font-bold">Dashboard</CardTitle>
+        <Avatar className="h-12 w-12">
           {user.photoURL ? (
             <AvatarImage src={user.photoURL} alt={user.displayName || 'User'} />
           ) : (
-            <AvatarFallback>
+            <AvatarFallback className="text-lg">
               {user.displayName ? user.displayName.charAt(0) : 'U'}
             </AvatarFallback>
           )}
         </Avatar>
       </CardHeader>
-      <CardContent>
-        {/* Goal Overview */}
+      <CardContent className="space-y-6">
+        {/* Goals Overview */}
         <Card className="bg-background text-foreground border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Goals Overview</CardTitle>
+            <CardTitle className="text-2xl font-semibold">Goals Overview</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <ScrollArea className="h-[20dvh] w-full pr-4">
+            <ScrollArea className="h-[25vh] w-full pr-4">
               <div className="space-y-4">
                 {goals.length > 0 ? (
                   goals.map(goal => (
@@ -82,10 +82,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                       deleteTask={deleteTask}
                       isGoalsView={false}
                       updateTask={updateTask}
-                />
+                    />
                   ))
                 ) : (
-                  <p>No goals available.</p>
+                  <p className="text-center text-gray-500">No goals available.</p>
                 )}
               </div>
             </ScrollArea>
