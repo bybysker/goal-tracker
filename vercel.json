@@ -1,7 +1,6 @@
 {
   "functions": {
     "api/index.py": {
-      "runtime": "@vercel/python",
       "excludeFiles": "/{.next,*.cache,node_modules,public,app}/**"
     }
   },
