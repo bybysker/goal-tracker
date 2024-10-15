@@ -36,6 +36,7 @@ export const questionsUser = [
     type: 'textarea',
     icon: Sun,
   },
+  */
   {
     id: 'productivityLevel',
     question: "How productive are you when focused on a task?",
@@ -44,7 +45,6 @@ export const questionsUser = [
     max: 5,
     icon: Target,
   },
-  */
   {
     id: 'topStrengths',
     question: "What are your key strengths, talents, or skills?",
@@ -101,6 +101,7 @@ export const questionsUser = [
     type: 'textarea',
     icon: Globe,
   },
+  */
   {
     id: 'availableTime',
     question: "How much free time can you dedicate to your objectives each week?",
@@ -113,6 +114,7 @@ export const questionsUser = [
       'More than 20 hours'
     ]
   },
+  /*
   {
     id: 'learningStyle',
     question: "Which of the following best describes your learning style?",
