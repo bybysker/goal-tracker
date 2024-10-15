@@ -3,5 +3,8 @@
     "api/index.py": {
       "excludeFiles": "{.next,*.cache,node_modules,public,app,*.pyc,__pycache__}/**"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" }
+  ]
 }
