@@ -3,6 +3,8 @@
 
 import React from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
+import { ThemeProvider } from '@/hooks/theme-context';
+
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -11,8 +13,9 @@ interface ProvidersProps {
 const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <AuthProvider>
-      {/* You can add more providers here in the future */}
-      {children}
+      <ThemeProvider>
+        {children}
+      </ThemeProvider>
     </AuthProvider>
   );
 };

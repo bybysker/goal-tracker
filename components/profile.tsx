@@ -26,7 +26,7 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
   }
 
   return (
-    <Card className="bg-gray-900 text-gray-100 border-gray-700">
+    <Card className="bg-transparent text-foreground border-border max-h-full max-w-screen-lg mx-auto ">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">User Profile</CardTitle>
       </CardHeader>

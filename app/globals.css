@@ -2,83 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #f5f5f5; /* Light grey */
-  --foreground: #333333; /* Dark grey */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a1a; /* Dark grey */
-    --foreground: #e0e0e0; /* Light grey */
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
 @layer base {
   :root {
-    --background: 0 0% 95%; /* Light grey */
-    --foreground: 0 0% 20%; /* Dark grey */
-    --card: 0 0% 95%; /* Light grey */
-    --card-foreground: 0 0% 20%; /* Dark grey */
-    --popover: 0 0% 95%; /* Light grey */
-    --popover-foreground: 0 0% 20%; /* Dark grey */
-    --primary: 210 10% 40%; /* Muted blue */
-    --primary-foreground: 0 0% 98%; /* Near white */
-    --secondary: 210 5% 85%; /* Light blue */
-    --secondary-foreground: 210 10% 40%; /* Muted blue */
-    --muted: 210 5% 85%; /* Light blue */
-    --muted-foreground: 210 5% 50%; /* Medium blue */
-    --accent: 210 5% 85%; /* Light blue */
-    --accent-foreground: 210 10% 40%; /* Muted blue */
-    --destructive: 0 70% 50%; /* Soft red */
-    --destructive-foreground: 0 0% 98%; /* Near white */
-    --border: 210 5% 80%; /* Light blue */
-    --input: 210 5% 80%; /* Light blue */
-    --ring: 210 10% 40%; /* Muted blue */
-    --chart-1: 30 70% 50%; /* Soft orange */
-    --chart-2: 120 50% 40%; /* Soft green */
-    --chart-3: 180 40% 30%; /* Soft teal */
-    --chart-4: 60 70% 60%; /* Soft yellow */
-    --chart-5: 300 70% 50%; /* Soft purple */
+    /* Light Mode Colors */
+    --background: 0 0% 98%; /* Slightly off-white for softer appearance */
+    --foreground: 220 15% 15%; /* Darker for better contrast */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    /* Enhanced Primary Colors */
+    --primary: 210 90% 50%; /* Vibrant blue */
+    --primary-foreground: 0 0% 100%; /* White for contrast */
+
+    /* Enhanced Secondary Colors */
+    --secondary: 340 70% 58%; /* Rich magenta */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Enhanced Accent Colors */
+    --accent: 120 60% 50%; /* Fresh green */
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted and Destructive Colors */
+    --muted: 60 10% 90%; /* Soft yellow */
+    --muted-foreground: 60 10% 30%;
+    --destructive: 0 70% 50%; /* Bold red */
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI Elements */
+    --border: 210 20% 85%;
+    --input: 210 20% 85%;
+    --ring: 210 90% 50%;
     --radius: 0.5rem;
   }
+
   .dark {
-    --background: 0 0% 20%; /* Dark grey */
-    --foreground: 0 0% 98%; /* Near white */
-    --card: 0 0% 20%; /* Dark grey */
-    --card-foreground: 0 0% 98%; /* Near white */
-    --popover: 0 0% 20%; /* Dark grey */
-    --popover-foreground: 0 0% 98%; /* Near white */
-    --primary: 0 0% 98%; /* Near white */
-    --primary-foreground: 210 10% 40%; /* Muted blue */
-    --secondary: 210 5% 30%; /* Dark blue */
-    --secondary-foreground: 0 0% 98%; /* Near white */
-    --muted: 210 5% 30%; /* Dark blue */
-    --muted-foreground: 210 5% 60%; /* Medium blue */
-    --accent: 210 5% 30%; /* Dark blue */
-    --accent-foreground: 0 0% 98%; /* Near white */
-    --destructive: 0 60% 40%; /* Dark red */
-    --destructive-foreground: 0 0% 98%; /* Near white */
-    --border: 210 5% 30%; /* Dark blue */
-    --input: 210 5% 30%; /* Dark blue */
-    --ring: 210 5% 70%; /* Medium blue */
-    --chart-1: 30 60% 40%; /* Dark orange */
-    --chart-2: 120 50% 35%; /* Dark green */
-    --chart-3: 180 50% 40%; /* Dark teal */
-    --chart-4: 60 60% 50%; /* Dark yellow */
-    --chart-5: 300 60% 40%; /* Dark purple */
+    /* Dark Mode Colors */
+    --background: 220 15% 15%;
+    --foreground: 210 40% 98%;
+    --card: 220 15% 15%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 15% 15%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Enhanced Primary Colors */
+    --primary: 210 80% 60%; /* Slightly muted vibrant blue */
+    --primary-foreground: 0 0% 100%;
+
+    /* Enhanced Secondary Colors */
+    --secondary: 340 80% 60%; /* Slightly muted rich magenta */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Enhanced Accent Colors */
+    --accent: 120 70% 60%; /* Slightly muted fresh green */
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted and Destructive Colors */
+    --muted: 60 10% 30%; /* Soft yellow darkened */
+    --muted-foreground: 60 10% 90%;
+    --destructive: 0 70% 40%; /* Bold red darkened */
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI Elements */
+    --border: 210 20% 25%;
+    --input: 210 20% 25%;
+    --ring: 210 80% 60%;
   }
 }
 
@@ -88,5 +77,38 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Updated Gradient Classes for More Vibrant Look */
+.bg-gradient-light {
+  background-image: linear-gradient(to bottom right, #bae6fd, #c4b5fd, #fbcfe8);
+}
+
+.bg-gradient-dark {
+  background-image: linear-gradient(to bottom right, #1e40af, #9333ea, #4ade80);
+}
+
+.backdrop-blur-card {
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary;
 }

@@ -29,6 +29,7 @@ export const questionsUser = [
     type: 'textarea',
     icon: Flame,
   },
+  /*  
   {
     id: 'purposeAndFulfillment',
     question: "Describe moments when you felt the most fulfilled or found deep meaning in what you were doing.",
@@ -43,6 +44,7 @@ export const questionsUser = [
     max: 5,
     icon: Target,
   },
+  */
   {
     id: 'topStrengths',
     question: "What are your key strengths, talents, or skills?",
@@ -50,12 +52,14 @@ export const questionsUser = [
     type: 'textarea',
     icon: Star,
   },
+  /*
   {
     id: 'pastAchievements',
     question: "List accomplishments you're proud of and explain why they are significant to you.",
     type: 'textarea',
     icon: Trophy,
   },
+  */
   {
     id: 'developmentOpportunities',
     question: "What skills or areas would you like to improve?",
@@ -76,18 +80,21 @@ export const questionsUser = [
     ],
     icon: Swords
   },
+  /*
   {
     id: 'envisionFuture',
     question: "Where do you see yourself in the next 5 to 10 years?",
     type: 'textarea',
     icon: Mountain,
   },
+  */
   {
     id: 'lifeGoals',
     question: "What long-term goals do you aspire to achieve?",
     type: 'textarea',
     icon: Award,
   },
+  /*
   {
     id: 'desiredImpact',
     question: "What positive impact do you want to make in your life, community, or the world?",
@@ -133,4 +140,5 @@ export const questionsUser = [
     type: 'textarea',
     icon: Info,
   },
+  */
 ];

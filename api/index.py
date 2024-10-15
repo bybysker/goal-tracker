@@ -20,9 +20,7 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 app = FastAPI()
 
 # Initialize Firestore
-cred_path = os.path.join(os.path.dirname(__file__), "firebase_credentials.json")
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app()
 db = firestore.client()
 
 class GoalFormData(BaseModel):
