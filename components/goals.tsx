@@ -320,7 +320,7 @@ export default function Goals({
   };
 
   return (
-    <Card className="bg-background text-foreground border-border max-h-full">
+    <Card className="bg-transparent text-foreground border-border max-h-full max-w-screen-lg mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Goals</CardTitle>
       </CardHeader>
@@ -350,9 +350,9 @@ export default function Goals({
               </Button>
             </div>
           </DialogTrigger>
-          <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-4xl w-full max-h-[80vh]">
+          <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold mb-4">Add New Goal</DialogTitle>
+              <DialogTitle className="text-xl font-bold mb-4 text-center">ADD A NEW GOAL</DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[calc(80vh-8rem)] pr-4">
               <form onSubmit={handleNext} onKeyDown={handleKeyDown}>
@@ -420,13 +420,13 @@ export default function Goals({
         </Dialog>
         {/* New dialog for displaying milestones */}
         <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
-          <DialogContent className="bg-gray-800 text-white border-gray-700 max-w-md w-full">
+          <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[60vh] pr-4">
               {milestones.map((milestone, index) => (
-                <Card key={index} className="mb-4 bg-gray-700">
+                <Card key={index} className="mb-4 bg-purple-700 backdrop-blur-3xl border-none text-white">
                   <CardContent className="p-4">
                     <h3 className="text-lg font-semibold">{milestone.name}</h3>
                     <p>Duration: {milestone.duration} weeks</p>

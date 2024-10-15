@@ -42,7 +42,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
   return (
     <>
       <Card
-        className="w-full cursor-pointer hover:bg-gray-200 transition-colors"
+        className="w-full cursor-pointer hover:bg-gray-200 "
         onClick={() => setIsDialogOpen(true)}
         >
         <CardHeader>

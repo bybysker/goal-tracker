@@ -30,7 +30,7 @@ const GoalTrackerApp: React.FC = () => {
   const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
   const [activeTab, setActiveTab] = useState<string>('goals');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [darkMode, setDarkMode] = useState<boolean>(true);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
   const tasksArray: Task[] = Object.values(tasks).flat();
 
   useEffect(() => {
@@ -240,7 +240,7 @@ const GoalTrackerApp: React.FC = () => {
   }
   
   return (
-    <div className={`h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'} flex `}>
+    <div className={`min-h-screen ${darkMode ?  "bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800" : "bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100" } flex `}>
       {/* <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} /> */}
       <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
       <main className="flex-1 px-8 py-16">

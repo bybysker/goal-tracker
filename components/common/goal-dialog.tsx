@@ -8,7 +8,6 @@ import MilestoneAccordion from './milestone-accordion';
 import { getFirestore, collection, getDocs } from 'firebase/firestore'; // Import necessary Firestore functions
 import { ScrollArea } from '@/components/ui/scroll-area'; // Import ScrollArea component
 
-
 interface GoalDialogProps {
   goal: Goal;
   isOpen: boolean;
@@ -90,10 +89,10 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 text-white max-w-4xl w-full " >
+      <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] max-h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto" >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{goal.name}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className='text-gray-200'>
             {typedDescription}
           </DialogDescription>
         </DialogHeader>

@@ -15,7 +15,7 @@ const MilestoneAccordion: React.FC<MilestoneAccordionProps> = ({ milestone, task
   return (
     <Accordion type="single" collapsible className="mb-4">
       <AccordionItem value={milestone.muid}>
-        <AccordionTrigger className={`text-lg ${allTasksCompleted ? 'text-green-500' : 'text-white'}`}>
+        <AccordionTrigger className={`text-base text-start justify-between ${allTasksCompleted ? 'text-green-500' : 'text-white'}`}>
           {milestone.name}
         </AccordionTrigger>
         <AccordionContent>

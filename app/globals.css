@@ -4,48 +4,70 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Mode Colors */
+    --background: 0 0% 98%; /* Slightly off-white for softer appearance */
+    --foreground: 220 15% 15%; /* Darker for better contrast */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 15% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --popover-foreground: 220 15% 15%;
+
+    /* Enhanced Primary Colors */
+    --primary: 210 90% 50%; /* Vibrant blue */
+    --primary-foreground: 0 0% 100%; /* White for contrast */
+
+    /* Enhanced Secondary Colors */
+    --secondary: 340 70% 58%; /* Rich magenta */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Enhanced Accent Colors */
+    --accent: 120 60% 50%; /* Fresh green */
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted and Destructive Colors */
+    --muted: 60 10% 90%; /* Soft yellow */
+    --muted-foreground: 60 10% 30%;
+    --destructive: 0 70% 50%; /* Bold red */
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI Elements */
+    --border: 210 20% 85%;
+    --input: 210 20% 85%;
+    --ring: 210 90% 50%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Dark Mode Colors */
+    --background: 220 15% 15%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 220 15% 15%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 220 15% 15%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+
+    /* Enhanced Primary Colors */
+    --primary: 210 80% 60%; /* Slightly muted vibrant blue */
+    --primary-foreground: 0 0% 100%;
+
+    /* Enhanced Secondary Colors */
+    --secondary: 340 80% 60%; /* Slightly muted rich magenta */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Enhanced Accent Colors */
+    --accent: 120 70% 60%; /* Slightly muted fresh green */
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted and Destructive Colors */
+    --muted: 60 10% 30%; /* Soft yellow darkened */
+    --muted-foreground: 60 10% 90%;
+    --destructive: 0 70% 40%; /* Bold red darkened */
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI Elements */
+    --border: 210 20% 25%;
+    --input: 210 20% 25%;
+    --ring: 210 80% 60%;
   }
 }
 
@@ -59,12 +81,13 @@
   }
 }
 
+/* Updated Gradient Classes for More Vibrant Look */
 .bg-gradient-light {
-  background-image: linear-gradient(to bottom right, #e0f2fe, #f3e8ff, #fce7f3);
+  background-image: linear-gradient(to bottom right, #bae6fd, #c4b5fd, #fbcfe8);
 }
 
 .bg-gradient-dark {
-  background-image: linear-gradient(to bottom right, #1e3a8a, #4c1d95, #1e3a8a);
+  background-image: linear-gradient(to bottom right, #1e40af, #9333ea, #4ade80);
 }
 
 .backdrop-blur-card {
@@ -87,7 +110,5 @@
 }
 
 .focus-ring {
-  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary;
 }
-
-

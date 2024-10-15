@@ -3,15 +3,11 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { CheckCircle, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { User as FirebaseUser } from 'firebase/auth';
-import { Goal, Task, Memo } from '@/types';
+import { Goal, Task } from '@/types';
 import VoiceMemo from '@/components/voice-memo';
-import GoalCard  from '@/components/common/goal-card'
-import TaskCard  from '@/components/common/task-card';
+import GoalCard from '@/components/common/goal-card'
 import { ScrollArea } from './ui/scroll-area';
 
 interface DashboardProps {
@@ -30,31 +26,22 @@ const Dashboard: React.FC<DashboardProps> = ({
   generateTodaysTasks,
   updateTask,
   deleteTask,
-
 }) => {
-  const [memoText, setMemoText] = useState('');
   const [voiceMemo, setVoiceMemo] = useState<string | null>(null);
 
   if (!user) {
-    return (
-      <Card className="bg-background text-foreground border-border">
-        <CardContent>
-          <p className="text-center">User data is not available.</p>
-        </CardContent>
-      </Card>
-    );
+    return <p className="text-center">User data is not available.</p>;
   }
-
 
   const todaysTasks = tasks.filter(task => 
     new Date(task.date).toDateString() === new Date().toDateString()
   );
 
   return (
-    <Card className="bg-background text-foreground border-border max-h-screen p-6">
-      <CardHeader className="flex flex-row items-center justify-between pb-6">
-        <CardTitle className="text-3xl font-bold">Dashboard</CardTitle>
-        <Avatar className="h-12 w-12">
+    <div className="max-h-full max-w-screen-lg mx-auto p-4 sm:p-6 space-y-6 pb-24 md:pb-20">
+      <header className="flex flex-col sm:flex-row items-center justify-between pb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+        <Avatar className="h-10 w-10 sm:h-12 sm:w-12 mt-4 sm:mt-0">
           {user.photoURL ? (
             <AvatarImage src={user.photoURL} alt={user.displayName || 'User'} />
           ) : (
@@ -63,15 +50,15 @@ const Dashboard: React.FC<DashboardProps> = ({
             </AvatarFallback>
           )}
         </Avatar>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Goals Overview */}
-        <Card className="bg-background text-foreground border-border">
+      </header>
+
+      <section>
+        <Card className="bg-transparent border-none">
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Goals Overview</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl font-semibold">Goals Overview</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <ScrollArea className="h-[25vh] w-full pr-4">
+            <ScrollArea className="h-60 sm:h-80 w-full pr-4">
               <div className="space-y-4">
                 {goals.length > 0 ? (
                   goals.map(goal => (
@@ -91,23 +78,23 @@ const Dashboard: React.FC<DashboardProps> = ({
             </ScrollArea>
           </CardContent>
         </Card>
+      </section>
 
-        
-        {/* Generate/Update Today's Tasks */}
-        <Card className="mt-4 bg-background text-foreground border-border">
+      <section>
+        <Card className="mt-4 bg-transparent text-foreground border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">Today's Tasks</CardTitle>
+            <CardTitle className="text-lg sm:text-xl font-bold">Today's Tasks</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center pt-4">
-              <Button onClick={generateTodaysTasks} className="mb-4 w-full">
+              <Button onClick={generateTodaysTasks} className="mb-4 w-full sm:w-auto">
                 Generate/Update Today's Tasks
               </Button>
             </div>
             {todaysTasks.length > 0 ? (
               <ul className="space-y-2">
                 {todaysTasks.map((task) => (
-                  <li key={task.tuid} className="flex items-center justify-between">
+                  <li key={task.tuid} className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -115,27 +102,26 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onChange={() => updateTask(task, { completed: !task.completed })}
                         className="form-checkbox h-4 w-4"
                       />
-                      <span className={task.completed ? 'line-through' : ''}>{task.name}</span>
+                      <span className={`${task.completed ? 'line-through' : ''} text-sm sm:text-base`}>{task.name}</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task)}>
+                    <Button variant="ghost" size="sm" onClick={() => deleteTask(task)} className="mt-2 sm:mt-0">
                       Delete
                     </Button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>No tasks for today.</p>
+              <p className="text-center text-gray-500">No tasks for today.</p>
             )}
           </CardContent>
         </Card>
+      </section>
 
-        {/* Voice Memo */}
-        <div className="mt-4">
+      <section className="mt-4">
         <VoiceMemo voiceMemo={voiceMemo} user={user} />
-        </div>
-      </CardContent>
-    </Card>
-  )
+      </section>
+    </div>
+  );
 }
 
 export default Dashboard;

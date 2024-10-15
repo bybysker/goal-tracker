@@ -142,7 +142,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
   return (
 
     <div >
-      <Card className="bg-background text-foreground border-border">
+      <Card className="bg-transparent text-foreground border-border">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Express your thoughts</CardTitle>
         </CardHeader>
@@ -164,7 +164,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             )}
             <Textarea 
               placeholder="Transcribe your voice memo here or type your daily reflection" 
-              className="w-full bg-gray-800 border-gray-700 text-gray-100 min-h-[100px]"
+              className="w-full bg-white border-gray-200 text-black min-h-[100px]"
               value={transcription}
               onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
             />
