@@ -1,21 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "excludeFiles": "/{.next,*.cache,node_modules,public,app}/**"
-      }
-    },
-    {
-      "src": "next.config.js",
-      "use": "@vercel/next"
+  "functions": {
+    "api/index.py": {
+      "runtime": "@vercel/python",
+      "excludeFiles": "/{.next,*.cache,node_modules,public,app}/**"
     }
-  ],
-  "routes": [
-    { "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" }
   ]
 }
