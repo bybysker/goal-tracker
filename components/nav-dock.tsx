@@ -31,7 +31,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
                 >
                   <DockIcon>
                     <tab.icon
-                      className={`w-8 h-8 hover:text-primary ${
+                      className={`h-6 w-6 sm:w-8 sm:h-8 hover:text-primary ${
                         activeTab === tab.name ? 'text-primary' : 'text-gray-700'
                       }`}
                     />
@@ -50,7 +50,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
                 className="focus:outline-none flex flex-col items-center"
               >
                 <DockIcon>
-                  <LogOut className="w-8 h-8 text-gray-700 hover:text-primary" />
+                  <LogOut className="h-4 w-4 sm:w-8 sm:h-8 text-gray-700 hover:text-primary" />
                 </DockIcon>
               </button>
             </TooltipTrigger>
