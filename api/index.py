@@ -1,6 +1,5 @@
 import os
 import io
-from rich import print
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
