@@ -130,7 +130,8 @@ export default function Goals({
         if (!guid) throw new Error("Failed to create goal");
         resetForm();
 
-        const milestonesResponse = await axios.post('/api/generate_milestones',  {
+        //const milestonesResponse = await axios.post('/api/generate_milestones',  {
+        const milestonesResponse = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_milestones',  {
           user_id: user.uid,
           goal_data: { ...formData, guid: guid }
         }, {
@@ -169,7 +170,8 @@ export default function Goals({
         setProgress(((i) / milestones.length) * 100);
 
         // Generate tasks for each milestone
-        const tasksResponse = await axios.post('/api/generate_tasks', {
+        // const tasksResponse = await axios.post('/api/generate_tasks', {
+        const tasksResponse = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_tasks', {
           user_id: user.uid,
           guid: milestone.guid,
           muid: milestoneId

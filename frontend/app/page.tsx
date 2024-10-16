@@ -210,7 +210,8 @@ const GoalTrackerApp: React.FC = () => {
     // Implement logic to generate or update tasks for today
     console.log("Generating today's tasks");
     if (!user) return;
-    const response = await axios.post('/api/generate_tasks',  {
+    //const response = await axios.post('/api/generate_tasks',  {
+    const response = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_tasks',  {
       user_id: user.uid,
       guid: user.uid,
       muid: user.uid

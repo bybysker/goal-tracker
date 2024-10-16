@@ -3,6 +3,7 @@ import io
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -19,8 +20,18 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 app = FastAPI()
 
 # Initialize Firestore
-firebase_admin.initialize_app()
+cred = credentials.Certificate("api/cred.json")
+firebase_admin.initialize_app(cred)
 db = firestore.client()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to the origins you want to allow
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 class GoalFormData(BaseModel):
     user_id: str
@@ -30,6 +41,10 @@ class MilestoneFormInfo(BaseModel):
     user_id: str
     guid: str
     muid: str
+
+@app.get('/')
+def root():
+    return {"message": "Hello World"}
 
 @app.post('/generate_milestones')
 def generate_milestones(goal_form_data: GoalFormData):

@@ -50,7 +50,8 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
           formData.append('voice_memo', audioBlob, "voice_memo.wav");
           
           try {
-            const response = await axios.post('/api/transcribe_voice', formData, {
+            //const response = await axios.post('/api/transcribe_voice', formData, {
+            const response = await axios.post('https://backend-weathered-hill-9485.fly.dev/transcribe_voice', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
