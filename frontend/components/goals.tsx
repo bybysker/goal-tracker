@@ -130,8 +130,7 @@ export default function Goals({
         if (!guid) throw new Error("Failed to create goal");
         resetForm();
 
-        //const milestonesResponse = await axios.post('/api/generate_milestones',  {
-        const milestonesResponse = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_milestones',  {
+        const milestonesResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/generate_milestones`,  {
           user_id: user.uid,
           goal_data: { ...formData, guid: guid }
         }, {
@@ -170,8 +169,7 @@ export default function Goals({
         setProgress(((i) / milestones.length) * 100);
 
         // Generate tasks for each milestone
-        // const tasksResponse = await axios.post('/api/generate_tasks', {
-        const tasksResponse = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_tasks', {
+        const tasksResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/generate_tasks`, {
           user_id: user.uid,
           guid: milestone.guid,
           muid: milestoneId
@@ -357,7 +355,7 @@ export default function Goals({
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
+            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4 text-center">ADD A NEW GOAL</DialogTitle>
               </DialogHeader>
@@ -427,7 +425,7 @@ export default function Goals({
           </Dialog>
           {/* New dialog for displaying milestones */}
           <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
-            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
+            <DialogContent className="border-none bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
               </DialogHeader>

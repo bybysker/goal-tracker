@@ -51,8 +51,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
           formData.append('voice_memo', audioBlob, "voice_memo.wav");
           
           try {
-            //const response = await axios.post('/api/transcribe_voice', formData, {
-            const response = await axios.post('https://backend-weathered-hill-9485.fly.dev/transcribe_voice', formData, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/transcribe_voice`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -167,7 +166,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             )}
             <Textarea 
               placeholder="Transcribe your voice memo here or type your daily reflection" 
-              className="w-full bg-white border-gray-200 text-black min-h-[100px]"
+              className="w-full"
               value={transcription}
               onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
             />

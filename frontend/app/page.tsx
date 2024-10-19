@@ -209,18 +209,26 @@ const GoalTrackerApp: React.FC = () => {
   const generateTodaysTasks = async () => {
     // Implement logic to generate or update tasks for today
     console.log("Generating today's tasks");
+    
     if (!user) return;
-    //const response = await axios.post('/api/generate_tasks',  {
-    const response = await axios.post('https://backend-weathered-hill-9485.fly.dev/generate_tasks',  {
-      user_id: user.uid,
-      guid: user.uid,
-      muid: user.uid
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-  }
+
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/generate_tasks`, {
+        user_id: user.uid,
+        guid: user.uid,
+        muid: user.uid
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      // Handle the response as needed
+      console.log("Tasks generated successfully:", response.data);
+    } catch (error) {
+      console.error("Error generating tasks:", error);
+    }
+  };
 
   // Update Profile Function
   const updateProfile = (profile: { name: string; email: string }) => {

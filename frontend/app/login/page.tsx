@@ -73,7 +73,7 @@ const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-gray-800 border-gray-700 text-gray-100"
+                  className="bg-white border-gray-200 text-black"
                 />
                 <Input
                   type="password"
@@ -81,7 +81,7 @@ const Auth: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-gray-800 border-gray-700 text-gray-100"
+                  className="bg-white border-gray-200 text-black"
                 />
                 <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
                   Login
@@ -96,7 +96,7 @@ const Auth: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="bg-gray-800 border-gray-700 text-gray-100"
+                  className="bg-white border-gray-200 text-black"
                 />
                 <Input
                   type="email"
@@ -104,7 +104,7 @@ const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-gray-800 border-gray-700 text-gray-100"
+                  className="bg-white border-gray-200 text-black"
                 />
                 <Input
                   type="password"
@@ -112,7 +112,7 @@ const Auth: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-gray-800 border-gray-700 text-gray-100"
+                  className="bg-white border-gray-200 text-black"
                 />
                 <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
                   Sign Up
@@ -130,6 +130,7 @@ const Auth: React.FC = () => {
             >
               <FaGoogle className="mr-2" /> Google
             </Button>
+            {/*
             <Button
               onClick={handleGithubSignIn}
               variant="outline"
@@ -144,6 +145,7 @@ const Auth: React.FC = () => {
             >
               <FaApple className="mr-2" /> Apple
             </Button>
+            */}
           </div>
 
           {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
