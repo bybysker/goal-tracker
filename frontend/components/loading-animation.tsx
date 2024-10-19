@@ -36,20 +36,19 @@ export default function LoadingAnimation() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      exit={{ opacity: 0, zIndex: -1 }}
+      className="fixed top-0 left-0 right-0 bottom-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
     >
       <motion.div
         className="flex space-x-2"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        exit="hidden"
       >
         {[...Array(3)].map((_, index) => (
           <motion.span
             key={index}
-            className="w-4 h-4 bg-blue-800 rounded-full"
+            className="w-4 h-4 bg-black rounded-full"
             variants={dotVariants}
             transition={{
               duration: 0.5,

@@ -89,7 +89,7 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] max-h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto" >
+      <DialogContent className="border-none bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] max-h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto" >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{goal.name}</DialogTitle>
           <DialogDescription className='text-gray-200'>

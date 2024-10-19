@@ -68,7 +68,7 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
               id="profile-name"
               name="name"
               defaultValue={user.displayName ?? ''}
-              className="bg-gray-800 border-gray-700 text-gray-100"
+              className=" bg-white border-gray-200 text-black"
               required
             />
           </div>
@@ -79,7 +79,7 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
               name="email"
               type="email"
               defaultValue={user.email ?? ''}
-              className="bg-gray-800 border-gray-700 text-gray-100"
+              className=" bg-white border-gray-200 text-black focus:text-black"
               required
             />
           </div>

@@ -12,6 +12,7 @@ import axios from 'axios'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/db/configFirebase';
 import { User as FirebaseUser } from 'firebase/auth'
+import { Dialog, DialogContent, DialogOverlay } from './ui/dialog';
 
 
 
@@ -50,7 +51,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
           formData.append('voice_memo', audioBlob, "voice_memo.wav");
           
           try {
-            const response = await axios.post('/api/transcribe_voice', formData, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/transcribe_voice`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -95,7 +96,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
         description: "Please record or type a reflection before saving.",
         variant: "destructive",
       })
-      return
+      return;
     }
 
     if (!user) {
@@ -104,6 +105,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
     }
 
     try {
+      showMessage();
       // **Step 1:** Create a text Blob from the reflection
       const reflectionBlob = new Blob([transcription], { type: 'text/plain' });
 
@@ -120,7 +122,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
       console.log("Transcription uploaded to:", url);
 
 
-      // Optionally, reset the transcription state
+      // Reset the transcription state
       setTranscription('');
       // If you want to clear the textarea after saving, you might need to adjust the `VoiceMemo` component accordingly
 
@@ -136,7 +138,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
 
   const showMessage = () => {
     setShowSuccessMessage(true)
-    setTimeout(() => setShowSuccessMessage(false), 1500)
+    setTimeout(() => setShowSuccessMessage(false), 5000)
   }
 
   return (
@@ -164,13 +166,13 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             )}
             <Textarea 
               placeholder="Transcribe your voice memo here or type your daily reflection" 
-              className="w-full bg-white border-gray-200 text-black min-h-[100px]"
+              className="w-full"
               value={transcription}
               onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
             />
             <div className="flex justify-center pt-4">
               <Button 
-                onClick={() => { handleSaveReflection(); showMessage(); }}
+                onClick={() => { handleSaveReflection();}}
                 className="w-1/3 min-w-44 bg-green-600 hover:bg-green-700"
               >
                 Save Reflection
@@ -185,7 +187,8 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            className="fixed top-0 left-0 right-0 bottom-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+            //className="fixed inset-0 flex items-center justify-center bg-black/50"
           >
             <motion.div
               className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
@@ -198,7 +201,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+          </AnimatePresence>
     </div>
   )
 }
