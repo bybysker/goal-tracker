@@ -96,7 +96,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
         description: "Please record or type a reflection before saving.",
         variant: "destructive",
       })
-      return
+      return;
     }
 
     if (!user) {
@@ -105,6 +105,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
     }
 
     try {
+      showMessage();
       // **Step 1:** Create a text Blob from the reflection
       const reflectionBlob = new Blob([transcription], { type: 'text/plain' });
 
@@ -121,7 +122,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
       console.log("Transcription uploaded to:", url);
 
 
-      // Optionally, reset the transcription state
+      // Reset the transcription state
       setTranscription('');
       // If you want to clear the textarea after saving, you might need to adjust the `VoiceMemo` component accordingly
 
@@ -171,7 +172,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             />
             <div className="flex justify-center pt-4">
               <Button 
-                onClick={() => { handleSaveReflection(); showMessage(); }}
+                onClick={() => { handleSaveReflection();}}
                 className="w-1/3 min-w-44 bg-green-600 hover:bg-green-700"
               >
                 Save Reflection
@@ -186,7 +187,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            className="fixed inset-0 flex overflow-visible items-center justify-center bg-black bg-opacity-50"
           >
             <motion.div
               className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
