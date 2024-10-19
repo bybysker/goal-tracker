@@ -21,7 +21,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
   return (
     <TooltipProvider>
       <div className="fixed bottom-0 w-full py-2 z-10">
-        <Dock direction="middle" className="justify-around rounded-full md:my-6">
+        <Dock direction="middle" className="justify-around rounded-full">
           {tabs.map((tab) => (
             <Tooltip key={tab.name}>
               <TooltipTrigger asChild>
