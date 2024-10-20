@@ -290,7 +290,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-              <h2 className="text-xl font-bold text-gray-800">Submission successful</h2>
+              <h2 className="text-xl font-bold text-gray-800 text-center">Submission successful</h2>
             </motion.div>
           </motion.div>
         )}
