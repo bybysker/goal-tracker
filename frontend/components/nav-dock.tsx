@@ -20,7 +20,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-0 w-full py-2t z-10">
+      <div className="fixed bottom-0 w-full py-2 z-[500]">
         <Dock direction="middle" className="justify-around rounded-full">
           {tabs.map((tab) => (
             <Tooltip key={tab.name}>

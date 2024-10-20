@@ -57,7 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <CardHeader>
             <CardTitle className="text-xl sm:text-2xl font-semibold">Goals Overview</CardTitle>
           </CardHeader>
-          <CardContent className='space-y-4'>
+          <CardContent>
             <ScrollArea className="h-60 sm:h-80 w-full pr-4">
               <div className="space-y-4">
                 {goals.length > 0 ? (

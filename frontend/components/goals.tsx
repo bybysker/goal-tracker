@@ -324,13 +324,13 @@ export default function Goals({
   };
 
   return (
-    <div>
-      <Card className="bg-transparent text-foreground border-border max-h-full max-w-screen-lg mx-auto">
+    <div className="max-h-full max-w-screen-lg mx-auto space-y-6">
+      <Card className="bg-transparent text-foreground border-border">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Goals</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-semibold">Goals</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[70dvh] w-full pr-4">
+          <ScrollArea className="h-[70vh] sm:h-[80vh] w-full">
             <div className="space-y-4">
               {goals.map(goal => (
                 <GoalCard
@@ -355,13 +355,13 @@ export default function Goals({
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
+            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80vw] h-[80vh] rounded-lg">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4 text-center">ADD A NEW GOAL</DialogTitle>
               </DialogHeader>
-              <ScrollArea className="h-[calc(80vh-8rem)] pr-4">
+              <ScrollArea className="h-[70vh] sm:h-[80vh]">
                 <form onSubmit={handleNext} onKeyDown={handleKeyDown}>
-                  <CardContent className="space-y-6 p-6">
+                  <CardContent className="space-y-4 p-4">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={currentQuestion.id}
@@ -425,11 +425,11 @@ export default function Goals({
           </Dialog>
           {/* New dialog for displaying milestones */}
           <Dialog open={showMilestonesDialog} onOpenChange={setShowMilestonesDialog}>
-            <DialogContent className="border-none bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto">
+            <DialogContent className="border-none bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80vw] h-[80vh] rounded-lg overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4">Generated Milestones</DialogTitle>
               </DialogHeader>
-              <ScrollArea className="h-[60vh] pr-4">
+              <ScrollArea className="h-[60vh]">
                 {milestones.map((milestone, index) => (
                   <Card key={index} className="mb-4 bg-purple-700 backdrop-blur-3xl border-none text-white">
                     <CardContent className="p-4">
