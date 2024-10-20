@@ -38,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   );
 
   return (
-    <div className="max-h-full max-w-screen-lg mx-auto p-4 sm:p-6 space-y-6 pb-24 md:pb-20">
+    <div className="max-h-full max-w-screen-lg mx-auto space-y-6">
       <header className="flex flex-col sm:flex-row items-center justify-between pb-6">
         <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
         <Avatar className="h-10 w-10 sm:h-12 sm:w-12 mt-4 sm:mt-0">

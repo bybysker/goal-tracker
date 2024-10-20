@@ -187,8 +187,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed top-0 left-0 right-0 bottom-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
-            //className="fixed inset-0 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 flex items-center justify-center bg-transparent backdrop-blur-sm"
           >
             <motion.div
               className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
@@ -197,7 +196,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-              <h2 className="text-xl font-bold text-gray-800">Reflection saved successfully!</h2>
+              <h2 className="text-xl font-bold text-gray-800 text-center">Reflection saved successfully!</h2>
             </motion.div>
           </motion.div>
         )}
