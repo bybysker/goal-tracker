@@ -3,8 +3,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 
       'europe-west1-docker.pkg.dev/goal-tracker-firebase-f61cf/cloud-run-source-deploy/backend-image:$COMMIT_SHA',
-      #'-f', 
-      #'backend/Dockerfile',
+      '-f', 
+      'backend/Dockerfile',
       '.' # current directory
     ]
 
