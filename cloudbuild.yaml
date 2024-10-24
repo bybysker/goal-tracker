@@ -4,7 +4,7 @@ steps:
     args: ['build', '-t', 
       'europe-west1-docker.pkg.dev/goal-tracker-firebase-f61cf/cloud-run-source-deploy/backend-image:$COMMIT_SHA',
       '-f', 
-      'backend/Dockerfile'
+      './backend/Dockerfile'
     ]
 
   # Step 2: Push the Docker image to Google Container Registry
