@@ -20,4 +20,4 @@ ENV PORT=8080
 ENV HOSTNAME=0.0.0.0  
 
 # Command to print the working directory and then run the FastAPI application using Uvicorn
-CMD ["sh", "-c", "pwd && uvicorn api.index:app --host 0.0.0.0 --port 8080 --reload"]
+CMD ["sh", "-c", "ls && uvicorn api.index:app --host 0.0.0.0 --port 8080 --reload"]
