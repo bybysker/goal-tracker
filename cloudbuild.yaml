@@ -2,17 +2,14 @@ steps:
   # Step 1: Build the Docker image for the backend
   - name: 'gcr.io/cloud-builders/docker'
     dir: 'backend'  # Specify the backend directory
-    args: [
-      'build', 
-      '-t', 
+    args: ['build', '-t', 
       'europe-west1-docker.pkg.dev/goal-tracker-firebase-f61cf/cloud-run-source-deploy/backend-image:$COMMIT_SHA', 
       '.'
     ]
 
   # Step 2: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'push', 
+    args: ['push', 
       'europe-west1-docker.pkg.dev/goal-tracker-firebase-f61cf/cloud-run-source-deploy/backend-image:$COMMIT_SHA'
     ]
 
