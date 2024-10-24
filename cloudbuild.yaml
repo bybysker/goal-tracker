@@ -30,6 +30,9 @@ steps:
       '--allow-unauthenticated'
     ]
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 # Define the images to be pushed
 images:
   - 'europe-west1-docker.pkg.dev/goal-tracker-firebase-f61cf/cloud-run-source-deploy/backend-image:$COMMIT_SHA'
