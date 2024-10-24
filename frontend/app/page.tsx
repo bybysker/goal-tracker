@@ -249,7 +249,7 @@ const GoalTrackerApp: React.FC = () => {
   }
   
   return (
-    <div className={`${darkMode ?  "bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800" : "bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100" } flex `}>
+    <div className={`${darkMode ?  "bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800" : "bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100" } flex`}>
       {/* <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} /> */}
       <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
       <main className="min-h-screen relative flex-1 px-8 py-16">
