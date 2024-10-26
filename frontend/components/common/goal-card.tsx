@@ -64,7 +64,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
                       <Trash className="h-4 w-4 text-destructive" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className='rounded-md w-[80vw]'>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure you want to delete this goal?</AlertDialogTitle>
                       <AlertDialogDescription>
