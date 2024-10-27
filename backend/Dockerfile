@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Use the official Python image from the Docker Hub
 FROM python:3.9-slim
 
@@ -14,9 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port that the FastAPI app will run on
-#EXPOSE 8080
-#ENV PORT=8080
-#ENV HOSTNAME=0.0.0.0  
+EXPOSE 8080
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0  
 
-# Command to run the FastAPI application using Uvicorn
-CMD ["uvicorn", "api.index:app", "--host", "0.0.0.0", "--port", "$PORT", "--reload"]
+# Command to print the working directory and then run the FastAPI application using Uvicorn
+CMD ["sh", "-c", "ls && uvicorn api.index:app --host 0.0.0.0 --port 8080 --reload"]

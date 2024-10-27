@@ -185,7 +185,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-[#0f0f1a]">
+    <div className="fixed inset-0 flex items-center justify-center p-4 bg-[#ceced8]">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-5"></div>
         <motion.div
@@ -281,7 +281,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            className="fixed inset-0 flex items-center justify-center bg-black/50"
           >
             <motion.div
               className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"

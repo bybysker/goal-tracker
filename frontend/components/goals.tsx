@@ -260,8 +260,9 @@ export default function Goals({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <div className="text-center text-sm text-white">
-                Current value: {sliderValue}
+              <div className="flex justify-between text-sm text-white/60">
+                <span className="text-xs">{currentQuestion.min}</span>
+                <span className="text-xs">{currentQuestion.max}</span>
               </div>
             </div>
           )
@@ -330,7 +331,7 @@ export default function Goals({
           <CardTitle className="text-xl sm:text-2xl font-semibold">Goals</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[70vh] sm:h-[80vh] w-full">
+          <ScrollArea className="max-h-[70vh] sm:max-h-[80vh] w-full">
             <div className="space-y-4">
               {goals.map(goal => (
                 <GoalCard
@@ -351,15 +352,15 @@ export default function Goals({
             <DialogTrigger asChild>
               <div className="flex justify-center pt-4">
                 <Button className="w-1/3 min-w-44 bg-blue-600 hover:bg-blue-700 text-white">
-                  <Plus className="mr-2 h-4 w-4" /> Add Goal
+                  <Plus className="mr-2 h-4 w-4"/> Add Goal
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80vw] h-[80vh] rounded-lg">
+            <DialogContent className="max-h-[80vh] overflow-y-auto bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80vw] h-[80vh] rounded-lg">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4 text-center">ADD A NEW GOAL</DialogTitle>
               </DialogHeader>
-              <ScrollArea className="h-[70vh] sm:h-[80vh]">
+              <ScrollArea className="max-h-[70vh] sm:h-[80vh]">
                 <form onSubmit={handleNext} onKeyDown={handleKeyDown}>
                   <CardContent className="space-y-4 p-4">
                     <AnimatePresence mode="wait">
@@ -380,7 +381,7 @@ export default function Goals({
                           >
                             {React.createElement(currentQuestion.icon, { className: "w-6 h-6 text-white" })}
                           </motion.div>
-                          <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
+                          <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-bla">
                             {currentQuestion.question}
                           </Label>
                         </div>
@@ -414,8 +415,8 @@ export default function Goals({
                       </Button>
                     </div>
                     <div className="text-sm text-gray-400 flex justify-between w-full">
-                      <span>Question {currentQuestionIndex + 1} of {questionsGoal.length}</span>
-                      <span>{Math.round(progress)}% completed</span>
+                      <span className="text-xs">Question {currentQuestionIndex + 1} of {questionsGoal.length}</span>
+                      <span className="text-xs">{Math.round(progress)}% done</span>
                     </div>
                     <Progress value={progress} className="w-full h-2 bg-gray-700 text-white" />
                   </CardFooter>

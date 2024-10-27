@@ -15,6 +15,9 @@ import {
   signOut,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { FirebaseError } from "firebase/app"
+import { useToast } from "@/hooks/use-toast"
+import { authErrors } from "@/app/login/error-handler"
 
 // Initialize Providers
 const googleProvider = new GoogleAuthProvider();
@@ -42,6 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
+  const { toast } = useToast()
+
 
   const checkFirstLogin = async (user: FirebaseUser) => {
     const userDocRef = doc(db, 'users', user.uid);
@@ -75,6 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Google Sign-In Error:", error);
+      toast({
+        title: "Login Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 
@@ -85,6 +95,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Github Sign-In Error:", error);
+      toast({
+        title: "Login Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 
@@ -95,6 +110,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await checkFirstLogin(result.user);
     } catch (error) {
       console.error("Apple Sign-In Error:", error);
+      toast({
+        title: "Login Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 
@@ -102,9 +122,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       setUser(result.user);
-      await checkFirstLogin(result.user);
+      const userDocRef = doc(db, 'users', result.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+      if (userData && userData.firstLogin) {
+        // User hasn't completed onboarding
+        router.push('/onboarding');
+      } else {
+        // Regular login
+        router.push('/');
+      }
     } catch (error) {
-      console.error("Email/Password Sign-In Error:", error);
+      console.error("Email/Password Sign-In Error:",authErrors[((error as FirebaseError).code) as keyof typeof authErrors]);
+      toast({
+        title: "Login Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 
@@ -115,6 +149,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       router.push('/login');
     } catch (error) {
       console.error("Sign-Out Error:", error);
+      toast({
+        title: "Sign-Out Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 
@@ -122,9 +161,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       setUser(result.user);
-      await checkFirstLogin(result.user);
+      const userDocRef = doc(db, 'users', result.user.uid);
+      // First login
+      await setDoc(userDocRef, {
+        email: result.user.email,
+        firstLogin: true,
+        // Add any other initial user data you want to store
+      });
+      router.push('/onboarding');
     } catch (error) {
       console.error("User Registration Error:", error);
+      toast({
+        title: "Registration Failed",
+        description: authErrors[((error as FirebaseError).code) as keyof typeof authErrors],
+        variant: "destructive",
+      });
     }
   };
 

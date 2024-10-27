@@ -58,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <CardTitle className="text-xl sm:text-2xl font-semibold">Goals Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-60 sm:h-80 w-full pr-4">
+            <ScrollArea className="h-60 sm:h-80 w-full pr-1">
               <div className="space-y-4">
                 {goals.length > 0 ? (
                   goals.map(goal => (

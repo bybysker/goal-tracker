@@ -42,7 +42,6 @@ const Auth: React.FC = () => {
       } else {
         await registerUser(email, password);
       }
-      router.push('/');
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
     }
@@ -90,14 +89,6 @@ const Auth: React.FC = () => {
             </TabsContent>
             <TabsContent value="signup">
               <form onSubmit={handleEmailAuth} className="space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="bg-white border-gray-200 text-black"
-                />
                 <Input
                   type="email"
                   placeholder="Email"

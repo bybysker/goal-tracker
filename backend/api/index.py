@@ -19,11 +19,23 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 app = FastAPI()
 
-# Initialize Firestore
-cred = credentials.Certificate("api/cred.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+GCP_DEPLOYMENT = os.getenv('GCP_DEPLOYMENT', 'True') == 'True'
 
+def initialize_firestore():
+    """
+    Initialize Firestore based on the platform.
+    """
+    if GCP_DEPLOYMENT:
+        # Initialize Firestore for GCP
+        firebase_admin.initialize_app()
+    else:
+        # Initialize Firestore for other platforms
+        cred = credentials.Certificate("api/cred.json")
+        firebase_admin.initialize_app(cred)
+    
+    return firestore.client()
+
+db = initialize_firestore()
 
 app.add_middleware(
     CORSMiddleware,
