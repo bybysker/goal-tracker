@@ -18,7 +18,7 @@ const MilestoneAccordion: React.FC<MilestoneAccordionProps> = ({ milestone, task
         <AccordionTrigger className={`text-base text-start justify-between ${allTasksCompleted ? 'text-green-500' : 'text-white'}`}>
           {milestone.name}
         </AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent className="text-xs">
           <div className="space-y-2">
             {tasks.map((task) => (
               <TaskCheckbox

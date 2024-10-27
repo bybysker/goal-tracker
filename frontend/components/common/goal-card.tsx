@@ -47,7 +47,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
         >
         <CardHeader>
           <div className="flex items-center justify-between relative">
-            <div className="shrink">
+            <div className="shrink w-4/5 break-words">
               <CardTitle className="pb-2">{goal.name}</CardTitle>
               <CardDescription>Deadline: {new Date(goal.timeframe).toLocaleDateString()}</CardDescription>
             </div>

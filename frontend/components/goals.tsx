@@ -232,7 +232,7 @@ export default function Goals({
           <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || ''} className="space-y-2">
             {currentQuestion.options?.map((option) => (
               <div key={option} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`${currentQuestion.id}-${option}`} className="border-gray-600 text-blue-500" />
+                <RadioGroupItem value={option} id={`${currentQuestion.id}-${option}`} className="border-white/20 text-white" />
                 <Label htmlFor={`${currentQuestion.id}-${option}`} className="text-white">{option}</Label>
               </div>
             ))}
@@ -331,7 +331,7 @@ export default function Goals({
           <CardTitle className="text-xl sm:text-2xl font-semibold">Goals</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="max-h-[70vh] sm:max-h-[80vh] w-full">
+          <ScrollArea className="max-h-[70vh] sm:max-h-[80vh] overflow-y-auto w-full">
             <div className="space-y-4">
               {goals.map(goal => (
                 <GoalCard
@@ -356,7 +356,7 @@ export default function Goals({
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="max-h-[80vh] overflow-y-auto bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80vw] h-[80vh] rounded-lg">
+            <DialogContent className="bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white border-none max-w-4xl w-[80vw] h-[80vh] rounded-lg">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold mb-4 text-center">ADD A NEW GOAL</DialogTitle>
               </DialogHeader>
@@ -381,7 +381,7 @@ export default function Goals({
                           >
                             {React.createElement(currentQuestion.icon, { className: "w-6 h-6 text-white" })}
                           </motion.div>
-                          <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-bla">
+                          <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
                             {currentQuestion.question}
                           </Label>
                         </div>

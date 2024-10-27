@@ -90,14 +90,14 @@ const GoalDialog: React.FC<GoalDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="border-none bg-gradient-to-br from-indigo-700 via-purple-900 to-indigo-600 text-white max-w-4xl w-[80dvw] max-h-[80dvh] rounded-lg sm:p-6 md:p-8 overflow-y-auto" >
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{goal.name}</DialogTitle>
+        <DialogHeader className="pt-4 items-center">
+          <DialogTitle className="text-xl sm:text-2xl font-bold w-4/5 break-words">{goal.name}</DialogTitle>
           <DialogDescription className='text-gray-200'>
             {typedDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4">Milestones</h3>
+          <h3 className="text-lg sm:text-xl font-semibold mb-4">Milestones</h3>
           <ScrollArea className="h-[70dvh] w-full pr-4"> {/* Adjust max height as needed */}
             {milestones.map((milestone) => (
               <MilestoneAccordion
