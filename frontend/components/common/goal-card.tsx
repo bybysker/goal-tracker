@@ -48,7 +48,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between relative">
             <div className="shrink">
-              <CardTitle>{goal.name}</CardTitle>
+              <CardTitle className="pb-2">{goal.name}</CardTitle>
               <CardDescription>Deadline: {new Date(goal.timeframe).toLocaleDateString()}</CardDescription>
             </div>
             {isGoalsView && (
@@ -72,8 +72,8 @@ const GoalCard: React.FC<GoalCardProps> = ({
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                      <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={(e) => {e.stopPropagation(); onDelete && onDelete()}}>Delete</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
