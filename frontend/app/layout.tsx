@@ -29,7 +29,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-dark min-h-screen`}
       >
         <Providers>
           {/* You can place components that should be present on all pages here */}

@@ -1,10 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from api.prompts import (MILESTONE_TO_TASK_SYS_MSG, 
                      MILESTONE_TO_TASK_USR_MSG,
                      ENRICHED_GOAL_SYS_MSG,
                      ENRICHED_GOAL_USR_MSG,
                      GOAL_TO_MILESTONE_SYS_MSG,
-                     GOAL_TO_MILESTONE_USR_MSG)
+                     GOAL_TO_MILESTONE_USR_MSG,
+                     NEW_PROFILE_SYS_MSG,
+                     NEW_PROFILE_USR_MSG)
 
 class Goal(BaseModel):
     guid: str
@@ -25,7 +27,11 @@ class Milestone(BaseModel):
 class Task(BaseModel):
     name: str
     completed: bool
+    description: str
     duration_hours: float
+    simplicity: int = Field(ge=0, le=5)
+    importance: int = Field(ge=0, le=5)
+    urgency: int = Field(ge=0, le=5)
     guid: str
     muid: str
 
@@ -35,6 +41,8 @@ class GoalMilestones(BaseModel):
 class WeeklyTasks(BaseModel):
     tasks: list[Task]
 
+
+#TODO: Add a new prompt to generate a new profile
 
 class MilestonesGeneration:
 

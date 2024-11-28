@@ -9,14 +9,10 @@ import { Switch } from "@/components/ui/switch";
 
 
 interface SettingsProps {
-  darkMode: boolean;
-  setDarkMode: (value: boolean) => void;
   saveSettings: () => void;
 }
 
 const Settings: React.FC<SettingsProps> = ({
-  darkMode,
-  setDarkMode,
   saveSettings
 }) => {
   return (
@@ -26,16 +22,6 @@ const Settings: React.FC<SettingsProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Dark Mode Toggle */}
-          <div className="flex items-center justify-between">
-            <Label htmlFor="dark-mode">Dark Mode</Label>
-            <Switch
-              id="dark-mode"
-              checked={darkMode}
-              onCheckedChange={setDarkMode}
-            />
-          </div>
-          
           {/* Save Settings Button */}
           <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={saveSettings}>
             Save Settings

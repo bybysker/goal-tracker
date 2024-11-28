@@ -30,7 +30,6 @@ const GoalTrackerApp: React.FC = () => {
   const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
   const [activeTab, setActiveTab] = useState<string>('goals');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [darkMode, setDarkMode] = useState<boolean>(false);
   const tasksArray: Task[] = Object.values(tasks).flat();
 
   useEffect(() => {
@@ -239,17 +238,96 @@ const GoalTrackerApp: React.FC = () => {
       .catch(error => console.error("Error updating profile:", error));
   }
 
-  // Save Settings Function
-  const saveSettings = () => {
-    if (!user) return;
-    const userDocRef = doc(db, 'users', user.uid);
-    updateDoc(userDocRef, { darkMode })
-      .then(() => console.log("Settings saved"))
-      .catch(error => console.error("Error saving settings:", error));
-  }
-  
+
   return (
-    <div className={`${darkMode ?  "bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800" : "bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100" } flex`}>
+    <div className="bg-gradient-to-b from-[#150578] via-[#192BC2] to-[#0E0E52] flex">
+      
+      {/* Enhanced Particle Effect Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0"
+        />
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: Math.random() * 4 + 1,
+              height: Math.random() * 4 + 1,
+              backgroundColor: '#78C0E0',
+            }}
+            animate={{
+              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              opacity: [0.2, 0.8, 0.2],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 10,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Animated Lines */}
+      <svg className="fixed inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <motion.path
+          d="M0 100 Q250 50 500 100 T1000 100"
+          fill="none"
+          stroke="#78C0E0"
+          strokeWidth="2"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 5, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+        />
+        <motion.path
+          d="M0 200 Q250 150 500 200 T1000 200"
+          fill="none"
+          stroke="#449DD1"
+          strokeWidth="2"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 7, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 1 }}
+        />
+      </svg>
+
+      {/* Glowing Orbs */}
+      <motion.div
+        className="fixed top-1/4 left-1/4 w-32 h-32 rounded-full"
+        style={{
+          background: `radial-gradient(circle at 30% 30%, ${hexToRGBA('#78C0E0', 0.4)} 0%, transparent 70%)`,
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div
+        className="fixed bottom-1/4 right-1/4 w-48 h-48 rounded-full"
+        style={{
+          background: `radial-gradient(circle at 70% 70%, ${hexToRGBA('#449DD1', 0.3)} 0%, transparent 70%)`,
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.4, 0.7, 0.4],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+      />
+
       {/* <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} /> */}
       <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} handleSignOut={handleSignOut} />
       <main className="min-h-screen relative flex-1 px-8 py-16">
@@ -303,9 +381,7 @@ const GoalTrackerApp: React.FC = () => {
             )}
             {activeTab === 'settings' && (
               <Settings
-                darkMode={darkMode}
-                setDarkMode={setDarkMode}
-                saveSettings={saveSettings}
+                saveSettings={() => {/* function logic here */}}
               />
             )}
           </motion.div>
@@ -313,6 +389,14 @@ const GoalTrackerApp: React.FC = () => {
       </main>
     </div>
   );
+}
+
+// Helper function to convert hex to rgba
+const hexToRGBA = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export default GoalTrackerApp;

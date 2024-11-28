@@ -4,13 +4,12 @@
 
 @layer base {
   :root {
-    /* Light Mode Colors */
-    --background: 0 0% 98%; /* Slightly off-white for softer appearance */
-    --foreground: 220 15% 15%; /* Darker for better contrast */
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --background: 248 92% 24%; /* #150578 - Darkest blue */
+    --foreground: 210 40% 98%;
+    --card: 240 15% 15%;
+    --card-foreground: 210 40% 98%;
+    --popover: 240 15% 15%;
+    --popover-foreground: 210 40% 98%;
 
     /* Enhanced Primary Colors */
     --primary: 210 90% 50%; /* Vibrant blue */
@@ -36,39 +35,6 @@
     --ring: 210 90% 50%;
     --radius: 0.5rem;
   }
-
-  .dark {
-    /* Dark Mode Colors */
-    --background: 220 15% 15%;
-    --foreground: 210 40% 98%;
-    --card: 220 15% 15%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 15% 15%;
-    --popover-foreground: 210 40% 98%;
-
-    /* Enhanced Primary Colors */
-    --primary: 210 80% 60%; /* Slightly muted vibrant blue */
-    --primary-foreground: 0 0% 100%;
-
-    /* Enhanced Secondary Colors */
-    --secondary: 340 80% 60%; /* Slightly muted rich magenta */
-    --secondary-foreground: 0 0% 100%;
-
-    /* Enhanced Accent Colors */
-    --accent: 120 70% 60%; /* Slightly muted fresh green */
-    --accent-foreground: 0 0% 100%;
-
-    /* Muted and Destructive Colors */
-    --muted: 60 10% 30%; /* Soft yellow darkened */
-    --muted-foreground: 60 10% 90%;
-    --destructive: 0 70% 40%; /* Bold red darkened */
-    --destructive-foreground: 0 0% 100%;
-
-    /* UI Elements */
-    --border: 210 20% 25%;
-    --input: 210 20% 25%;
-    --ring: 210 80% 60%;
-  }
 }
 
 @layer base {
@@ -83,11 +49,11 @@
 
 /* Updated Gradient Classes for More Vibrant Look */
 .bg-gradient-light {
-  background-image: linear-gradient(to bottom right, #bae6fd, #c4b5fd, #fbcfe8);
+  background-image: linear-gradient(to bottom right, #78C0E0, #449DD1, #192BC2);
 }
 
 .bg-gradient-dark {
-  background-image: linear-gradient(to bottom right, #1e40af, #9333ea, #4ade80);
+  background-image: linear-gradient(to bottom right, #192BC2, #150578, #0E0E52);
 }
 
 .backdrop-blur-card {

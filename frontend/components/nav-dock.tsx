@@ -21,7 +21,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
   return (
     <TooltipProvider>
       <div className="fixed bottom-0 w-full py-2 z-[500]">
-        <Dock direction="middle" className="justify-around rounded-full">
+        <Dock direction="middle" className="justify-around rounded-xl">
           {tabs.map((tab) => (
             <Tooltip key={tab.name}>
               <TooltipTrigger asChild>
@@ -32,7 +32,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
                   <DockIcon>
                     <tab.icon
                       className={`h-6 w-6 sm:w-8 sm:h-8 hover:text-primary ${
-                        activeTab === tab.name ? 'text-primary' : 'text-gray-700'
+                        activeTab === tab.name ? 'text-primary' : 'text-gray-300'
                       }`}
                     />
                   </DockIcon>
@@ -50,7 +50,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
                 className="focus:outline-none flex flex-col items-center"
               >
                 <DockIcon>
-                  <LogOut className="h-4 w-4 sm:w-8 sm:h-8 text-gray-700 hover:text-primary" />
+                  <LogOut className="h-4 w-4 sm:w-8 sm:h-8 text-gray-300 hover:text-primary" />
                 </DockIcon>
               </button>
             </TooltipTrigger>
