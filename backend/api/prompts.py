@@ -7,24 +7,24 @@ Questionnaire:
 “When faced with new ideas or challenges, how likely are you to explore them enthusiastically?”
 	•	This measures curiosity, creativity, and openness to experience.
 	•	Response options: Very Unlikely - Unlikely - Neutral - Likely - Very Likely
-	2.	Conscientiousness:
+2.	Conscientiousness:
 “How often do you plan your tasks in advance and stick to your plans?”
 	•	This assesses organization, self-discipline, and goal-oriented behavior.
 	•	Response options: Rarely - Sometimes - Often - Always
-	3.	Extraversion:
+3.	Extraversion:
 “You are in a group setting with new people. How likely are you to initiate a conversation?”
 	•	This evaluates sociability, energy levels, and preference for social interactions.
 	•	Response options: Very Unlikely - Unlikely - Neutral - Likely - Very Likely
-	4.	Agreeableness:
+4.	Agreeableness:
 “When making decisions, how much do you consider other people’s feelings or preferences?”
 	•	This gauges empathy, cooperation, and kindness.
 	•	Response options: Not at All - A Little - Somewhat - A Lot - Always
-	5.	Neuroticism:
+5.	Neuroticism:
 “How often do you feel stressed or anxious about everyday situations?”
 	•	This identifies emotional stability and susceptibility to negative emotions.
 	•	Response options: Rarely - Sometimes - Often - Always
-6. Passions ? 
-7. Life Goals ? 
+6. “What are your main passions or interests?” 
+7. “What are your key life goals, and how do you plan to achieve them?”
 
 #Instructions
 1. Provide an overall Personality Summary in one paragraph 

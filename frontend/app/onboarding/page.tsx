@@ -10,26 +10,58 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
+import { Mascot } from '@/components/mascot'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronsRight, ChevronLeft, CheckCircle } from 'lucide-react'
 import { collection, addDoc, doc, updateDoc} from 'firebase/firestore';
 import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
-
+import LoadingAnimation from '@/components/loading-animation'
 import { questionsUser } from '@/config/questionsUserConfig'
+import { questionsGoal } from '@/config/questionsGoalConfig'
+import type { UserProfile, GoalConfig } from '@/types'
 
-
+const steps = [
+  'welcome',
+  'explanation',
+  'userProfile',
+  'transition',
+  'goalSetting',
+  'complete',
+  'loading',
+] as const
 
 const FuturisticFirstLoginForm: React.FC = () => {
   const { user } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [formData, setFormData] = useState<Record<string, any>>({})
-  const [progress, setProgress] = useState(0)
   const router = useRouter();
+  const [currentStep, setCurrentStep] = useState<(typeof steps)[number]>('welcome')
+  const [questionProgress, setQuestionProgress] = useState(0)
+
+  const progress = (() => {
+    switch (currentStep) {
+      case 'welcome':
+        return 0
+      case 'explanation':
+        return 20
+      case 'userProfile':
+        return 20 + (currentQuestionIndex / questionsUser.length) * 30
+      case 'transition':
+        return 50
+      case 'goalSetting':
+        return 50 + (currentQuestionIndex / questionsGoal.length) * 45
+      case 'complete':
+      case 'loading':
+        return 100
+      default:
+        return 0
+    }
+  })()
 
   useEffect(() => {
-    setProgress(((currentQuestionIndex + 1) / questionsUser.length) * 100)
+    setQuestionProgress(((currentQuestionIndex + 1) / questionsUser.length) * 100)
   }, [currentQuestionIndex])
 
   const currentQuestion = questionsUser[currentQuestionIndex]
@@ -109,7 +141,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
             value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
-            className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
+            className="text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
             placeholder="Type your answer here..."
           />
         )
@@ -121,34 +153,17 @@ const FuturisticFirstLoginForm: React.FC = () => {
             value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
-            className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
+            className="text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
             rows={4}
             placeholder="Type your answer here..."
           />
         )
-      case 'slider':
-        return (
-          <div className="space-y-4">
-            <Slider
-              defaultValue={[Number(value) || currentQuestion.min || 0]}
-              min={currentQuestion.min}
-              max={currentQuestion.max}
-              step={1}
-              onValueChange={handleSliderChange}
-              className="[&_[role=slider]]:bg-white"
-            />
-            <div className="flex justify-between text-sm text-white/60">
-              <span>{currentQuestion.min}</span>
-              <span>{currentQuestion.max}</span>
-            </div>
-          </div>
-        )
       case 'radio':
         return (
-          <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || []} className="space-y-2">
+          <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || []} className="space-y-2 p-3">
             {currentQuestion.options?.map((option) => (
               <div key={String(option)} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={option} className="border-white/20 text-white" />
+                <RadioGroupItem value={option} id={option} className="border-[#78C0E0]/40 text-white" />
                 <Label htmlFor={option} className="text-white">{option}</Label>
               </div>
             ))}
@@ -167,7 +182,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
                   value={option}
                   checked={currentValues.includes(option)}
                   onChange={() => handleCheckboxChange(option)}
-                  className="border-white/20 text-white"
+                  className="border-[#78C0E0]/40 text-white"
                 />
                 <Label htmlFor={option} className="text-white">{option}</Label>
               </div>
@@ -185,23 +200,8 @@ const FuturisticFirstLoginForm: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-[#ceced8]">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-5"></div>
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30"
-          animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        />
-      </div>
-      <Card className="w-full max-w-lg bg-black/30 backdrop-blur-xl shadow-2xl rounded-xl overflow-hidden border border-white/10">
+    <div className="fixed inset-0 flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg bg-[#192BC2]/70 backdrop-blur-md text-white border-gray-700">
         <CardHeader className="text-center relative">
           <div className="absolute top-0 left-0 w-full">
             <Progress value={progress} className="w-full rounded-none h-1" />
@@ -211,12 +211,53 @@ const FuturisticFirstLoginForm: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+
+            {currentStep === 'welcome' && (
+              <div className="text-center space-y-6">
+                <Mascot />
+                <h1 className="text-4xl font-bold text-blue-800">Welcome to Goal Tracker!</h1>
+                <p className="text-blue-600 text-lg">
+                  Let's embark on a journey to achieve your goals together.
+                </p>
+                <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
+              </div>
+            )}
+
+            {currentStep === 'explanation' && (
+              <div className="space-y-8">
+                <h2 className="text-3xl font-bold text-center text-blue-800">How it works?</h2>
+                <div className="space-y-6">
+                  <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-200">
+                    <h3 className="font-semibold text-xl mb-2 text-blue-700">1. Build Your Profile</h3>
+                    <p className="text-blue-600">
+                      Answer a few questions to help us understand your personality and preferences.
+                    </p>
+                  </div>
+                  <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-200">
+                    <h3 className="font-semibold text-xl mb-2 text-blue-700">2. Set Your Goals</h3>
+                    <p className="text-blue-600">
+                      Define clear, actionable goals with our guided process.
+                    </p>
+                  </div>
+                  <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-200">
+                    <h3 className="font-semibold text-xl mb-2 text-blue-700">3. Track Progress</h3>
+                    <p className="text-blue-600">
+                      Monitor your progress and get personalized recommendations.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Continue</Button>
+                </div>
+              </div>
+            )}
+            
             <CardTitle className="text-3xl font-bold text-white mt-4">Welcome, {formData.name || 'Explorer'}!</CardTitle>
             <CardDescription className="text-lg text-white/80">Let&apos;s embark on a journey of discovery</CardDescription>
           </motion.div>
         </CardHeader>
         <form onSubmit={handleNext}>
-          <CardContent className="space-y-6 p-6">
+          <CardContent className="space-y-4 p-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion.id}
@@ -231,17 +272,14 @@ const FuturisticFirstLoginForm: React.FC = () => {
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-2"
+                    className="bg-[#78C0E0]/40 shadow-xl rounded-full p-2"
                   >
                     <currentQuestion.icon className="w-6 h-6 text-white" />
                   </motion.div>
-                  <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
+                  <Label htmlFor={currentQuestion.id} className=" text-md text-center font-medium text-white">
                     {currentQuestion.question}
                   </Label>
                 </div>
-                <p className="text-sm italic text-white/80">
-                  {currentQuestion.guidance}
-                </p>
                 {getInputComponent()}
               </motion.div>
             </AnimatePresence>
@@ -251,13 +289,13 @@ const FuturisticFirstLoginForm: React.FC = () => {
               <Button 
                 type="button" 
                 onClick={handleBack} 
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white"
+                className="flex-1 bg-muted hover:bg-gray-600 text-white"
                 disabled={currentQuestionIndex === 0}
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <Button type="submit" className="flex-1 text-lg font-semibold group bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">
+              <Button type="submit" className="flex-1 text-lg font-semibold group bg-[#78C0E0]/40 shadow-xl text-white hover:bg-blue-700">
                 <span className="mr-2">{currentQuestionIndex < questionsUser.length - 1 ? 'Next' : 'Submit'}</span>
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
@@ -270,7 +308,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
             </div>
             <div className="text-sm text-white/60 flex justify-between w-full">
               <span>Question {currentQuestionIndex + 1} of {questionsUser.length}</span>
-              <span>{Math.round(progress)}% completed</span>
+              <span>{Math.round(questionProgress)}% completed</span>
             </div>
           </CardFooter>
         </form>

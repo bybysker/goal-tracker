@@ -16,7 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import TaskCard from './task-card';
-import GoalDialog from '@/components/common/goal-dialog';
+import GoalDrawer from '@/components/common/goal-drawer';
 import { User as FirebaseUser } from 'firebase/auth';
 
 
@@ -38,12 +38,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
   isGoalsView
 }) => {
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   return (
     <>
       <Card
         className="w-full cursor-pointer hover:bg-gray-200 "
-        onClick={() => setIsDialogOpen(true)}
+        onClick={() => setIsDrawerOpen(true)}
         >
         <CardHeader>
           <div className="flex items-center justify-between relative">
@@ -95,10 +95,10 @@ const GoalCard: React.FC<GoalCardProps> = ({
           </div>
         </CardContent>
       </Card>
-      <GoalDialog 
+      <GoalDrawer 
       goal={goal}
-      isOpen={isDialogOpen}
-      onClose={() => setIsDialogOpen(false)}
+      isOpen={isDrawerOpen}
+      onClose={() => setIsDrawerOpen(false)}
       userId={user?.uid || ''}
       updateTask={updateTask}
       />

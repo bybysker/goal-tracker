@@ -4,35 +4,35 @@
 
 @layer base {
   :root {
-    --background: 248 92% 24%; /* #150578 - Darkest blue */
+    --background: 231 74% 43%; /* #192BC2 - Deep blue */
     --foreground: 210 40% 98%;
-    --card: 240 15% 15%;
+    --card: 247 92% 25%; /* #150578 Darker shade of background */
     --card-foreground: 210 40% 98%;
-    --popover: 240 15% 15%;
+    --popover: 248 70% 10%;
     --popover-foreground: 210 40% 98%;
 
-    /* Enhanced Primary Colors */
-    --primary: 210 90% 50%; /* Vibrant blue */
-    --primary-foreground: 0 0% 100%; /* White for contrast */
+    /* Primary Colors - Using the middle blue */
+    --primary: 207 60% 54%; /* #449DD1 - Medium blue */
+    --primary-foreground: 0 0% 100%;
 
-    /* Enhanced Secondary Colors */
-    --secondary: 340 70% 58%; /* Rich magenta */
+    /* Secondary Colors - Using the light blue */
+    --secondary: 199 61% 68%; /* #78C0E0 - Light blue */
     --secondary-foreground: 0 0% 100%;
 
-    /* Enhanced Accent Colors */
-    --accent: 120 60% 50%; /* Fresh green */
+    /* Accent Colors - Using the royal blue */
+    --accent: 231 74% 43%; /* #192BC2 - Royal blue */
     --accent-foreground: 0 0% 100%;
 
-    /* Muted and Destructive Colors */
-    --muted: 60 10% 90%; /* Soft yellow */
-    --muted-foreground: 60 10% 30%;
-    --destructive: 0 70% 50%; /* Bold red */
+    /* Muted and UI Colors */
+    --muted: 248 30% 20%; /* Muted version of background */
+    --muted-foreground: 210 40% 80%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* UI Elements */
-    --border: 210 20% 85%;
-    --input: 210 20% 85%;
-    --ring: 210 90% 50%;
+    /* UI Elements - Adjusted to match theme */
+    --border: 205 54% 54%;
+    --input: 248 30% 30%;
+    --ring: 207 60% 54%; /* Matching primary color */
     --radius: 0.5rem;
   }
 }
@@ -49,11 +49,11 @@
 
 /* Updated Gradient Classes for More Vibrant Look */
 .bg-gradient-light {
-  background-image: linear-gradient(to bottom right, #78C0E0, #449DD1, #192BC2);
+  background-image: linear-gradient(to bottom , #78C0E0, #449DD1, #192BC2);
 }
 
 .bg-gradient-dark {
-  background-image: linear-gradient(to bottom right, #192BC2, #150578, #0E0E52);
+  background-image: linear-gradient(to bottom , #192BC2, #150578, #0E0E52);
 }
 
 .backdrop-blur-card {
@@ -78,3 +78,22 @@
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary;
 }
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+textarea {
+  font-size: 16px; /* Prevents zoom on iOS */
+  -webkit-text-size-adjust: 100%; /* Prevents text size adjust on orientation change */
+}
+
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+

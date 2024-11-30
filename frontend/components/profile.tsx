@@ -27,7 +27,7 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
 
   return (
     <div className="max-h-full max-w-screen-lg mx-auto">
-      <Card className="bg-transparent text-foreground border-border ">
+      <Card className="bg-[#150578]/70 backdrop-blur-sm text-foreground shadow-xl border-none">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">User Profile</CardTitle>
         </CardHeader>
@@ -69,7 +69,7 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
                 id="profile-name"
                 name="name"
                 defaultValue={user.displayName ?? ''}
-                className=" bg-white border-gray-200 text-black"
+                className=" text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
                 required
               />
             </div>
@@ -80,11 +80,11 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
                 name="email"
                 type="email"
                 defaultValue={user.email ?? ''}
-                className=" bg-white border-gray-200 text-black focus:text-black"
+                className=" text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="w-full bg-[#78C0E0]/40 shadow-xl hover:bg-[#78C0E0]/60">
               Update Profile
             </Button>
           </form>
