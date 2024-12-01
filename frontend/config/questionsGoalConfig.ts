@@ -29,6 +29,7 @@ export const questionsGoal = [
     ],
     icon: Calendar,
   },
+  /*
   {
     id: 'resources',
     question: 'What resources or support do you need to achieve this goal?',
@@ -36,4 +37,5 @@ export const questionsGoal = [
     type: 'textarea',
     icon: Hammer,
   },
+  */
 ];

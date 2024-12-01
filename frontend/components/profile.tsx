@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User as FirebaseUser } from 'firebase/auth';
+import { ChevronLeft, ChevronRight, Mail, Shield, FileText, Star, Trash2 } from 'lucide-react'
 
 interface ProfileProps {
   user: FirebaseUser | null; // Updated to allow null
@@ -90,8 +91,36 @@ const Profile: React.FC<ProfileProps> = ({ user, updateProfile }) => {
           </form>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          <div className="divide-y">
+            <ProfileItem label="Name" value={user.displayName ?? ''} />
+            <ProfileItem label="Openness to Experience" value={userProfile.openness} />
+            <ProfileItem label="Conscientiousness" value={userProfile.conscientiousness} />
+            <ProfileItem label="Extraversion" value={userProfile.extraversion} />
+            <ProfileItem label="Agreeableness" value={userProfile.agreeableness} />
+            <ProfileItem label="Emotional Stability" value={userProfile.neuroticism} />
+            <ProfileItem label="Passions" value={userProfile.passions} />
+            <ProfileItem label="Life Goals" value={userProfile.lifeGoals} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
+}
+
+
+function ProfileItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between p-4 hover:bg-blue-50/50 transition-colors">
+      <span className="text-sm font-medium">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">{value}</span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
+    </div>
+  )
 }
 
 export default Profile;
