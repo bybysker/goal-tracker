@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Goal, Task } from '@/types';
+import { Goal, Milestone, Task } from '@/types';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +18,8 @@ import {
 import TaskCard from './task-card';
 import GoalDrawer from '@/components/common/goal-drawer';
 import { User as FirebaseUser } from 'firebase/auth';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/db/configFirebase';
 
 
 interface GoalCardProps {
@@ -26,7 +28,7 @@ interface GoalCardProps {
   onDelete?: () => void;
   deleteTask: (task: Task) => void;
   updateTask: (task: Task, updatedTask: Partial<Task>) => void;
-  isGoalsView: boolean; // New prop to determine if we're in the Goals view
+  isGoalsView: boolean;
 }
 
 const GoalCard: React.FC<GoalCardProps> = ({ 
@@ -35,21 +37,70 @@ const GoalCard: React.FC<GoalCardProps> = ({
   onDelete, 
   deleteTask,
   updateTask,
-  isGoalsView
+  isGoalsView,
 }) => {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const fetchAllTasksForGoal = async () => {
+    try {
+      // Step 1: Fetch milestones for the goal
+      const milestonesSnapshot = await getDocs(collection(db, 'users', user?.uid || '', 'goals', goal.guid, 'milestones'));
+      const milestonesData = milestonesSnapshot.docs.map(doc => ({
+        muid: doc.id,
+        ...doc.data(),
+      } as Milestone));
+
+      // Sort milestones by name in ascending order
+      milestonesData.sort((a, b) => a.name.localeCompare(b.name));
+
+      setMilestones(milestonesData);
+  
+      // Step 2: Fetch tasks for each milestone
+      const allTasks = await Promise.all(milestonesData.map(async (milestone) => {
+        const tasksSnapshot = await getDocs(collection(db, 'users', user?.uid || '', 'goals', goal.guid, 'milestones', milestone.muid, 'tasks'));
+        const tasksData = tasksSnapshot.docs.map(doc => ({
+          tuid: doc.id,
+          ...doc.data(),
+        } as Task));
+        
+        // Sort tasks by name in ascending order
+        tasksData.sort((a, b) => a.name.localeCompare(b.name));
+
+        return tasksData; // Return sorted tasks for this milestone
+      }));
+
+      setTasks(allTasks.flat()); // Set the tasks state
+      console.log('All fetched tasks for goal:', allTasks.flat()); // Debug log
+    } catch (error) {
+      console.error("Error fetching tasks for goal:", error);
+    }
+  };
+
+  // Calculate progress based on completed tasks
+  const calculateProgress = (tasks: Task[]) => {
+    fetchAllTasksForGoal();
+    if (tasks.length === 0) return goal.progress || 0;
+    
+    const completedTasks = tasks.filter(task => task.completed).length;
+    return Math.round((completedTasks / tasks.length) * 100);
+  };
+
+  const progress = calculateProgress(tasks);
+
   return (
     <>
       <Card
-        className="w-full cursor-pointer hover:bg-gray-200 "
+        className="w-full cursor-pointer border shadow-lg hover:bg-[#150578]/90 "
         onClick={() => setIsDrawerOpen(true)}
         >
         <CardHeader>
           <div className="flex items-center justify-between relative">
             <div className="shrink w-4/5 break-words">
               <CardTitle className="pb-2">{goal.name}</CardTitle>
-              <CardDescription>Deadline: {new Date(goal.timeframe).toLocaleDateString()}</CardDescription>
+              <CardDescription>Deadline: {new Date(goal.deadline).toLocaleDateString()}</CardDescription>
             </div>
             {isGoalsView && (
               <div className="flex-none absolute top-0 right-0">
@@ -83,14 +134,13 @@ const GoalCard: React.FC<GoalCardProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            
             <div className="flex items-center justify-between text-sm">
               <span>Progress</span>
-              <span>{goal.progress}%</span>
+              <span>{progress}%</span>
             </div>
-            <Progress value={goal.progress} className="w-full" />
+            <Progress value={progress} className="w-full" />
           </div>
-          <div className="mt-4 space-y-2 text-sm text-gray-500">
+          <div className="mt-4 space-y-2 text-sm text-gray-300">
          Click to show related tasks
           </div>
         </CardContent>

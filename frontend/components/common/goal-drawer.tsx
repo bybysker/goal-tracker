@@ -82,7 +82,7 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
       setTypedName('');
       setTypedDescription('');
       typeText(goal.name, setTypedName, 2, () => {
-        typeText('No description available yet.', setTypedDescription, 10);
+        typeText(goal.description, setTypedDescription, 10);
       });
       fetchAllTasksForGoal();
     }
@@ -90,16 +90,16 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="backdrop-blur-md bg-[#192BC2]/70 text-white border-gray-700 mx-auto max-h-full max-w-screen-lg rounded-lg pb-12 z-[60]" >
+      <DrawerContent className="backdrop-blur-md bg-[#150578]/70 text-white border-gray-700 mx-auto max-h-full max-w-screen-lg rounded-lg px-4 pb-12 z-[60]" >
         <DrawerHeader className="pt-4 items-center">
-          <DrawerTitle className="text-xl sm:text-2xl font-bold w-4/5 break-words">{goal.name}</DrawerTitle>
-          <DrawerDescription className='text-gray-200'>
+          <DrawerTitle className="text-xl sm:text-2xl font-bold text-center">{goal.name}</DrawerTitle>
+          <DrawerDescription className='text-gray-200 text-xs'>
             {typedDescription}
           </DrawerDescription>
         </DrawerHeader>
-        <div className="mt-6">
-          <h3 className="text-lg sm:text-xl font-semibold mb-4">Milestones</h3>
-          <ScrollArea className="h-[70dvh] w-full pr-4"> {/* Adjust max height as needed */}
+        <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 space-y-4">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4">Detailed Plan</h3>
+          <ScrollArea className="h-[calc(65vh-8rem)] w-full"> {/* Adjust max height as needed */}
             {milestones.map((milestone) => (
               <MilestoneAccordion
                 key={milestone.muid}

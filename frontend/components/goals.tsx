@@ -114,55 +114,6 @@ export default function Goals({
       }
     }
   }
-  const handleSaveMilestones = async () => {
-
-    if (!user) return;
-    try {
-      console.log('Saving milestones:', milestones);
-      //Save milestones and generate tasks
-
-      setShowMilestonesDrawer(false); // Close the milestone drawer
-      setIsLoading(true); // Start loading animation
-  
-      let i = 0;
-      for (const milestone of milestones) {
-        const milestoneId = await addMilestone({ ...milestone } as Milestone);
-        if (!milestoneId) continue;
-
-        // Update progress
-        setProgress(((i) / milestones.length) * 100);
-
-        // Generate tasks for each milestone
-        const tasksResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/generate_tasks`, {
-          user_id: user.uid,
-          guid: milestone.guid,
-          muid: milestoneId
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        const generatedTasks = tasksResponse.data.tasks;
-
-        // Save tasks
-        for (const task of generatedTasks) {
-          const taskID = await addTask({ ...task } as Task);
-          task.tuid = taskID;
-          await updateTask(task, { tuid: taskID }); 
-        }
-        i+=1;
-      }
-      console.log('isLoading', isLoading);
-
-    } catch (error) {
-      console.error('Error generating tasks:', error);
-    }finally {
-      console.log('isLoading', isLoading);
-      setIsLoading(false);
-      console.log('isLoading', isLoading);
-      showMessage();
-    }
-  }
 
   const resetForm = () => {
     setFormData({});
@@ -245,27 +196,6 @@ export default function Goals({
                 <DrawerTitle className="text-xl font-bold text-center">ADD A NEW GOAL</DrawerTitle>
               </DrawerHeader>
               <GoalDefinition user={user} addGoal={addGoal} resetForm={resetForm} />
-            </DrawerContent>
-          </Drawer>
-          {/* New drawer for displaying milestones */}
-          <Drawer open={showMilestonesDrawer} onOpenChange={setShowMilestonesDrawer}>
-            <DrawerContent className="backdrop-blur-md bg-[#192BC2]/70 text-white border-gray-700 mx-auto max-h-full max-w-screen-lg rounded-lg pb-12 z-[60]">
-              <DrawerHeader>
-                <DrawerTitle className="text-xl font-bold mb-4">Generated Milestones</DrawerTitle>
-              </DrawerHeader>
-              <ScrollArea className="h-[60vh]">
-                {milestones.map((milestone, index) => (
-                  <Card key={index} className="mb-4 bg-purple-700 backdrop-blur-3xl border-none text-white">
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold">{milestone.name}</h3>
-                      <p>Duration: {milestone.duration} weeks</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </ScrollArea>
-              <Button onClick={handleSaveMilestones} className="w-full mt-4">
-                Save Milestones
-              </Button>
             </DrawerContent>
           </Drawer>
         </CardFooter>

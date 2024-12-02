@@ -14,11 +14,11 @@ const MilestoneAccordion: React.FC<MilestoneAccordionProps> = ({ milestone, task
 
   return (
     <Accordion type="single" collapsible className="mb-4">
-      <AccordionItem value={milestone.muid}>
-        <AccordionTrigger className={`text-base text-start justify-between ${allTasksCompleted ? 'text-green-500' : 'text-white'}`}>
+      <AccordionItem value={milestone.muid} className="border border-white/10 rounded-lg overflow-hidden">
+        <AccordionTrigger className={`px-4 py-3 text-base text-start justify-between ${allTasksCompleted ? 'text-primary' : 'text-white'}`}>
           {milestone.name}
         </AccordionTrigger>
-        <AccordionContent className="text-xs">
+        <AccordionContent className="px-4 pb-4 text-xs">
           <div className="space-y-2">
             {tasks.map((task) => (
               <TaskCheckbox

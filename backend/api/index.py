@@ -7,10 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
-from api.goal_to_tasks import TasksGeneration, MilestonesGeneration, Goal
+from api.goal_to_tasks import GoalToTasks, Goal
+from api.profiling import ProfileDefinition, RawProfile
 
-#from some_vector_db_library import VectorDBClient
-embed_model = "text-embedding-ada-002"
 # Load environment variables from .env file
 load_dotenv()
 
@@ -45,9 +44,18 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+class ProfileFormData(BaseModel):
+    user_id: str
+    profile_data: RawProfile
+
+class PreGoal(BaseModel):
+    what: str
+    why: str
+    when: str
+
 class GoalFormData(BaseModel):
     user_id: str
-    goal_data: Goal
+    pre_goal_data: PreGoal
 
 class MilestoneFormInfo(BaseModel):
     user_id: str
@@ -57,53 +65,6 @@ class MilestoneFormInfo(BaseModel):
 @app.get('/')
 def root():
     return {"message": "Hello World"}
-
-@app.post('/generate_milestones')
-def generate_milestones(goal_form_data: GoalFormData):
-    """
-    Endpoint to generate milestones for a given user and goal.
-
-    Args:
-    - user_id (str): The ID of the user.
-    - goal_data (Goal): The ID of the goal.
-
-    Returns:
-    - dict: A dictionary containing the generated milestones.
-    """
-    user_id = goal_form_data.user_id
-    goal_data = goal_form_data.goal_data
-    try:
-        milestone_generator = MilestonesGeneration(db, client, user_id, goal_data)
-        milestones = milestone_generator.generate_milestones()
-        return {"milestones": milestones}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@app.post('/generate_tasks')
-def generate_tasks(milestone_form_info: MilestoneFormInfo):
-    """
-    Endpoint to generate tasks for a given user, goal, and milestone.
-
-    Args:
-    - user_id (str): The ID of the user.
-    - guid (str): The ID of the goal.
-    - muid (str): The ID of the milestone.
-
-    Returns:
-    - dict: A dictionary containing the generated tasks.
-    """
-    user_id = milestone_form_info.user_id
-    guid = milestone_form_info.guid
-    muid = milestone_form_info.muid
-
-    try:
-        task_generator = TasksGeneration(db, client, user_id, guid, muid)
-        tasks = task_generator.generate_tasks()
-        return {"tasks": tasks}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post('/transcribe_voice')
 def transcribe_voice(voice_memo: UploadFile = File(...)):
@@ -138,12 +99,21 @@ def transcribe_voice(voice_memo: UploadFile = File(...)):
         # Handle exceptions and return an error message
         return {"error": str(e)}
 
-#goal_doc = db.collection("users", "oQP2oJzlrtR84IjAlQYizLSFywT2", "goals").document("XJoJ8iTirGwydAQ5pm5J").get()
-    #user_ids = [user.id for user in users.stream()]
-#goal_data = goal_doc.to_dict()
+@app.post('/profile_definition')
+def profile_definition(profile_form_data: ProfileFormData):
+    profile = ProfileDefinition(client, db, profile_form_data.user_id)
+    refined_profile = profile.profile_definition(profile_form_data.profile_data)
+    profile.save_profile(refined_profile)
+    return refined_profile
 
-#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").generate_tasks())
-#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").formulate_goal())
-#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").user_profile_data)
-#print(TasksGeneration("saIj3tndzESNUy2jO5iU5SMKFU73", "qXJvA5OU0nHcSj9f0gsj").goal_data)
+@app.post('/smart_goal')
+def smart_goal(pre_goal_form_data: GoalFormData):
+    goal_to_tasks = GoalToTasks(db, client, pre_goal_form_data.user_id)
+    goal = goal_to_tasks.smart_goal(pre_goal_form_data.pre_goal_data)
+    return goal
 
+@app.post('/generate_milestones_and_tasks')
+def generate_milestones_and_tasks(validated_goal: str, user_id: str):
+    goal_to_tasks = GoalToTasks(db, client, user_id)
+    milestones_and_tasks = goal_to_tasks.generate_milestones_and_tasks(validated_goal)
+    return milestones_and_tasks

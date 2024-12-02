@@ -6,6 +6,8 @@ export interface Goal {
   guid: string;
   progress: number;
   name: string;
+  deadline: string;
+  description: string;
   measurable: string;
   achievable: string;
   relevance: number;
