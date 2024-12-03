@@ -22,7 +22,6 @@ import GoalDefinition from '@/components/common/goal-definition';
 
 interface GoalsProps {
   goals: Goal[];
-  addGoal: (goal: Omit<Goal, 'guid' | 'progress'>) => Promise<string>;
   deleteGoal?: (id: string) => void;
   setIsEditing?: (item: Goal | null) => void;
   updateGoal?: (id: string, updatedGoal: Partial<Goal>) => void;
@@ -36,7 +35,6 @@ interface GoalsProps {
 
 export default function Goals({
   goals,
-  addGoal,
   deleteGoal,
   setIsEditing,
   updateGoal,
@@ -68,53 +66,6 @@ export default function Goals({
 
   const currentQuestion = questionsGoal[currentQuestionIndex]
 
-  const handleNext = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const currentAnswer = formData[currentQuestion.id];
-    if (!currentAnswer || (Array.isArray(currentAnswer) && currentAnswer.length === 0)) {
-      console.log("Triggering toast for incomplete answer");
-      toast({
-        title: "Incomplete Answer",
-        description: "Please answer the current question before proceeding.",
-        variant: "destructive",
-        duration: 1500,
-      });;
-      return;
-    }
-    if (currentQuestionIndex < questionsGoal.length - 1) {
-      setCurrentQuestionIndex(prevIndex => prevIndex + 1)
-    } else {
-      setIsLoading(true);
-      if (!user) return;
-      try {
-        console.log('Submitting formData:', formData);
-        // Step 1: Save the goal and get the ID
-        const guid = await addGoal(formData as Omit<Goal, 'guid' | 'progress'>);
-        if (!guid) throw new Error("Failed to create goal");
-        resetForm();
-
-        const milestonesResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/generate_milestones`,  {
-          user_id: user.uid,
-          goal_data: { ...formData, guid: guid }
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        const generatedMilestones = milestonesResponse.data.milestones;
-
-        setMilestones(generatedMilestones);
-        setShowMilestonesDrawer(true);
-      } catch (error) {
-        console.error('Error generating milestones:', error);
-        // Handle error (e.g., show error message to user)
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  }
-
   const resetForm = () => {
     setFormData({});
     setCurrentQuestionIndex(0);
@@ -138,7 +89,7 @@ export default function Goals({
   // Effect for typing animation
   useEffect(() => {
     if (isTyping && selectedGoal) {
-      const text = "Description"//`${selectedGoal.name}\n${selectedGoal.description}`;
+      const text = "Description";
       let i = 0;
       const typingInterval = setInterval(() => {
         if (i < text.length) {
@@ -153,11 +104,6 @@ export default function Goals({
     }
   }, [isTyping, selectedGoal]);
   
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      handleNext(e); // Call the function to go to the next question
-    }
-  };
 
   return (
     <div className="max-h-full max-w-screen-lg mx-auto space-y-6">
@@ -195,7 +141,7 @@ export default function Goals({
               <DrawerHeader>
                 <DrawerTitle className="text-xl font-bold text-center">ADD A NEW GOAL</DrawerTitle>
               </DrawerHeader>
-              <GoalDefinition user={user} addGoal={addGoal} resetForm={resetForm} />
+              <GoalDefinition user={user} resetForm={resetForm} />
             </DrawerContent>
           </Drawer>
         </CardFooter>

@@ -266,7 +266,6 @@ const GoalTrackerApp: React.FC = () => {
             {activeTab === 'goals' && (
               <Goals
                 goals={goals}
-                addGoal={addGoal}
                 updateGoal={updateGoal}
                 deleteGoal={deleteGoal}
                 setIsEditing={() => {/* function logic here */}}

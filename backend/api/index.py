@@ -53,9 +53,14 @@ class PreGoal(BaseModel):
     why: str
     when: str
 
-class GoalFormData(BaseModel):
+class PreGoalFormData(BaseModel):
     user_id: str
     pre_goal_data: PreGoal
+
+
+class ValidatedGoalFormData(BaseModel):
+    user_id: str
+    validated_goal: str
 
 class MilestoneFormInfo(BaseModel):
     user_id: str
@@ -107,13 +112,13 @@ def profile_definition(profile_form_data: ProfileFormData):
     return refined_profile
 
 @app.post('/smart_goal')
-def smart_goal(pre_goal_form_data: GoalFormData):
+def smart_goal(pre_goal_form_data: PreGoalFormData):
     goal_to_tasks = GoalToTasks(db, client, pre_goal_form_data.user_id)
     goal = goal_to_tasks.smart_goal(pre_goal_form_data.pre_goal_data)
     return goal
 
 @app.post('/generate_milestones_and_tasks')
-def generate_milestones_and_tasks(validated_goal: str, user_id: str):
-    goal_to_tasks = GoalToTasks(db, client, user_id)
-    milestones_and_tasks = goal_to_tasks.generate_milestones_and_tasks(validated_goal)
+def generate_milestones_and_tasks(validated_goal_form_data: ValidatedGoalFormData):
+    goal_to_tasks = GoalToTasks(db, client, validated_goal_form_data.user_id)
+    milestones_and_tasks = goal_to_tasks.generate_milestones_and_tasks(validated_goal_form_data.validated_goal)
     return milestones_and_tasks

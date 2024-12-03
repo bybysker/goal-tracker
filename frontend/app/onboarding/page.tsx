@@ -295,7 +295,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
               <div className="space-y-6">
                 <h2 className="text-3xl font-bold text-center text-blue-800">Set Your First Goal</h2>
                 <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-200 space-y-4">
-                  <GoalDefinition user={user} addGoal={addGoal} resetForm={resetForm} />
+                  <GoalDefinition user={user} resetForm={resetForm} />
                 </div>
               </div>
             )}
