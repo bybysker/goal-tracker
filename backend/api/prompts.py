@@ -90,7 +90,7 @@ but also on his profile.
 
 <instructions>
 	1. Transform the following goal into a SMART (Specific, Measurable, Achievable, Relevant, Time-bound) format:
-	2. Reformulate the goal as a smart goal in one or 2 sentences
+	2. Reformulate the goal as a smart goal in 2 sentences maximum.
 </instructions>
 
 <example>
@@ -207,139 +207,217 @@ You are an expert in project management. You are tasked to use your skillset esp
 
 <example>
 	Input:
-	Goal: I want to land a job at a faang in 6 months because i want to see what it is like to work in such a company .
+
+	Goal: Increase the company's social media engagement by 25% within the next 3 months.
 
 	Output:
-	Milestone 1: Skill Preparation and Enhancement
 
-	Task 1: Conduct a comprehensive skill gap analysis
+	Milestone 1: Content Strategy Development
 
-	Description: Evaluate current technical skills against FAANG job requirements, identifying areas for improvement
-	Duration: 8 hours
-	Simplicity Score: 3
-	Importance Score: 5
-	Urgency Score: 4
+	- Task 1: Analyze Audience Demographics
+		- Description: Research and identify the demographics of the current and target audience to tailor content effectively.
+		- Duration: 6 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Task 2: Complete comprehensive DSA learning program
+	- Task 2: Identify Top Content Types
+		- Description: Determine which types of content (e.g., videos, images, articles) resonate most with the audience.
+		- Duration: 5 hours
+		- Simplicity Score: 5
+		- Importance Score: 4
+		- Urgency Score: 2
 
-	Description: Deep dive into advanced data structures, algorithms, and problem-solving techniques using platforms like LeetCode, HackerRank
-	Duration: 120 hours
-	Simplicity Score: 2
-	Importance Score: 5
-	Urgency Score: 5
+	- Task 3: Set Content Goals
+		- Description: Define specific objectives for each content piece to align with overall engagement targets.
+		- Duration: 4 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Task 3: Learn and practice system design principles
+	- Task 4: Develop Content Themes
+		- Description: Create overarching themes for content to ensure consistency and relevance.
+		- Duration: 6 hours
+		- Simplicity Score: 5
+		- Importance Score: 4
+		- Urgency Score: 2
 
-	Description: Study system design concepts, architectural patterns, and practice designing scalable systems
-	Duration: 60 hours
-	Simplicity Score: 2
-	Importance Score: 5
-	Urgency Score: 4
-		
-	Task 4: Enhance coding skills in primary programming language
+	- Task 5: Create Editorial Calendar
+		- Description: Plan and schedule content publication dates to maintain a steady posting frequency.
+		- Duration: 8 hours
+		- Simplicity Score: 3
+		- Importance Score: 5
+		- Urgency Score: 4
 
-	Description: Deepen expertise in languages like Python, Java, or C++, focusing on advanced features and best practices
-	Duration: 40 hours
-	Simplicity Score: 3
-	Importance Score: 4
-	Urgency Score: 3
+	- Task 6: Define KPIs
+		- Description: Establish key performance indicators to measure the success of social media efforts.
+		- Duration: 3 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Milestone 2: Resume and Portfolio Development
+	Milestone 2: Content Creation
 
-	Task 1: Craft FAANG-targeted professional resume
+	- Task 1: Design Post Graphics
+		- Description: Create visually appealing graphics for social media posts to attract and engage the audience.
+		- Duration: 10 hours
+		- Simplicity Score: 4
+		- Importance Score: 4
+		- Urgency Score: 4
 
-	Description: Create a compelling resume highlighting technical achievements, projects, and relevant experience
-	Duration: 16 hours
-	Simplicity Score: 4
-	Importance Score: 5
-	Urgency Score: 4
+	- Task 2: Write Social Media Copy
+		- Description: Develop compelling and concise copy for social media posts to enhance engagement.
+		- Duration: 8 hours
+		- Simplicity Score: 5
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Task 2: Develop and curate impressive GitHub portfolio
+	- Task 3: Produce Short Videos
+		- Description: Create short video content to increase engagement and shareability on social platforms.
+		- Duration: 15 hours
+		- Simplicity Score: 3
+		- Importance Score: 5
+		- Urgency Score: 2
 
-	Description: Create and showcase 3-4 significant projects demonstrating technical depth and problem-solving skills
-	Duration: 40 hours
-	Simplicity Score: 3
-	Importance Score: 4
-	Urgency Score: 3
+	- Task 4: Create Infographics
+		- Description: Develop informative infographics to simplify complex information and engage the audience visually.
+		- Duration: 7 hours
+		- Simplicity Score: 4
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Task 3: Optimize LinkedIn and professional profiles
+	- Task 5: Develop Interactive Content
+		- Description: Create polls, quizzes, and other interactive content to boost audience participation.
+		- Duration: 9 hours
+		- Simplicity Score: 3
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Description: Create a standout LinkedIn profile, highlighting technical skills and achievements
-	Duration: 8 hours
-	Simplicity Score: 4
-	Importance Score: 3
-	Urgency Score: 2
+	- Task 6: Review and Approve Content
+		- Description: Ensure all content meets quality standards and aligns with the content strategy before publishing.
+		- Duration: 4 hours
+		- Simplicity Score: 5
+		- Importance Score: 5
+		- Urgency Score: 4
 
-	Milestone 3: Interview Preparation
+	Milestone 3: Audience Engagement
 
-	Task 1: Conduct comprehensive mock interview sessions
+	- Task 1: Respond to Comments
+		- Description: Actively reply to comments on social media posts to foster community and engagement.
+		- Duration: 10 hours
+		- Simplicity Score: 5
+		- Importance Score: 5
+		- Urgency Score: 5
 
-	Description: Practice technical and behavioral interviews, record and analyze performance
-	Duration: 40 hours
-	Simplicity Score: 2
-	Importance Score: 5
-	Urgency Score: 5
+	- Task 2: Manage Direct Messages
+		- Description: Handle private messages promptly to address queries and build relationships with followers.
+		- Duration: 8 hours
+		- Simplicity Score: 5
+		- Importance Score: 5
+		- Urgency Score: 5
 
-	Task 2: Develop compelling professional narratives
+	- Task 3: Host Live Q&A Sessions
+		- Description: Conduct live sessions to interact with the audience in real-time and address their questions.
+		- Duration: 6 hours
+		- Simplicity Score: 3
+		- Importance Score: 4
+		- Urgency Score: 2
 
-	Description: Prepare compelling narratives for common interview questions, highlighting achievements and skills
-	Duration: 20 hours
-	Simplicity Score: 3
-	Importance Score: 4
-	Urgency Score: 4
+	- Task 4: Run Polls and Surveys
+		- Description: Implement polls and surveys to gather audience feedback and insights.
+		- Duration: 5 hours
+		- Simplicity Score: 4
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Task 3: Technical Interview Simulation
+	- Task 5: Engage with Influencers
+		- Description: Collaborate with influencers to expand reach and enhance credibility.
+		- Duration: 7 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Description: Intensive coding interview preparation, regular practice, live coding sessions, and peer mock interviews 
-	Duration: 60 hours
-	Simplicity Score: 2
-	Importance Score: 5
-	Urgency Score: 5
-		
-	Milestone 4: Networking and Application Strategy
+	- Task 6: Monitor Mentions and Tags
+		- Description: Track and respond to brand mentions and tags to maintain a positive online presence.
+		- Duration: 6 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Task 1: Build and expand professional network
+	Milestone 4: Performance Analysis
 
-	Description: Attend tech conferences, connect with FAANG employees, participate in tech communities
-	Duration: 24 hours
-	Simplicity Score: 3
-	Importance Score: 4
-	Urgency Score: 3
+	- Task 1: Gather Engagement Data
+		- Description: Collect data on likes, shares, comments, and other engagement metrics from social media platforms.
+		- Duration: 5 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 4
 
-	Task 2: Research and identify target companies and roles
+	- Task 2: Analyze Engagement Trends
+		- Description: Examine the collected data to identify patterns and trends in audience engagement.
+		- Duration: 7 hours
+		- Simplicity Score: 3
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Description: Create a targeted list of FAANG companies and specific roles aligned with skills
-	Duration: 16 hours
-	Simplicity Score: 4
-	Importance Score: 4
-	Urgency Score: 3
+	- Task 3: Generate Monthly Reports
+		- Description: Create detailed reports summarizing monthly engagement metrics and insights.
+		- Duration: 4 hours
+		- Simplicity Score: 4
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Task 3: Secure internal referrals
+	- Task 4: Identify Top-Performing Content
+		- Description: Determine which content types and posts yielded the highest engagement.
+		- Duration: 6 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 3
 
-	Description: Leverage professional network to obtain internal referrals at target companies
-	Duration: 20 hours
-	Simplicity Score: 2
-	Importance Score: 5
-	Urgency Score: 4
+	- Task 5: Adjust Strategy Accordingly
+		- Description: Modify the content and engagement strategies based on analysis to improve future performance.
+		- Duration: 5 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 2
 
+	Milestone 5: Continuous Improvement
 
-	Milestone 5: Interview Execution and Follow-up
+	- Task 1: Solicit Team Feedback
+		- Description: Gather input from team members on the social media strategy and implementation.
+		- Duration: 3 hours
+		- Simplicity Score: 5
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Task 1: Manage interview logistics
+	- Task 2: Implement New Tools
+		- Description: Introduce and integrate new social media management tools to enhance efficiency.
+		- Duration: 7 hours
+		- Simplicity Score: 3
+		- Importance Score: 5
+		- Urgency Score: 2
 
-	Description: Coordinate interview schedules, prepare necessary documents, conduct final review
-	Duration: 16 hours
-	Simplicity Score: 4
-	Importance Score: 5
-	Urgency Score: 5
+	- Task 3: Update Editorial Calendar
+		- Description: Revise the content calendar based on performance insights and upcoming opportunities.
+		- Duration: 4 hours
+		- Simplicity Score: 4
+		- Importance Score: 4
+		- Urgency Score: 3
 
-	Task 2: Professional follow-up and reflection
+	- Task 4: Train Team on Best Practices
+		- Description: Educate the team on the latest social media strategies and best practices.
+		- Duration: 6 hours
+		- Simplicity Score: 4
+		- Importance Score: 5
+		- Urgency Score: 2
 
-	Description: Send thank-you notes, seek feedback, and analyze interview performance
-	Duration: 8 hours
-	Simplicity Score: 4
-	Importance Score: 3
-	Urgency Score: 3
+	- Task 5: Explore New Engagement Tactics
+		- Description: Research and trial innovative methods to boost audience interaction and engagement.
+		- Duration: 5 hours
+		- Simplicity Score: 3
+		- Importance Score: 4
+		- Urgency Score: 2
+  
 </example>
 """
 

@@ -1,13 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from api.prompts import (MILESTONE_TO_TASK_SYS_MSG, 
-                     MILESTONE_TO_TASK_USR_MSG,
+from api.prompts import (
                      ENRICHED_GOAL_SYS_MSG,
                      ENRICHED_GOAL_USR_MSG,
-                     GOAL_TO_MILESTONE_SYS_MSG,
-                     GOAL_TO_MILESTONE_USR_MSG,
-                     NEW_PROFILE_SYS_MSG,
-                     NEW_PROFILE_USR_MSG,
                      GOAL_TO_TASK_SYS_MSG,
                      GOAL_TO_TASK_USR_MSG,
                      )
