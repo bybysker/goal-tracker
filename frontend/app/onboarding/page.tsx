@@ -17,16 +17,30 @@ import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 
 import { questionsUser } from '@/config/questionsUserConfig'
+import { OnboardingCard } from '@/components/onboarding/onboarding-card'
+import { Mascot } from '@/components/mascot'
+import GoalDefinition from '@/components/common/goal-definition'
+import { Goal } from '@/types'
+import axios from 'axios'
 
-
+const steps = [
+  'welcome',
+  'explanation',
+  'userProfile',
+  'transition',
+  'goalSetting',
+  'complete',
+] as const
 
 const FuturisticFirstLoginForm: React.FC = () => {
   const { user } = useAuth();
+  const [currentStep, setCurrentStep] = useState<(typeof steps)[number]>('welcome')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [progress, setProgress] = useState(0)
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setProgress(((currentQuestionIndex + 1) / questionsUser.length) * 100)
@@ -66,7 +80,15 @@ const FuturisticFirstLoginForm: React.FC = () => {
     })
   }
 
-  const handleNext = async (e: React.FormEvent) => {
+  const handleNext = () => {
+    const stepIndex = steps.indexOf(currentStep)
+    if (stepIndex < steps.length - 1) {
+      setCurrentStep(steps[stepIndex + 1])
+      setCurrentQuestionIndex(0)
+    }
+  }
+
+  const handleNextQuestion = async (e: React.FormEvent) => {
     e.preventDefault()
     if (currentQuestionIndex < questionsUser.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1)
@@ -80,12 +102,22 @@ const FuturisticFirstLoginForm: React.FC = () => {
         await addDoc(collection(db, 'users', user.uid, "userProfile"), formData);
 
         const userDocRef = doc(db, 'users', user.uid);
+
         await updateDoc(userDocRef, { firstLogin: false });
 
-        showMessage();
-        setTimeout(() => {
-          router.push('/'); // Redirect to the main page after the animation
-        }, 1500);
+        setIsLoading(true)
+
+        try {
+          await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/profile_definition`, {
+            user_id: user.uid,
+            profile_data: formData
+          });
+        } catch (error) {
+          console.error("Error adding document: ", error);
+        }
+
+        setIsLoading(false)
+        setCurrentStep('transition')
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -109,7 +141,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
             value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
-            className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
+            className="text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
             placeholder="Type your answer here..."
           />
         )
@@ -121,34 +153,17 @@ const FuturisticFirstLoginForm: React.FC = () => {
             value={formData[currentQuestion.id] || ''}
             onChange={handleInputChange}
             required
-            className="text-lg bg-white/10 border-white/20 text-white placeholder-white/50"
+            className="text-lg bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50"
             rows={4}
             placeholder="Type your answer here..."
           />
         )
-      case 'slider':
-        return (
-          <div className="space-y-4">
-            <Slider
-              defaultValue={[Number(value) || currentQuestion.min || 0]}
-              min={currentQuestion.min}
-              max={currentQuestion.max}
-              step={1}
-              onValueChange={handleSliderChange}
-              className="[&_[role=slider]]:bg-white"
-            />
-            <div className="flex justify-between text-sm text-white/60">
-              <span>{currentQuestion.min}</span>
-              <span>{currentQuestion.max}</span>
-            </div>
-          </div>
-        )
       case 'radio':
         return (
-          <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || []} className="space-y-2">
+          <RadioGroup onValueChange={handleRadioChange} value={formData[currentQuestion.id] || []} className="space-y-2 p-3">
             {currentQuestion.options?.map((option) => (
               <div key={String(option)} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={option} className="border-white/20 text-white" />
+                <RadioGroupItem value={option} id={option} className="border-[#78C0E0]/40 text-white" />
                 <Label htmlFor={option} className="text-white">{option}</Label>
               </div>
             ))}
@@ -167,7 +182,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
                   value={option}
                   checked={currentValues.includes(option)}
                   onChange={() => handleCheckboxChange(option)}
-                  className="border-white/20 text-white"
+                  className="border-[#78C0E0]/40 text-white"
                 />
                 <Label htmlFor={option} className="text-white">{option}</Label>
               </div>
@@ -179,102 +194,123 @@ const FuturisticFirstLoginForm: React.FC = () => {
     }
   }
 
+  const resetForm = () => {
+    setFormData({});
+    setCurrentQuestionIndex(0);
+    setCurrentStep('complete')
+  }
+
   const showMessage = () => {
     setShowSuccessMessage(true)
     setTimeout(() => setShowSuccessMessage(false), 1500)
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-[#ceced8]">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-5"></div>
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30"
-          animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-        />
-      </div>
-      <Card className="w-full max-w-lg bg-black/30 backdrop-blur-xl shadow-2xl rounded-xl overflow-hidden border border-white/10">
-        <CardHeader className="text-center relative">
-          <div className="absolute top-0 left-0 w-full">
-            <Progress value={progress} className="w-full rounded-none h-1" />
-          </div>
+    <div className="fixed inset-0 flex items-center justify-center p-4">
+      
+
+      <AnimatePresence mode="wait">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            key={`${currentStep}-${currentQuestionIndex}`}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-8"
           >
-            <CardTitle className="text-3xl font-bold text-white mt-4">Welcome, {formData.name || 'Explorer'}!</CardTitle>
-            <CardDescription className="text-lg text-white/80">Let&apos;s embark on a journey of discovery</CardDescription>
-          </motion.div>
-        </CardHeader>
-        <form onSubmit={handleNext}>
-          <CardContent className="space-y-6 p-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuestion.id}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center space-x-3">
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-2"
-                  >
-                    <currentQuestion.icon className="w-6 h-6 text-white" />
-                  </motion.div>
-                  <Label htmlFor={currentQuestion.id} className="text-xl font-medium text-white">
-                    {currentQuestion.question}
-                  </Label>
+            {currentStep === 'welcome' && (
+                    <div className="text-center space-y-6">
+                      <Mascot />
+                      <h1 className="text-4xl font-bold text-foreground">Welcome to Goal Tracker!</h1>
+                      <p className="text-foreground text-lg">
+                        Let's embark on a journey to achieve your goals together.
+                      </p>
+                      <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
+              </div>
+            )}
+
+            {currentStep === 'explanation' && (
+              <div className="space-y-8">
+                <h2 className="text-3xl font-bold text-center text-foreground">How it works ?</h2>
+                <div className="space-y-6">
+                  <Card className="">
+                    <CardHeader>
+                      <CardTitle className="text-lg">1. Build Your Profile</CardTitle>
+                      <CardDescription className="">
+                        Answer a few questions to help us understand your personality and preferences.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">2. Set Your Goals</CardTitle>
+                      <CardDescription className="">
+                        Define clear, actionable goals with our guided process.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">3. Track Progress</CardTitle>
+                      <CardDescription className="">
+                        Monitor your progress and get personalized recommendations.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
                 </div>
-                <p className="text-sm italic text-white/80">
-                  {currentQuestion.guidance}
+                <div className="flex justify-center">
+                  <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Continue</Button>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'userProfile' && (
+              <OnboardingCard
+                progress={progress}
+                currentQuestionIndex={currentQuestionIndex}
+                questionsLength={questionsUser.length}
+                formData={formData}
+                currentQuestion={currentQuestion}
+                getInputComponent={getInputComponent}
+                handleBack={handleBack}
+                handleNext={handleNextQuestion}
+              />
+            )}
+
+            {currentStep === 'transition' && (
+              <div className="text-center space-y-6">
+                <Mascot />
+                <h2 className="text-3xl font-bold text-foreground">Great Job on Your Profile!</h2>
+                <p className="text-foreground text-lg">
+                  Now that we know you better, let's set your first goal and start your journey to success.
                 </p>
-                {getInputComponent()}
-              </motion.div>
-            </AnimatePresence>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="flex w-full space-x-4">
-              <Button 
-                type="button" 
-                onClick={handleBack} 
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white"
-                disabled={currentQuestionIndex === 0}
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <Button type="submit" className="flex-1 text-lg font-semibold group bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">
-                <span className="mr-2">{currentQuestionIndex < questionsUser.length - 1 ? 'Next' : 'Submit'}</span>
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                  className="inline-block"
-                >
-                  <ChevronsRight className="w-5 h-5 inline" />
-                </motion.div>
-              </Button>
-            </div>
-            <div className="text-sm text-white/60 flex justify-between w-full">
-              <span>Question {currentQuestionIndex + 1} of {questionsUser.length}</span>
-              <span>{Math.round(progress)}% completed</span>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+                <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Set Your First Goal</Button>
+              </div>
+            )}
+
+            {currentStep === 'goalSetting' && (
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold text-center text-foreground">Set Your First Goal</h2>
+                <div className="p-6 bg-[#150578]/70 backdrop-blur-md rounded-lg shadow-sm border border-foreground/10 space-y-4">
+                  <GoalDefinition user={user} resetForm={resetForm} />
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'complete' && (
+              <div className="text-center space-y-6">
+                <Mascot />
+                <h2 className="text-3xl font-bold">You're All Set!</h2>
+                <p className="text-foreground text-lg">
+                  Your profile is complete and your first goal is set. Let's start tracking your progress!
+                </p>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/')}>Go to Dashboard</Button>
+              </div>
+            )}
+        </motion.div>
+      </AnimatePresence>
       <AnimatePresence>
         {showSuccessMessage && (
           <motion.div
@@ -292,6 +328,21 @@ const FuturisticFirstLoginForm: React.FC = () => {
               <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
               <h2 className="text-xl font-bold text-gray-800 text-center">Submission successful</h2>
             </motion.div>
+          </motion.div>
+        )}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+          <div className="bg-[#150578]/70 backdrop-blur-sm p-8 rounded-lg shadow-xl">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              <p className="text-white text-lg">Validating your profile...</p>
+            </div>
+          </div>
           </motion.div>
         )}
       </AnimatePresence>

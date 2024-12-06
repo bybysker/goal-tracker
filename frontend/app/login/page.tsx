@@ -48,7 +48,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center  p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -59,10 +59,11 @@ const Auth: React.FC = () => {
           <Tabs
             value={authMode}
             onValueChange={(value: string) => setAuthMode(value as 'login' | 'signup')}
+            className="text-white"
           >
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login" className="data-[state=active]:bg-[#192BC2]/70 data-[state=active]:text-white">Login</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-green-600/50 data-[state=active]:text-white">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
               <form onSubmit={handleEmailAuth} className="space-y-4">
@@ -72,7 +73,7 @@ const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white border-gray-200 text-black"
+                  className=""
                 />
                 <Input
                   type="password"
@@ -80,9 +81,9 @@ const Auth: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white border-gray-200 text-black"
+                  className=""
                 />
-                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="w-full bg-[#192BC2]/100 hover:bg-[#78C0E0]/60">
                   Login
                 </Button>
               </form>
@@ -95,7 +96,7 @@ const Auth: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white border-gray-200 text-black"
+                  className=""
                 />
                 <Input
                   type="password"
@@ -103,9 +104,9 @@ const Auth: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white border-gray-200 text-black"
+                  className=""
                 />
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                <Button type="submit" className="w-full bg-green-600/80 hover:bg-green-700">
                   Sign Up
                 </Button>
               </form>
@@ -113,11 +114,11 @@ const Auth: React.FC = () => {
           </Tabs>
 
           <div className="mt-6 space-y-2">
-            <p className="text-center text-sm text-gray-600 mb-2">Or continue with</p>
+            <p className="text-center text-sm text-white/80 mb-2">Or continue with</p>
             <Button
               onClick={handleGoogleSignIn}
               variant="outline"
-              className="w-full flex items-center justify-center"
+              className="w-full flex items-center justify-center bg-white/30 hover:bg-white/20 text-white"
             >
               <FaGoogle className="mr-2" /> Google
             </Button>
