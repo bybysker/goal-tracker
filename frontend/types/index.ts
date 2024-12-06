@@ -61,5 +61,5 @@ export interface UserProfile {
   agreeableness: string
   neuroticism: string
   passions: string
-  lifeGoals: string
+  life_goals: string
 }

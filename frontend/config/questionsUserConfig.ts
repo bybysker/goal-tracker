@@ -85,7 +85,7 @@ export const questionsUser = [
     icon: Flame,
   },
   {
-    id: 'lifeGoals',
+    id: 'life_goals',
     question: "What long-term goals do you aspire to achieve?",
     type: 'textarea',
     icon: Award,

@@ -6,6 +6,8 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs } fr
 import { db } from '@/db/configFirebase';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { updateProfile as updateAuthProfile } from 'firebase/auth';
+import { useToast } from "@/hooks/use-toast";
 
 // Import components
 import DockNavigation from '@/components/nav-dock';
@@ -14,7 +16,6 @@ import Dashboard from '@/components/dashboard';
 import Goals from '@/components/goals';
 import CalendarComponent from '@/components/calendar-component';
 import Settings from '@/components/settings';
-import Profile from '@/components/profile';
 
 // Import types
 import { Goal, Task, Milestone } from '@/types';
@@ -24,6 +25,7 @@ import BackgroundAnimation from '@/components/common/bg-animation';
 const GoalTrackerApp: React.FC = () => {
   const { user, handleSignOut } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   // Application data
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -231,13 +233,66 @@ const GoalTrackerApp: React.FC = () => {
   };
 
   // Update Profile Function
-  const updateProfile = (profile: { name: string; email: string }) => {
+  const updateProfile = async (profile: { 
+    name: string; 
+    passions?: string;
+    life_goals?: string;
+  }) => {
     if (!user) return;
-    const userDocRef = doc(db, 'users', user.uid);
-    updateDoc(userDocRef, profile)
-      .then(() => console.log("Profile updated:", profile))
-      .catch(error => console.error("Error updating profile:", error));
-  }
+    
+    try {
+      // Update auth profile (for name and email)
+      if (profile.name !== user.displayName) {
+        await updateAuthProfile(user, {
+          displayName: profile.name,
+        });
+      }
+      
+      // Update Firestore document
+      const userDocRef = doc(db, 'users', user.uid);
+      const userProfileSnapshot = await getDocs(collection(db, 'users', user.uid, 'userProfile'));
+      const userProfileRef = userProfileSnapshot.docs[0].ref;
+      const userProfileData = userProfileSnapshot.docs[0].data();
+      
+      await updateDoc(userProfileRef, {
+        passions: profile.passions,
+        life_goals: profile.life_goals
+      });
+
+      // Call profile definition API using the actual Firestore data
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/profile_definition`, {
+          user_id: user.uid,
+          profile_data: {
+            ...userProfileData,  // Use all existing profile data from Firestore
+            name: user.displayName  // Use the updated display name from Auth
+          }
+        });
+      } catch (error) {
+        console.error("Error calling profile definition API:", error);
+        toast({
+          title: "Warning",
+          description: "Profile updated but failed to update AI analysis. Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+        duration: 3000,
+      });
+
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
 
   return (
@@ -286,15 +341,10 @@ const GoalTrackerApp: React.FC = () => {
                 deleteTask={deleteTask}
               />
             )}
-            {activeTab === 'profile' && (
-              <Profile
-                user={user}
-                updateProfile={updateProfile}
-              />
-            )}
             {activeTab === 'settings' && (
               <Settings
-                saveSettings={() => {/* function logic here */}}
+              user={user}
+              updateProfile={updateProfile}
               />
             )}
           </motion.div>

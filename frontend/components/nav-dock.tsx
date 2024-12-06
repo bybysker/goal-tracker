@@ -14,8 +14,7 @@ const DockNavigation: React.FC<DockNavigationProps> = ({ activeTab, setActiveTab
     //{ name: 'dashboard', icon: Home, label: 'Dashboard' },
     { name: 'goals', icon: Target, label: 'Goals' },
     //{ name: 'calendar', icon: Calendar, label: 'Calendar' },
-    { name: 'profile', icon: User, label: 'Profile' },
-    //{ name: 'settings', icon: Settings, label: 'Settings' },
+    { name: 'settings', icon: Settings, label: 'Settings' },
   ];
 
   return (

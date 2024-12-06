@@ -137,7 +137,7 @@ export default function Goals({
                 </Button>
               </div>
             </DrawerTrigger>
-          <DrawerContent className="backdrop-blur-md bg-[#150578]/70 text-white border-gray-700 mx-auto max-h-full max-w-screen-lg rounded-lg pb-12 z-[60]">
+            <DrawerContent className="backdrop-blur-md bg-[#150578]/70 text-white border-gray-700 mx-auto max-h-full max-w-screen-lg rounded-lg pb-12 z-[60]">
               <DrawerHeader>
                 <DrawerTitle className="text-xl font-bold text-center">ADD A NEW GOAL</DrawerTitle>
               </DrawerHeader>

@@ -21,6 +21,7 @@ import { OnboardingCard } from '@/components/onboarding/onboarding-card'
 import { Mascot } from '@/components/mascot'
 import GoalDefinition from '@/components/common/goal-definition'
 import { Goal } from '@/types'
+import axios from 'axios'
 
 const steps = [
   'welcome',
@@ -39,24 +40,11 @@ const FuturisticFirstLoginForm: React.FC = () => {
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [progress, setProgress] = useState(0)
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setProgress(((currentQuestionIndex + 1) / questionsUser.length) * 100)
   }, [currentQuestionIndex])
-
-  const addGoal = async (goal: Omit<Goal, 'guid' | 'progress'>): Promise<string> => {
-    if (!user) {
-      alert("User not authenticated.")
-      return ''
-    }
-    try {
-      const docRef = await addDoc(collection(db, 'users', user.uid, 'goals'), { ...goal, progress: 0 })
-      return docRef.id
-    } catch (error) {
-      console.error("Error adding goal:", error)
-      return ''
-    }
-  }
 
   const currentQuestion = questionsUser[currentQuestionIndex]
 
@@ -114,12 +102,22 @@ const FuturisticFirstLoginForm: React.FC = () => {
         await addDoc(collection(db, 'users', user.uid, "userProfile"), formData);
 
         const userDocRef = doc(db, 'users', user.uid);
+
         await updateDoc(userDocRef, { firstLogin: false });
 
-        showMessage();
-        setTimeout(() => {
-          router.push('/'); // Redirect to the main page after the animation
-        }, 1500);
+        setIsLoading(true)
+
+        try {
+          await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/profile_definition`, {
+            user_id: user.uid,
+            profile_data: formData
+          });
+        } catch (error) {
+          console.error("Error adding document: ", error);
+        }
+
+        setIsLoading(false)
+        setCurrentStep('transition')
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -199,6 +197,7 @@ const FuturisticFirstLoginForm: React.FC = () => {
   const resetForm = () => {
     setFormData({});
     setCurrentQuestionIndex(0);
+    setCurrentStep('complete')
   }
 
   const showMessage = () => {
@@ -283,8 +282,8 @@ const FuturisticFirstLoginForm: React.FC = () => {
             {currentStep === 'transition' && (
               <div className="text-center space-y-6">
                 <Mascot />
-                <h2 className="text-3xl font-bold text-blue-800">Great Job on Your Profile!</h2>
-                <p className="text-blue-600 text-lg">
+                <h2 className="text-3xl font-bold text-foreground">Great Job on Your Profile!</h2>
+                <p className="text-foreground text-lg">
                   Now that we know you better, let's set your first goal and start your journey to success.
                 </p>
                 <Button size="lg" onClick={handleNext} className="bg-blue-600 hover:bg-blue-700">Set Your First Goal</Button>
@@ -293,8 +292,8 @@ const FuturisticFirstLoginForm: React.FC = () => {
 
             {currentStep === 'goalSetting' && (
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-center text-blue-800">Set Your First Goal</h2>
-                <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-200 space-y-4">
+                <h2 className="text-3xl font-bold text-center text-foreground">Set Your First Goal</h2>
+                <div className="p-6 bg-[#150578]/70 backdrop-blur-md rounded-lg shadow-sm border border-foreground/10 space-y-4">
                   <GoalDefinition user={user} resetForm={resetForm} />
                 </div>
               </div>
@@ -303,11 +302,11 @@ const FuturisticFirstLoginForm: React.FC = () => {
             {currentStep === 'complete' && (
               <div className="text-center space-y-6">
                 <Mascot />
-                <h2 className="text-3xl font-bold text-blue-800">You're All Set!</h2>
-                <p className="text-blue-600 text-lg">
+                <h2 className="text-3xl font-bold">You're All Set!</h2>
+                <p className="text-foreground text-lg">
                   Your profile is complete and your first goal is set. Let's start tracking your progress!
                 </p>
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">Go to Dashboard</Button>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/')}>Go to Dashboard</Button>
               </div>
             )}
         </motion.div>
@@ -329,6 +328,21 @@ const FuturisticFirstLoginForm: React.FC = () => {
               <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
               <h2 className="text-xl font-bold text-gray-800 text-center">Submission successful</h2>
             </motion.div>
+          </motion.div>
+        )}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+          <div className="bg-[#150578]/70 backdrop-blur-sm p-8 rounded-lg shadow-xl">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              <p className="text-white text-lg">Validating your profile...</p>
+            </div>
+          </div>
           </motion.div>
         )}
       </AnimatePresence>
