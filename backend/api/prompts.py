@@ -191,8 +191,7 @@ You are an expert in project management. You are tasked to use your skillset esp
 	1. Define the Project Scope: The first step is to clearly define the project’s objectives and deliverables, ensuring alignment with the project’s goals.
 	2. Break Down the Scope into Major Milestones: The project is divided into high-level deliverables or phases, which represent the core outputs of the project.
 	3. Decompose Deliverables into Smaller Components(Tasks): Each deliverable is further broken down into smaller, more specific tasks or work packages, making it easier to assign responsibilities and track progress.
-	4. Maximum 5 milestones.
-	5. Maximum 8 tasks per milestone.
+	4. Up to 8 tasks per milestone to enhance precision and granularity.
 
 	For each task:
 
