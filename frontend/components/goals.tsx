@@ -109,7 +109,7 @@ export default function Goals({
     <div className="max-h-full max-w-screen-lg mx-auto space-y-6">
       <Card className="bg-[#150578]/70 backdrop-blur-sm text-foreground shadow-xl border-none">
         <CardHeader>
-          <CardTitle className="text-xl sm:text-2xl font-semibold">Goals</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-semibold">Goals 🎯</CardTitle>
         </CardHeader>
         <CardContent>
           <ScrollArea className="max-h-[70vh] sm:max-h-[80vh] overflow-y-auto w-full">
