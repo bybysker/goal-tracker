@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast"
@@ -146,11 +146,12 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
     <div >
       <Card className="bg-transparent text-foreground border-border">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Express your thoughts</CardTitle>
+          <CardTitle className="text-lg font-bold">Express your thoughts 🧠</CardTitle>
+          <CardDescription className="italic font-bold"> This will be used in the future to adapt to you based on your reflections.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-center pt-4">
+          <div className="space-y-2">
+            <div className="flex justify-center pt-1">
               <Button 
                 onClick={isRecording ? stopRecording : startRecording}
                 className={`w-full ${isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
@@ -166,7 +167,7 @@ const VoiceMemo: React.FC<VoiceMemoProps> = ({
             )}
             <Textarea 
               placeholder="Transcribe your voice memo here or type your daily reflection" 
-              className="w-full"
+              className=" bg-[#78C0E0]/10 border-none shadow-md text-white placeholder-white/50w-full"
               value={transcription}
               onChange={(e) => setTranscription(e.target.value)} // Update transcription in parent
             />

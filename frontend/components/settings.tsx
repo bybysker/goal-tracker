@@ -110,10 +110,10 @@ const Settings: React.FC<SettingsProps> = ({ user, updateProfile }) => {
         </CardTitle>
         <CardContent className="p-0">
           <div className="divide-y">
-            <LinkItem href="/support" icon={Mail} label="Contact Us" />
-            <LinkItem href="/privacy" icon={Shield} label="Privacy Policy" />
-            <LinkItem href="/terms" icon={FileText} label="Terms of Service" />
-            <LinkItem href="/premium" icon={Star} label="Rate Us" />
+            <LinkItem href="/contact-us" icon={Mail} label="Contact Us" />
+            <LinkItem href="/privacy-policy" icon={Shield} label="Privacy Policy" />
+            <LinkItem href="/terms-of-service" icon={FileText} label="Terms of Service" />
+            <LinkItem href="/rate-us" icon={Star} label="Rate Us" />
           </div>
         </CardContent>
       </Card>

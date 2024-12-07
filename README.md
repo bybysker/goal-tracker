@@ -1,37 +1,160 @@
-# GoalTrackerApp
+# Goal Tracker App 🎯
 
-**GoalTrackerApp** is a Next.js-based web application designed to help users manage their personal and professional goals. Featuring goal setting, task management, challenge tracking, calendar integration, voice memos, and AI-driven insights, it offers a seamless and interactive experience using React, TypeScript, Tailwind CSS, and Framer Motion.
+A modern, intuitive web application designed to help users track and achieve their personal and professional goals. Built with Next.js 14, React, and TypeScript, featuring a beautiful UI with Tailwind CSS.
 
-## Features
+## 🌟 Live Demo
 
-- **Dashboard**: Overview of goals, challenges, progress tracking, and AI insights.
-- **Goals & Challenges**: Create, edit, and delete goals and challenges with deadlines and categories.
-- **Tasks Management**: Add, edit, delete, and toggle task completion.
-- **Calendar Integration**: View and manage tasks on specific dates.
-- **Voice Memos**: Record and transcribe voice memos for daily reflections.
-- **AI Insights**: Receive AI-generated insights based on your activities.
-- **Settings**: Customize preferences including dark mode and API key management.
-- **User Profile**: View and update user profile information.
+[Visit Goal Tracker App](https://goal-tracker-bybyskers-projects.vercel.app) - You can create a dummy acc to try
 
-## Technologies Used
+## ✨ Features
 
-- [Next.js](https://nextjs.org/)
-- [React](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [Firebase](https://firebase.google.com/) (optional)
-- [OpenAI API](https://openai.com/api/)
+### Core Features
+- 📊 **Interactive Dashboard**
+  - Visual progress tracking
+  - Goal completion statistics
+
+- 🎯 **Goal Management**
+  - Create and track multiple goals
+  - Set deadlines and priorities
+  - Track progress with subtasks
 
 
-Configure Environment Variables
-Create a .env.local file in the root directory and add the necessary environment variables:
+- 📝 **Task Management**
+  - Create, edit, and delete tasks
+  - Mark tasks as complete
+  - Organize tasks by goals
 
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+- 👤 **User Profile**
+  - Customize personal information
+  - Track achievement history
+  - Set preferences
 
-OPENAI_API_KEY=your_openai_api_key
+### Additional Features
+- 📱 **Responsive Design**
+- 🔒 **Secure Authentication**
+- 💾 **Data Persistence**
+
+## 🛠️ Tech Stack
+
+- **Frontend:**
+  - Next.js 14 (App Router)
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - Shadcn UI Components
+  - Lucide Icons
+
+- **Backend:**
+  - Python FastAPI
+  - PostgreSQL
+  - SQLAlchemy
+
+- **Authentication:**
+  - NextAuth.js
+  - Google OAuth
+
+- **Deployment:**
+  - Frontend: Vercel
+  - Backend: Google Cloud Run
+  - Database: Google Cloud SQL
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- Python 3.9+
+- PostgreSQL
+- Git
+
+### Frontend Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/goal-tracker.git
+   cd goal-tracker
+   ```
+
+2. Install frontend dependencies:
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+3. Create a `.env.local` file in the frontend directory:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+### Backend Setup
+1. Set up Python virtual environment:
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. Install backend dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Create a `.env` file in the backend directory:
+   ```env
+   DATABASE_URL=postgresql://user:password@localhost:5432/goaltracker
+   SECRET_KEY=your_secret_key
+   ```
+
+4. Start the backend server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+## 📝 Project Structure
+
+```
+goal-tracker/
+├── frontend/
+│   ├── app/              # Next.js pages and layouts
+│   ├── components/       # React components
+│   ├── lib/             # Utility functions
+│   └── types/           # TypeScript types
+├── backend/
+│   ├── api/             # API routes
+│   ├── models/          # Database models
+│   └── services/        # Business logic
+└── docs/               # Documentation
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Authors
+
+- **Bybysker** - *Initial work* - [bybysker@gmail.com](mailto:bybysker@gmail.com)
+
+## 🙏 Acknowledgments
+
+- Thanks to all contributors who have helped shape this project
+- Special thanks to the open-source community for the amazing tools and libraries
+
+## 📞 Support
+
+If you have any questions or need help, please:
+- Open an issue
+- Contact us at [bybysker@gmail.com](mailto:bybysker@gmail.com)
