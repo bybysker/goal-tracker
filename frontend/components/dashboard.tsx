@@ -35,10 +35,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     return <p className="text-center">User data is not available.</p>;
   }
 
-  const todaysTasks = tasks.filter(task => 
-    new Date(task.date).toDateString() === new Date().toDateString()
-  );
-
   return (
     <div className="max-h-full max-w-screen-lg mx-auto space-y-6">
       <header className="flex justify-center items-center pb-1">

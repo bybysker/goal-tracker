@@ -24,8 +24,6 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
   userId, // Added userId to the component props
   updateTask
 }) => {
-  const [typedName, setTypedName] = useState('');
-  const [typedDescription, setTypedDescription] = useState('');
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -38,8 +36,8 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
         ...doc.data(),
       } as Milestone));
 
-      // Sort milestones by name in ascending order
-      milestonesData.sort((a, b) => a.name.localeCompare(b.name));
+      // Sort milestones by number instead of name
+      milestonesData.sort((a, b) => a.number - b.number);
 
       setMilestones(milestonesData);
   
@@ -51,13 +49,13 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
           ...doc.data(),
         } as Task));
         
-        // Sort tasks by name in ascending order
-        tasksData.sort((a, b) => a.name.localeCompare(b.name));
+        // Sort tasks by number instead of name
+        tasksData.sort((a, b) => a.number - b.number);
 
         return tasksData; // Return sorted tasks for this milestone
       }));
 
-      setTasks(allTasks.flat()); // Set the tasks state
+      setTasks(allTasks.flat());
       console.log('All fetched tasks for goal:', allTasks.flat()); // Debug log
     } catch (error) {
       console.error("Error fetching tasks for goal:", error);
@@ -79,11 +77,6 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setTypedName('');
-      setTypedDescription('');
-      typeText(goal.name, setTypedName, 2, () => {
-        typeText(goal.description, setTypedDescription, 10);
-      });
       fetchAllTasksForGoal();
     }
   }, [isOpen, goal, userId]); 
@@ -94,7 +87,7 @@ const GoalDrawer: React.FC<GoalDrawerProps> = ({
         <DrawerHeader className="pt-4 items-center">
           <DrawerTitle className="text-xl sm:text-2xl font-bold text-center">{goal.name}</DrawerTitle>
           <DrawerDescription className='text-gray-200 text-xs'>
-            {typedDescription}
+            {goal.description}
           </DrawerDescription>
         </DrawerHeader>
         <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 space-y-4">

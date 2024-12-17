@@ -8,13 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User as FirebaseUser } from 'firebase/auth';
 import { ChevronLeft, ChevronRight, Mail, Shield, FileText, Star, Trash2 } from 'lucide-react'
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { db } from '@/db/configFirebase';
+import { collection, getDocs, doc, updateDoc, deleteDoc, query } from 'firebase/firestore';
+import { db, storage } from '@/db/configFirebase';
 import { UserProfile } from '@/types';
 import { ProfileItem } from '@/components/profile-item';
 import { LinkItem } from '@/components/link-item';
-import { updateProfile as updateAuthProfile } from 'firebase/auth';
+import { updateProfile as updateAuthProfile, deleteUser } from 'firebase/auth';
 import { useToast } from "@/hooks/use-toast";
+import { ref, listAll, deleteObject } from 'firebase/storage';
+import { useRouter } from 'next/navigation';
+
 
 interface SettingsProps {
   user: FirebaseUser | null;
@@ -28,6 +31,8 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ user, updateProfile }) => {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [changes, setChanges] = useState<Record<string, string>>({})
+  const { toast } = useToast();
+  const router = useRouter();
 
   const handleEdit = (field: string, value: string) => {
     setChanges(prev => ({ ...prev, [field]: value }))
@@ -59,6 +64,64 @@ const Settings: React.FC<SettingsProps> = ({ user, updateProfile }) => {
   useEffect(() => {
     fetchProfileData();
   }, [user]);
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    try {
+      // 1. Delete all Firestore data
+      // Delete user profile
+      const userProfileSnapshot = await getDocs(collection(db, 'users', user.uid, 'userProfile'));
+      for (const doc of userProfileSnapshot.docs) {
+        await deleteDoc(doc.ref);
+      }
+
+      // Delete goals and their nested collections
+      const goalsSnapshot = await getDocs(collection(db, 'users', user.uid, 'goals'));
+      for (const goalDoc of goalsSnapshot.docs) {
+        // Delete milestones and their tasks
+        const milestonesSnapshot = await getDocs(collection(db, 'users', user.uid, 'goals', goalDoc.id, 'milestones'));
+        for (const milestoneDoc of milestonesSnapshot.docs) {
+          // Delete tasks
+          const tasksSnapshot = await getDocs(collection(db, 'users', user.uid, 'goals', goalDoc.id, 'milestones', milestoneDoc.id, 'tasks'));
+          for (const taskDoc of tasksSnapshot.docs) {
+            await deleteDoc(taskDoc.ref);
+          }
+          await deleteDoc(milestoneDoc.ref);
+        }
+        await deleteDoc(goalDoc.ref);
+      }
+
+      // Delete main user document
+      await deleteDoc(doc(db, 'users', user.uid));
+
+      // 2. Delete files from Storage
+      const storageRef = ref(storage, `users/${user.uid}`);
+      const filesList = await listAll(storageRef);
+      await Promise.all(filesList.items.map(item => deleteObject(item)));
+
+      // 3. Delete the user authentication record
+      await deleteUser(user);
+
+      // 4. Show success message and redirect
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been successfully deleted.",
+        duration: 3000,
+      });
+
+      // 5. Redirect to login page
+      router.push('/login');
+
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!user) {
     return (
@@ -136,7 +199,7 @@ const Settings: React.FC<SettingsProps> = ({ user, updateProfile }) => {
           </DialogHeader>
           <div className="flex justify-end gap-4">
             <Button variant="outline">Cancel</Button>
-            <Button variant="destructive">Delete Account</Button>
+            <Button variant="destructive" onClick={handleDeleteAccount}>Delete Account</Button>
           </div>
         </DialogContent>
       </Dialog>

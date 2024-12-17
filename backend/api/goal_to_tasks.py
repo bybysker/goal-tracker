@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from api.prompts import (
@@ -15,6 +16,7 @@ class PreGoal(BaseModel):
 
 class Task(BaseModel):
     name: str
+    number: int
     description: Optional[str] = Field(None, description="Detailed description of the task")
     duration_hours: int = Field(..., description="Duration of the task in hours")
     simplicity: int = Field(..., description="Simplicity score (1-5)")
@@ -27,6 +29,7 @@ class Task(BaseModel):
 class Milestone(BaseModel):
     muid: str
     name: str
+    number: int
     description: Optional[str] = Field(None, description="Detailed description of the milestone")
     tasks: List[Task] = Field(..., description="List of tasks associated with this milestone")
     deadline: Optional[str] = Field(None, description="Deadline for the milestone in ISO format")
@@ -103,7 +106,7 @@ class GoalToTasks:
             model='gpt-4o-2024-08-06',
             messages=[
                 {"role": "system", "content": GOAL_TO_TASK_SYS_MSG},
-                {"role": "user", "content": GOAL_TO_TASK_USR_MSG.replace("$SMART_GOAL", validated_smart_goal)}
+                {"role": "user", "content": GOAL_TO_TASK_USR_MSG.replace("$SMART_GOAL", validated_smart_goal).replace("$CURRENT_DATE", str(datetime.now().isoformat()))}
                        ],
             response_format=Goal,
             seed=42

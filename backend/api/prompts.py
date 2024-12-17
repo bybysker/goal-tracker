@@ -421,7 +421,9 @@ You are an expert in project management. You are tasked to use your skillset esp
 """
 
 GOAL_TO_TASK_USR_MSG = """
+Current date: $CURRENT_DATE
 Goal: $SMART_GOAL
+
 
 Let's think step by step
 """

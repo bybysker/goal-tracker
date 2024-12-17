@@ -25,6 +25,7 @@ export interface GoalConfig {
 export interface Milestone {
   muid: string;
   name: string;
+  number: number;
   description: string;
   duration: string; // duration is in weeks  
   completed: boolean;
@@ -38,6 +39,7 @@ export interface Task {
   date: string;
   guid: string;
   muid: string;
+  number: number;
 }
 export interface Memo {
   id: string;
